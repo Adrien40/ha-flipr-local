@@ -30,7 +30,6 @@ CONF_CYA = "cya"
 
 # Intervalle
 CONF_SCAN_INTERVAL = "scan_interval"
-CONF_ACTIVE_INTERVAL = "active_interval"
 
 CONF_CHLORE_MODEL = "chlore_model"
 

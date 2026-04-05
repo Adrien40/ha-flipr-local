@@ -9,7 +9,11 @@ from bleak_retry_connector import establish_connection
 from homeassistant.helpers.update_coordinator import DataUpdateCoordinator, UpdateFailed
 from homeassistant.components.bluetooth import async_ble_device_from_address, async_last_service_info
 from .chemistry import compute_isl, compute_active_chlorine, get_mv_from_input, compute_ph_equilibrium
-from .const import *
+from .const import (
+    DOMAIN, CONF_MAC_ADDRESS, CONF_PH_CALIB_4, CONF_PH_CALIB_7,
+    CONF_PH_REF_7, CONF_PH_REF_4, CONF_CYA, CONF_CHLORE_MODEL,
+    FLIPR_CHARACTERISTIC_UUID
+)
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -22,12 +26,11 @@ async def async_setup_entry(hass, entry):
     hass.data.setdefault(DOMAIN, {})
     mac = entry.data[CONF_MAC_ADDRESS]
     
-    use_gateway = entry.options.get(CONF_USE_GATEWAY, entry.data.get(CONF_USE_GATEWAY, True))
-    
     if mac not in hass.data[DOMAIN]:
         hass.data[DOMAIN][mac] = {}
         
-    last_data = {}
+    # FIX ANTI-INCONNU : On récupère la mémoire de l'instant précédent
+    last_data = hass.data[DOMAIN][mac].get("last_data", {})
 
     entry.async_on_unload(entry.add_update_listener(update_listener))
 
@@ -97,15 +100,22 @@ async def async_setup_entry(hass, entry):
             "battery": int.from_bytes(data[11:13], 'little'), "rssi": rssi_val,
             "last_received": dt_util.utcnow(), "raw_frame": hex_frame
         }
+        
+        # FIX ANTI-INCONNU : On met en cache la dernière lecture
+        hass.data[DOMAIN][mac]["last_data"] = last_data
+        
         return last_data
 
-    interval = None if use_gateway else timedelta(minutes=75)
     coordinator = DataUpdateCoordinator(
         hass, _LOGGER, 
         name=f"Flipr {mac}", 
         update_method=async_update_data, 
-        update_interval=interval
+        update_interval=None
     )
+    
+    # FIX ANTI-INCONNU : On injecte les anciennes données avant même de charger les entités
+    if last_data:
+        coordinator.data = last_data
     
     hass.data[DOMAIN][entry.entry_id] = coordinator
     
@@ -118,7 +128,6 @@ async def async_unload_entry(hass, entry):
     ok = await hass.config_entries.async_unload_platforms(entry, PLATFORMS)
     if ok:
         hass.data[DOMAIN].pop(entry.entry_id, None)
-        mac = entry.data.get(CONF_MAC_ADDRESS)
-        if mac and mac in hass.data[DOMAIN]:
-            hass.data[DOMAIN].pop(mac, None)
+        # FIX ANTI-INCONNU : On a supprimé la ligne qui effaçait brutalement hass.data[DOMAIN][mac]
+        # Cela permet à la mémoire (TAC, TH, last_data) de survivre pendant le reload !
     return ok

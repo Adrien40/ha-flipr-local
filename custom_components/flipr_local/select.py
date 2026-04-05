@@ -5,7 +5,8 @@ from homeassistant.components.select import SelectEntity
 from homeassistant.const import EntityCategory
 from homeassistant.helpers.device_registry import DeviceInfo
 from homeassistant.helpers.update_coordinator import CoordinatorEntity
-from .const import DOMAIN, CONF_MAC_ADDRESS, CONF_CHLORE_MODEL, get_flipr_model
+from .const import DOMAIN, CONF_MAC_ADDRESS, CONF_CHLORE_MODEL, CONF_CYA, get_flipr_model
+from .chemistry import compute_active_chlorine
 
 async def async_setup_entry(hass, entry, async_add_entities):
     coordinator = hass.data[DOMAIN][entry.entry_id]
@@ -37,7 +38,22 @@ class FliprModelSelect(CoordinatorEntity, SelectEntity):
         return self.entry.options.get(CONF_CHLORE_MODEL, self.entry.data.get(CONF_CHLORE_MODEL, "stabilized"))
 
     async def async_select_option(self, option: str) -> None:
+        # 1. On recalcule la donnée tout de suite en local pour éviter le vide
+        if self.coordinator.data:
+            new_data = dict(self.coordinator.data)
+            mac_data = self.coordinator.hass.data[DOMAIN].get(self._mac, {})
+            cya = mac_data.get(CONF_CYA, 40)
+            temp = new_data.get("temperature")
+            ph = new_data.get("ph")
+            orp = new_data.get("orp")
+            
+            if temp is not None and ph is not None:
+                new_data["chlore_actif_hocl"] = compute_active_chlorine(orp, ph, temp, cya, option)
+                self.coordinator.async_set_updated_data(new_data)
+                # On met à jour la mémoire pour le redémarrage
+                self.coordinator.hass.data[DOMAIN][self._mac]["last_data"] = new_data
+
+        # 2. Sauvegarde officielle (provoque un redémarrage invisible en fond)
         new_options = dict(self.entry.options)
         new_options[CONF_CHLORE_MODEL] = option
         self.coordinator.hass.config_entries.async_update_entry(self.entry, options=new_options)
-        await self.coordinator.async_request_refresh()

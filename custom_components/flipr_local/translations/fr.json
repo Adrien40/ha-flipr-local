@@ -79,8 +79,7 @@
       "recup_derniere": { "name": "Récupérer dernière mesure" }
     },
     "number": {
-      "scan_interval": { "name": "Intervalle de rafraîchissement (Écoute passive)" },
-      "active_interval": { "name": "Intervalle de rafraîchissement (Interrogation active)" },
+      "scan_interval": { "name": "Intervalle de mise à jour" },
       "tac": { "name": "TAC (Alcalinité)" },
       "th": { "name": "TH (Dureté)" },
       "tds": { "name": "TDS (Solides dissous)" },
