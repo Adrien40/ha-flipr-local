@@ -82,9 +82,12 @@ class FliprConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
     @staticmethod
     @callback
     def async_get_options_flow(config_entry):
-        return FliprOptionsFlowHandler()
+        return FliprOptionsFlowHandler(config_entry)
 
 class FliprOptionsFlowHandler(config_entries.OptionsFlow):
+    def __init__(self, config_entry):
+        self.config_entry = config_entry
+
     async def async_step_init(self, user_input=None):
         if user_input is not None:
             return self.async_create_entry(title="", data=user_input)
@@ -92,18 +95,30 @@ class FliprOptionsFlowHandler(config_entries.OptionsFlow):
         opt = self.config_entry.options
         dat = self.config_entry.data
         
+        # Extraction propre des valeurs pour éviter tout crash silencieux
+        use_gw = opt.get(CONF_USE_GATEWAY, dat.get(CONF_USE_GATEWAY, False))
+        c7 = float(opt.get(CONF_PH_CALIB_7, dat.get(CONF_PH_CALIB_7, 8.40)))
+        r7 = float(opt.get(CONF_PH_REF_7, 7.02))
+        c4 = float(opt.get(CONF_PH_CALIB_4, dat.get(CONF_PH_CALIB_4, 6.02)))
+        r4 = float(opt.get(CONF_PH_REF_4, 4.00))
+        p_min = float(opt.get(CONF_PH_MIN, 6.90))
+        p_max = float(opt.get(CONF_PH_MAX, 7.50))
+        o_min = int(opt.get(CONF_ORP_MIN, 650))
+        t_min = float(opt.get(CONF_TEMP_MIN, 6.0))
+        t_max = float(opt.get(CONF_TEMP_MAX, 32.0))
+
         return self.async_show_form(
             step_id="init",
             data_schema=vol.Schema({
-                vol.Required(CONF_USE_GATEWAY, default=opt.get(CONF_USE_GATEWAY, dat.get(CONF_USE_GATEWAY, False))): bool,
-                vol.Required(CONF_PH_CALIB_7, default=float(opt.get(CONF_PH_CALIB_7, dat.get(CONF_PH_CALIB_7, 8.40)))): selector.NumberSelector(selector.NumberSelectorConfig(step=0.01, mode=selector.NumberSelectorMode.BOX)),
-                vol.Required(CONF_PH_REF_7, default=float(opt.get(CONF_PH_REF_7, 7.02))): selector.NumberSelector(selector.NumberSelectorConfig(step=0.01, mode=selector.NumberSelectorMode.BOX)),
-                vol.Required(CONF_PH_CALIB_4, default=float(opt.get(CONF_PH_CALIB_4, dat.get(CONF_PH_CALIB_4, 6.02)))): selector.NumberSelector(selector.NumberSelectorConfig(step=0.01, mode=selector.NumberSelectorMode.BOX)),
-                vol.Required(CONF_PH_REF_4, default=float(opt.get(CONF_PH_REF_4, 4.00))): selector.NumberSelector(selector.NumberSelectorConfig(step=0.01, mode=selector.NumberSelectorMode.BOX)),
-                vol.Required(CONF_PH_MIN, default=float(opt.get(CONF_PH_MIN, 6.90))): selector.NumberSelector(selector.NumberSelectorConfig(step=0.01, mode=selector.NumberSelectorMode.BOX)),
-                vol.Required(CONF_PH_MAX, default=float(opt.get(CONF_PH_MAX, 7.50))): selector.NumberSelector(selector.NumberSelectorConfig(step=0.01, mode=selector.NumberSelectorMode.BOX)),
-                vol.Required(CONF_ORP_MIN, default=int(opt.get(CONF_ORP_MIN, 650))): selector.NumberSelector(selector.NumberSelectorConfig(step=1, mode=selector.NumberSelectorMode.BOX)),
-                vol.Required(CONF_TEMP_MIN, default=float(opt.get(CONF_TEMP_MIN, 6.0))): selector.NumberSelector(selector.NumberSelectorConfig(step=0.5, mode=selector.NumberSelectorMode.BOX)),
-                vol.Required(CONF_TEMP_MAX, default=float(opt.get(CONF_TEMP_MAX, 32.0))): selector.NumberSelector(selector.NumberSelectorConfig(step=0.5, mode=selector.NumberSelectorMode.BOX)),
+                vol.Required(CONF_USE_GATEWAY, default=use_gw): bool,
+                vol.Required(CONF_PH_CALIB_7, default=c7): selector.NumberSelector(selector.NumberSelectorConfig(step=0.01, mode=selector.NumberSelectorMode.BOX)),
+                vol.Required(CONF_PH_REF_7, default=r7): selector.NumberSelector(selector.NumberSelectorConfig(step=0.01, mode=selector.NumberSelectorMode.BOX)),
+                vol.Required(CONF_PH_CALIB_4, default=c4): selector.NumberSelector(selector.NumberSelectorConfig(step=0.01, mode=selector.NumberSelectorMode.BOX)),
+                vol.Required(CONF_PH_REF_4, default=r4): selector.NumberSelector(selector.NumberSelectorConfig(step=0.01, mode=selector.NumberSelectorMode.BOX)),
+                vol.Required(CONF_PH_MIN, default=p_min): selector.NumberSelector(selector.NumberSelectorConfig(step=0.01, mode=selector.NumberSelectorMode.BOX)),
+                vol.Required(CONF_PH_MAX, default=p_max): selector.NumberSelector(selector.NumberSelectorConfig(step=0.01, mode=selector.NumberSelectorMode.BOX)),
+                vol.Required(CONF_ORP_MIN, default=o_min): selector.NumberSelector(selector.NumberSelectorConfig(step=1, mode=selector.NumberSelectorMode.BOX)),
+                vol.Required(CONF_TEMP_MIN, default=t_min): selector.NumberSelector(selector.NumberSelectorConfig(step=0.5, mode=selector.NumberSelectorMode.BOX)),
+                vol.Required(CONF_TEMP_MAX, default=t_max): selector.NumberSelector(selector.NumberSelectorConfig(step=0.5, mode=selector.NumberSelectorMode.BOX)),
             })
         )

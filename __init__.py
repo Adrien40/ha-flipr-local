@@ -24,7 +24,7 @@ async def update_listener(hass, entry):
     use_gateway = entry.options.get(CONF_USE_GATEWAY, entry.data.get(CONF_USE_GATEWAY, False))
     if use_gateway:
         coordinator.update_interval = None
-        _LOGGER.info("Mode passerelle : Intervalle local désactivé pour préserver la batterie.")
+        _LOGGER.info("Mode passerelle : Intervalle local désactivé.")
     else:
         coordinator.update_interval = timedelta(minutes=75)
 
@@ -47,14 +47,15 @@ async def async_setup_entry(hass, entry):
         nonlocal last_data
         
         try:
-            async with asyncio.timeout(20):
+            async with asyncio.timeout(15):
                 device = async_ble_device_from_address(hass, mac, connectable=True)
                 
                 if not device:
                     if last_data: return last_data
                     raise UpdateFailed("Flipr hors de portée Bluetooth")
 
-                client = await establish_connection(BleakClient, device, mac)
+                # CORRECTIF : max_attempts=2 force l'abandon rapide au lieu de boucler pendant 60 secondes.
+                client = await establish_connection(BleakClient, device, mac, max_attempts=2)
                 data = await client.read_gatt_char(FLIPR_CHARACTERISTIC_UUID)
                 await client.disconnect()
                 
@@ -106,10 +107,14 @@ async def async_setup_entry(hass, entry):
         update_interval=interval
     )
     
-    hass.async_create_task(coordinator.async_refresh())
-    
     hass.data[DOMAIN][entry.entry_id] = coordinator
+    
+    # CORRECTIF : On lance la configuration des entités en priorité absolue pour libérer l'UI
     await hass.config_entries.async_forward_entry_setups(entry, PLATFORMS)
+    
+    # Lancement du Bluetooth en tâche de fond invisible pour l'utilisateur
+    entry.async_create_background_task(hass, coordinator.async_request_refresh(), "Flipr_Init_Refresh")
+    
     return True
 
 async def async_unload_entry(hass, entry):
