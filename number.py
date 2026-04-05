@@ -6,7 +6,7 @@ from datetime import timedelta
 from homeassistant.components.number import RestoreNumber
 from homeassistant.const import EntityCategory
 from homeassistant.helpers.device_registry import DeviceInfo
-from .const import DOMAIN, CONF_MAC_ADDRESS, CONF_CYA, CONF_USE_GATEWAY, CONF_SCAN_INTERVAL, get_flipr_model
+from .const import DOMAIN, CONF_MAC_ADDRESS, CONF_CYA, CONF_USE_GATEWAY, CONF_SCAN_INTERVAL, CONF_ACTIVE_INTERVAL, get_flipr_model
 from .chemistry import compute_isl, compute_active_chlorine, compute_ph_equilibrium
 
 _LOGGER = logging.getLogger(__name__)
@@ -25,6 +25,7 @@ async def async_setup_entry(hass, entry, async_add_entities):
 
     async_add_entities([
         FliprIntervalNumber(coordinator, mac, use_gateway, model_name),
+        FliprActiveIntervalNumber(coordinator, mac, use_gateway, model_name),
         FliprWaterConfigNumber(coordinator, mac, "TAC : Alcalinité", "tac", 0, 500, 1, 100, "mdi:water-percent", entry_id, model_name),
         FliprWaterConfigNumber(coordinator, mac, "TDS : Solides Dissous", "tds", 0, 5000, 10, 500, "mdi:blur", entry_id, model_name),
         FliprWaterConfigNumber(coordinator, mac, "TH : Dureté Calcique", "th", 0, 800, 1, 200, "mdi:water-outline", entry_id, model_name),
@@ -36,6 +37,7 @@ class FliprIntervalNumber(RestoreNumber):
     def __init__(self, coordinator, mac, use_gateway, model_name):
         self.coordinator = coordinator
         self._mac = mac
+        self._use_gateway = use_gateway
         self._attr_name = "Intervalle de lecture passive"
         self._attr_unique_id = f"{mac}_{CONF_SCAN_INTERVAL}"
         self._attr_native_min_value = 15
@@ -47,21 +49,54 @@ class FliprIntervalNumber(RestoreNumber):
         self._attr_mode = "box"
         self._attr_device_info = DeviceInfo(identifiers={(DOMAIN, mac)}, name=model_name, manufacturer="Flipr", model=model_name)
 
+    @property
+    def available(self) -> bool:
+        return not self._use_gateway
+
     async def async_added_to_hass(self):
         await super().async_added_to_hass()
         last = await self.async_get_last_number_data()
         val = int(float(last.native_value)) if last and last.native_value is not None else 75
         self._attr_native_value = val
-        # On sauvegarde la valeur pour que le switch puisse la lire au démarrage
-        self.coordinator.hass.data[DOMAIN][self._mac]["scan_interval"] = val
 
     async def async_set_native_value(self, value):
         val = int(float(value))
         self._attr_native_value = val
-        self.coordinator.hass.data[DOMAIN][self._mac]["scan_interval"] = val
-        
-        # Si update_interval n'est pas None, c'est que le switch est ON, on applique la nouvelle durée
-        if self.coordinator.update_interval is not None:
+        self.async_write_ha_state()
+
+class FliprActiveIntervalNumber(RestoreNumber):
+    _attr_has_entity_name = True
+    def __init__(self, coordinator, mac, use_gateway, model_name):
+        self.coordinator = coordinator
+        self._mac = mac
+        self._use_gateway = use_gateway
+        self._attr_name = "Intervalle d'interrogation active"
+        self._attr_unique_id = f"{mac}_{CONF_ACTIVE_INTERVAL}"
+        self._attr_native_min_value = 15
+        self._attr_native_max_value = 1440
+        self._attr_native_step = 1
+        self._attr_native_unit_of_measurement = "min"
+        self._attr_entity_category = EntityCategory.CONFIG
+        self._attr_icon = "mdi:bluetooth-connect"
+        self._attr_mode = "box"
+        self._attr_device_info = DeviceInfo(identifiers={(DOMAIN, mac)}, name=model_name, manufacturer="Flipr", model=model_name)
+
+    @property
+    def available(self) -> bool:
+        return not self._use_gateway
+
+    async def async_added_to_hass(self):
+        await super().async_added_to_hass()
+        last = await self.async_get_last_number_data()
+        val = int(float(last.native_value)) if last and last.native_value is not None else 75
+        self._attr_native_value = val
+        if not self._use_gateway:
+            self.coordinator.update_interval = timedelta(minutes=val)
+
+    async def async_set_native_value(self, value):
+        val = int(float(value))
+        self._attr_native_value = val
+        if not self._use_gateway:
             self.coordinator.update_interval = timedelta(minutes=val)
             
         self.async_write_ha_state()

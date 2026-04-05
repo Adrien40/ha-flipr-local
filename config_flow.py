@@ -11,7 +11,7 @@ from homeassistant.helpers import selector
 from .const import (
     DOMAIN, CONF_MAC_ADDRESS, CONF_PH_CALIB_4, CONF_PH_CALIB_7,
     CONF_PH_MIN, CONF_PH_MAX, CONF_ORP_MIN, CONF_TEMP_MIN, CONF_TEMP_MAX,
-    CONF_PH_REF_7, CONF_PH_REF_4, get_flipr_model
+    CONF_PH_REF_7, CONF_PH_REF_4, CONF_USE_GATEWAY, get_flipr_model
 )
 
 MANUAL_ENTRY = "manual"
@@ -25,7 +25,6 @@ class FliprConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
         self._discovered_name = "Flipr"
 
     def _get_display_name(self, bt_name, model):
-        """Génère un nom d'affichage combinant le modèle et le nom Bluetooth."""
         if bt_name and bt_name != "Flipr" and not bt_name.startswith("Flipr Analys"):
             return f"{model} ({bt_name})"
         return model
@@ -57,7 +56,6 @@ class FliprConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
             
             user_input[CONF_MAC_ADDRESS] = final_mac
 
-            # Recherche du nom BT si on vient d'une sélection manuelle
             if not self._bt_name:
                 for info in async_discovered_service_info(self.hass, False):
                     if info.address == final_mac and info.name:
@@ -67,17 +65,19 @@ class FliprConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
             model = get_flipr_model(self._bt_name)
             user_input["model"] = model
             
-            # Titre final de l'intégration dans Home Assistant
             title = self._get_display_name(self._bt_name, model)
             
             return self.async_create_entry(title=title, data=user_input)
 
         discovered_devices = {MANUAL_ENTRY: "Entrer une adresse MAC manuellement"}
+        
         for info in async_discovered_service_info(self.hass, False):
-            if info.name and (info.name.startswith("Flipr") or info.name.startswith("F3") or info.name.startswith("F2") or info.name.startswith("F1") or info.name.startswith("F9")):
-                list_model = get_flipr_model(info.name)
-                display = self._get_display_name(info.name, list_model)
-                discovered_devices[info.address] = f"{display} ({info.address})"
+            if info.name:
+                name_up = info.name.upper()
+                if name_up.startswith(("FLIPR", "F1", "F2", "F3", "F4", "F9")):
+                    list_model = get_flipr_model(info.name)
+                    display = self._get_display_name(info.name, list_model)
+                    discovered_devices[info.address] = f"{display} ({info.address})"
 
         schema = {}
         if not self._mac_address:
@@ -86,6 +86,7 @@ class FliprConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
             else:
                 schema[vol.Required(CONF_MAC_ADDRESS)] = str
 
+        schema[vol.Optional(CONF_USE_GATEWAY, default=False)] = bool
         schema.update({
             vol.Required(CONF_PH_CALIB_7, default=8.40): selector.NumberSelector(
                 selector.NumberSelectorConfig(step=0.01, mode=selector.NumberSelectorMode.BOX)

@@ -30,6 +30,7 @@ CONF_CYA = "cya"
 
 # Intervalle
 CONF_SCAN_INTERVAL = "scan_interval"
+CONF_ACTIVE_INTERVAL = "active_interval"
 
 # UUIDs Bluetooth
 FLIPR_CHARACTERISTIC_UUID = "00000006-0000-1000-8000-00805f9b34fb"
@@ -44,4 +45,6 @@ def get_flipr_model(name: str | None) -> str:
         return "Flipr AnalysR 3"
     if name_upper.startswith("F2") or ("ANALYS" in name_upper and "2" in name_upper):
         return "Flipr AnalysR 2"
+    if name_upper.startswith("FLIPR 01"):
+        return "Flipr Start"
     return "Flipr"

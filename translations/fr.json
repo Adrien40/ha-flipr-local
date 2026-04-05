@@ -7,7 +7,7 @@
         "description": "Si l'adresse MAC n'est pas détectée automatiquement, utilisez une application type 'nRF Connect'. \n\nValeurs de calibration : Laissez par défaut si inconnues, modifiables via la roue crantée.",
         "data": {
           "mac_address": "Appareil détecté",
-          "use_gateway": "Passerelle Flipr active",
+          "use_gateway": "Je possède la Passerelle Wi-Fi Flipr (Désactive les interrogations Bluetooth actives pour préserver la batterie)",
           "ph_calib_7": "Valeur pH 7 (ex: 1600 mV ou 8.40)",
           "ph_calib_4": "Valeur pH 4 (ex: 1900 mV ou 6.02)"
         }
@@ -35,7 +35,7 @@
         "title": "Options Flipr",
         "description": "Ajustez la calibration et vos seuils d'alerte personnels.",
         "data": {
-          "use_gateway": "Passerelle Flipr active (désactive le rafraîchissement local)",
+          "use_gateway": "Je possède la Passerelle Wi-Fi Flipr (Désactive les interrogations Bluetooth actives pour préserver la batterie)",
           "ph_calib_7": "Valeur pH 7 (ex: 1600 mV ou 8.40)",
           "ph_ref_7": "Cible de la solution pH 7 (ex: 7.02)",
           "ph_calib_4": "Valeur pH 4 (ex: 1900 mV ou 6.02)",
@@ -69,7 +69,8 @@
       "recup_derniere": { "name": "Récupérer dernière mesure" }
     },
     "number": {
-      "scan_interval": { "name": "Intervalle de rafraîchissement (min)" },
+      "scan_interval": { "name": "Intervalle de rafraîchissement (Écoute passive)" },
+      "active_interval": { "name": "Intervalle de rafraîchissement (Interrogation active)" },
       "tac": { "name": "TAC (Alcalinité)" },
       "th": { "name": "TH (Dureté)" },
       "tds": { "name": "TDS (Solides dissous)" },
