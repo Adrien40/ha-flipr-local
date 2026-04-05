@@ -6,6 +6,17 @@ import logging
 
 _LOGGER = logging.getLogger(__name__)
 
+def get_mv_from_input(val):
+    """Convertit une entrée utilisateur (mV ou pH usine) en mV bruts."""
+    try:
+        val_f = float(val)
+        # Si la valeur est basse (ex: 8.40), c'est un pH usine à convertir en mV
+        if val_f < 20.0: 
+            return round((val_f - 22.2083) / -0.0084494)
+        return val_f
+    except (ValueError, TypeError): 
+        return 1600.0
+
 def compute_isl(temp, ph, tac, th, tds):
     """Calcule l'Indice de Langelier (ISL). Renvoie None si données invalides."""
     if not all(v is not None and v > 0 for v in [temp, tac, th, tds]) or ph is None:
@@ -47,7 +58,6 @@ def compute_active_chlorine(orp, ph, temp, cya=40, model="stabilized"):
             base_resultat = math.exp(-7.5 + (0.18 * ph) + (0.009 * orp) + (0.02 * temp))
 
         # 3. APPLICATION DU FACTEUR D'ÉVOLUTION DU STABILISANT (CyA)
-        # On compare le taux actuel au taux de référence (40 mg/L)
         _cya = max(5.0, min(float(cya), 150.0))
         ratio_evolution = 40.0 / _cya
         

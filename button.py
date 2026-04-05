@@ -1,7 +1,7 @@
 # Copyright (c) 2026 Adrien40
 # This file is part of Flipr Local.
 
-"""Boutons pour Flipr AnalysR 3."""
+"""Boutons pour Flipr"""
 import logging, asyncio
 from bleak import BleakClient
 from bleak_retry_connector import establish_connection

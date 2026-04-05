@@ -1,11 +1,11 @@
 # Copyright (c) 2026 Adrien40
 # This file is part of Flipr Local.
 
-"""Alertes pour Flipr AnalysR 3."""
+"""Alertes pour Flipr"""
 from homeassistant.components.binary_sensor import BinarySensorEntity, BinarySensorDeviceClass
 from homeassistant.helpers.device_registry import DeviceInfo
 from homeassistant.helpers.update_coordinator import CoordinatorEntity
-from .const import DOMAIN, CONF_MAC_ADDRESS, CONF_PH_MIN, CONF_PH_MAX, CONF_ORP_MIN, CONF_TEMP_MAX
+from .const import DOMAIN, CONF_MAC_ADDRESS, CONF_PH_MIN, CONF_PH_MAX, CONF_ORP_MIN, CONF_TEMP_MIN, CONF_TEMP_MAX
 
 async def async_setup_entry(hass, entry, async_add_entities):
     coordinator = hass.data[DOMAIN][entry.entry_id]
@@ -46,7 +46,7 @@ class FliprStatus(CoordinatorEntity, BinarySensorEntity):
             return val < self.entry.options.get(CONF_ORP_MIN, 650)
             
         if self._key == "temperature": 
-            return val > self.entry.options.get(CONF_TEMP_MAX, 32.0)
+            return val < self.entry.options.get(CONF_TEMP_MIN, 6.0) or val > self.entry.options.get(CONF_TEMP_MAX, 32.0)
             
         # Sécurité finale si la clé n'est pas reconnue
         return False

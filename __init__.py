@@ -1,7 +1,7 @@
 # Copyright (c) 2026 Adrien40
 # This file is part of Flipr Local.
 
-"""Initialisation Flipr AnalysR 3."""
+"""Initialisation Flipr"""
 import logging, asyncio
 from datetime import timedelta
 import homeassistant.util.dt as dt_util
@@ -16,7 +16,6 @@ _LOGGER = logging.getLogger(__name__)
 PLATFORMS = ["sensor", "binary_sensor", "button", "number", "select"]
 
 async def update_listener(hass, entry):
-    """Mise à jour dynamique lors du changement d'options."""
     coordinator = hass.data[DOMAIN].get(entry.entry_id)
     if not coordinator:
         return
@@ -24,14 +23,12 @@ async def update_listener(hass, entry):
     use_gateway = entry.options.get(CONF_USE_GATEWAY, entry.data.get(CONF_USE_GATEWAY, False))
     if use_gateway:
         coordinator.update_interval = None
-        _LOGGER.info("Mode passerelle : Intervalle local désactivé.")
     else:
         coordinator.update_interval = timedelta(minutes=75)
 
     await coordinator.async_refresh()
 
 async def async_setup_entry(hass, entry):
-    """Configuration de l'entrée Flipr Local."""
     hass.data.setdefault(DOMAIN, {})
     mac = entry.data[CONF_MAC_ADDRESS]
     use_gateway = entry.options.get(CONF_USE_GATEWAY, entry.data.get(CONF_USE_GATEWAY, False))
@@ -47,15 +44,14 @@ async def async_setup_entry(hass, entry):
         nonlocal last_data
         
         try:
-            async with asyncio.timeout(15):
+            async with asyncio.timeout(60):
                 device = async_ble_device_from_address(hass, mac, connectable=True)
                 
                 if not device:
                     if last_data: return last_data
                     raise UpdateFailed("Flipr hors de portée Bluetooth")
 
-                # CORRECTIF : max_attempts=2 force l'abandon rapide au lieu de boucler pendant 60 secondes.
-                client = await establish_connection(BleakClient, device, mac, max_attempts=2)
+                client = await establish_connection(BleakClient, device, mac, max_attempts=3)
                 data = await client.read_gatt_char(FLIPR_CHARACTERISTIC_UUID)
                 await client.disconnect()
                 
@@ -92,7 +88,7 @@ async def async_setup_entry(hass, entry):
         last_data = {
             "temperature": round(temp, 2), "ph": round(ph_calc, 2), "ph_raw": ph_raw_mv,
             "ph_usine": round(ph_usine, 2), "orp": round(orp), 
-            "chlore_actif": compute_active_chlorine(orp, ph_calc, temp, cya, chlore_model),
+            "chlore_actif_hocl": compute_active_chlorine(orp, ph_calc, temp, cya, chlore_model),
             "isl": compute_isl(temp, ph_calc, mac_data.get("tac", 0), mac_data.get("th", 0), mac_data.get("tds", 0)),
             "battery": int.from_bytes(data[11:13], 'little'), "rssi": rssi_val,
             "last_received": dt_util.utcnow(), "raw_frame": hex_frame
@@ -109,16 +105,12 @@ async def async_setup_entry(hass, entry):
     
     hass.data[DOMAIN][entry.entry_id] = coordinator
     
-    # CORRECTIF : On lance la configuration des entités en priorité absolue pour libérer l'UI
     await hass.config_entries.async_forward_entry_setups(entry, PLATFORMS)
-    
-    # Lancement du Bluetooth en tâche de fond invisible pour l'utilisateur
     entry.async_create_background_task(hass, coordinator.async_request_refresh(), "Flipr_Init_Refresh")
     
     return True
 
 async def async_unload_entry(hass, entry):
-    """Déchargement propre."""
     ok = await hass.config_entries.async_unload_platforms(entry, PLATFORMS)
     if ok:
         hass.data[DOMAIN].pop(entry.entry_id)
