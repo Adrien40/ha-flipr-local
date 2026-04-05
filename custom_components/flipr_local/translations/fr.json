@@ -55,16 +55,13 @@
     "chlore_model": {
       "options": {
         "stabilized": "Chlore stabilisé (Galets, granulés)",
-        "nernst": "Sel ou Chlore non stabilisé (Sticks, liquide)",
+        "nernst": "Sel / Chlore non stabilisé (Sticks, liquide)",
         "bromine": "Brome",
-        "custom": "Modèle"
+        "custom": "Spécifique"
       }
     }
   },
   "entity": {
-    "switch": {
-      "active_polling": { "name": "Interrogation Active" }
-    },
     "sensor": {
       "ph_raw": { "name": "pH Brut (mV)" },
       "ph_usine": { "name": "pH Brut (Usine)" },
@@ -89,7 +86,15 @@
       "cya": { "name": "CyA (Stabilisant)" }
     },
     "select": {
-      "chlore_model": { "name": "Modèle de calcul du désinfectant" }
+      "chlore_model": { 
+        "name": "Modèle de calcul du désinfectant",
+        "state": {
+          "stabilized": "Chlore stabilisé",
+          "nernst": "Sel / Chlore non stabilisé",
+          "bromine": "Brome",
+          "custom": "Spécifique"
+        }
+      }
     }
   }
 }

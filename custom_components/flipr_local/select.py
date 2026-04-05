@@ -6,7 +6,6 @@ from homeassistant.const import EntityCategory
 from homeassistant.helpers.device_registry import DeviceInfo
 from homeassistant.helpers.update_coordinator import CoordinatorEntity
 from .const import DOMAIN, CONF_MAC_ADDRESS, CONF_CHLORE_MODEL, get_flipr_model
-from .chemistry import compute_active_chlorine
 
 async def async_setup_entry(hass, entry, async_add_entities):
     coordinator = hass.data[DOMAIN][entry.entry_id]
@@ -17,7 +16,6 @@ async def async_setup_entry(hass, entry, async_add_entities):
 
 class FliprModelSelect(CoordinatorEntity, SelectEntity):
     _attr_has_entity_name = True
-    # DÉPLACÉ DANS CONFIGURATION POUR QUITTER LES CONTRÔLES
     _attr_entity_category = EntityCategory.CONFIG
     _attr_translation_key = "chlore_model"
     _attr_options = ["stabilized", "nernst", "bromine", "custom"]
@@ -27,7 +25,12 @@ class FliprModelSelect(CoordinatorEntity, SelectEntity):
         self.entry = entry
         self._mac = mac
         self._attr_unique_id = f"{mac}_chlore_model"
-        self._attr_device_info = DeviceInfo(identifiers={(DOMAIN, mac)}, name=model_name, manufacturer="Flipr", model=model_name)
+        self._attr_device_info = DeviceInfo(
+            identifiers={(DOMAIN, mac)}, 
+            name=model_name, 
+            manufacturer="Flipr", 
+            model=model_name
+        )
 
     @property
     def current_option(self):

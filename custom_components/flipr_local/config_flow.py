@@ -1,6 +1,7 @@
 # Copyright (c) 2026 Adrien40
 # This file is part of Flipr Local.
 
+"""Gestion de la configuration et des options pour Flipr"""
 import voluptuous as vol
 from homeassistant import config_entries
 from homeassistant.components.bluetooth import BluetoothServiceInfoBleak, async_discovered_service_info
@@ -87,13 +88,14 @@ class FliprConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
 
         schema[vol.Optional(CONF_USE_GATEWAY, default=True)] = bool
         
+        # Sélecteur mis à jour pour utiliser les traductions du strings.json
         schema[vol.Required(CONF_CHLORE_MODEL, default="stabilized")] = selector.SelectSelector(
             selector.SelectSelectorConfig(
                 options=[
-                    {"value": "stabilized", "label": "Chlore stabilisé"},
-                    {"value": "nernst", "label": "Sel ou Chlore non stabilisé"},
-                    {"value": "bromine", "label": "Brome"},
-                    {"value": "custom", "label": "Spécifique Adrien"}
+                    {"value": "stabilized", "label": "stabilized"},
+                    {"value": "nernst", "label": "nernst"},
+                    {"value": "bromine", "label": "bromine"},
+                    {"value": "custom", "label": "custom"}
                 ],
                 translation_key="chlore_model",
                 mode=selector.SelectSelectorMode.DROPDOWN
@@ -155,10 +157,10 @@ class FliprOptionsFlowHandler(config_entries.OptionsFlow):
                 vol.Required(CONF_CHLORE_MODEL, default=current_model): selector.SelectSelector(
                     selector.SelectSelectorConfig(
                         options=[
-                            {"value": "stabilized", "label": "Chlore stabilisé"},
-                            {"value": "nernst", "label": "Sel ou Chlore non stabilisé"},
-                            {"value": "bromine", "label": "Brome"},
-                            {"value": "custom", "label": "Spécifique Adrien"}
+                            {"value": "stabilized", "label": "stabilized"},
+                            {"value": "nernst", "label": "nernst"},
+                            {"value": "bromine", "label": "bromine"},
+                            {"value": "custom", "label": "custom"}
                         ],
                         translation_key="chlore_model",
                         mode=selector.SelectSelectorMode.DROPDOWN
