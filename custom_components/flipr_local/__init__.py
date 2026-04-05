@@ -91,6 +91,12 @@ async def async_setup_entry(hass, entry):
             elif isl_val > 0.3: isl_statut = "Eau entartrante"
             else: isl_statut = "Eau équilibrée"
 
+        now = dt_util.utcnow()
+        if last_data and last_data.get("raw_frame") == hex_frame:
+            heure_mesure = last_data.get("last_received", now)
+        else:
+            heure_mesure = now
+
         last_data = {
             "temperature": round(temp, 2), "ph": round(ph_calc, 2), "ph_raw": ph_raw_mv,
             "ph_usine": round(ph_usine, 2), "orp": round(orp), 
@@ -98,10 +104,10 @@ async def async_setup_entry(hass, entry):
             "ph_equilibre_cible": compute_ph_equilibrium(temp, tac_val, th_val, tds_val),
             "isl": isl_val, "isl_statut": isl_statut,
             "battery": int.from_bytes(data[11:13], 'little'), "rssi": rssi_val,
-            "last_received": dt_util.utcnow(), "raw_frame": hex_frame
+            "last_received": heure_mesure,  # <-- On utilise la variable ici
+            "raw_frame": hex_frame
         }
         
-        # FIX ANTI-INCONNU : On met en cache la dernière lecture
         hass.data[DOMAIN][mac]["last_data"] = last_data
         
         return last_data
@@ -113,7 +119,6 @@ async def async_setup_entry(hass, entry):
         update_interval=None
     )
     
-    # FIX ANTI-INCONNU : On injecte les anciennes données avant même de charger les entités
     if last_data:
         coordinator.data = last_data
     
@@ -128,6 +133,4 @@ async def async_unload_entry(hass, entry):
     ok = await hass.config_entries.async_unload_platforms(entry, PLATFORMS)
     if ok:
         hass.data[DOMAIN].pop(entry.entry_id, None)
-        # FIX ANTI-INCONNU : On a supprimé la ligne qui effaçait brutalement hass.data[DOMAIN][mac]
-        # Cela permet à la mémoire (TAC, TH, last_data) de survivre pendant le reload !
     return ok
