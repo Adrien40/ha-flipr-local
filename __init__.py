@@ -12,25 +12,16 @@ from .chemistry import compute_isl, compute_active_chlorine, get_mv_from_input, 
 from .const import *
 
 _LOGGER = logging.getLogger(__name__)
-PLATFORMS = ["sensor", "binary_sensor", "button", "number", "select"]
+PLATFORMS = ["sensor", "binary_sensor", "button", "number", "select", "switch"]
 
 async def update_listener(hass, entry):
     coordinator = hass.data[DOMAIN].get(entry.entry_id)
-    if not coordinator:
-        return
-
-    use_gateway = entry.options.get(CONF_USE_GATEWAY, entry.data.get(CONF_USE_GATEWAY, False))
-    if use_gateway:
-        coordinator.update_interval = None
-    else:
-        coordinator.update_interval = timedelta(minutes=75)
-
-    await coordinator.async_refresh()
+    if coordinator:
+        await coordinator.async_refresh()
 
 async def async_setup_entry(hass, entry):
     hass.data.setdefault(DOMAIN, {})
     mac = entry.data[CONF_MAC_ADDRESS]
-    use_gateway = entry.options.get(CONF_USE_GATEWAY, entry.data.get(CONF_USE_GATEWAY, False))
     
     if mac not in hass.data[DOMAIN]:
         hass.data[DOMAIN][mac] = {}
@@ -41,11 +32,9 @@ async def async_setup_entry(hass, entry):
 
     async def async_update_data():
         nonlocal last_data
-        
         try:
             async with asyncio.timeout(60):
                 device = async_ble_device_from_address(hass, mac, connectable=True)
-                
                 if not device:
                     if last_data: return last_data
                     raise UpdateFailed("Flipr hors de portée Bluetooth")
@@ -90,42 +79,34 @@ async def async_setup_entry(hass, entry):
         isl_val = compute_isl(temp, ph_calc, tac_val, th_val, tds_val)
         isl_statut = None
         if isl_val is not None:
-            if isl_val < -0.3:
-                isl_statut = "Eau corrosive"
-            elif isl_val > 0.3:
-                isl_statut = "Eau entartrante"
-            else:
-                isl_statut = "Eau équilibrée"
+            if isl_val < -0.3: isl_statut = "Eau corrosive"
+            elif isl_val > 0.3: isl_statut = "Eau entartrante"
+            else: isl_statut = "Eau équilibrée"
 
         last_data = {
             "temperature": round(temp, 2), "ph": round(ph_calc, 2), "ph_raw": ph_raw_mv,
             "ph_usine": round(ph_usine, 2), "orp": round(orp), 
             "chlore_actif_hocl": compute_active_chlorine(orp, ph_calc, temp, cya, chlore_model),
             "ph_equilibre_cible": compute_ph_equilibrium(temp, tac_val, th_val, tds_val),
-            "isl": isl_val,
-            "isl_statut": isl_statut,
+            "isl": isl_val, "isl_statut": isl_statut,
             "battery": int.from_bytes(data[11:13], 'little'), "rssi": rssi_val,
             "last_received": dt_util.utcnow(), "raw_frame": hex_frame
         }
         return last_data
 
-    interval = None if use_gateway else timedelta(minutes=75)
     coordinator = DataUpdateCoordinator(
         hass, _LOGGER, 
         name=f"Flipr {mac}", 
         update_method=async_update_data, 
-        update_interval=interval
+        update_interval=timedelta(minutes=75) 
     )
     
     hass.data[DOMAIN][entry.entry_id] = coordinator
-    
     await hass.config_entries.async_forward_entry_setups(entry, PLATFORMS)
     entry.async_create_background_task(hass, coordinator.async_request_refresh(), "Flipr_Init_Refresh")
-    
     return True
 
 async def async_unload_entry(hass, entry):
     ok = await hass.config_entries.async_unload_platforms(entry, PLATFORMS)
-    if ok:
-        hass.data[DOMAIN].pop(entry.entry_id)
+    if ok: hass.data[DOMAIN].pop(entry.entry_id)
     return ok

@@ -50,6 +50,9 @@
     }
   },
   "entity": {
+    "switch": {
+      "active_polling": { "name": "Interrogation Active" }
+    },
     "sensor": {
       "ph_raw": { "name": "pH Brut (mV)" },
       "ph_usine": { "name": "pH Brut (Usine)" },
