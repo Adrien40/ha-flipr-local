@@ -1,0 +1,145 @@
+# Copyright (c) 2026 Adrien40
+# This file is part of Flipr Local.
+
+"""Configuration et réglages pour Flipr AnalysR 3."""
+import logging
+from datetime import timedelta
+from homeassistant.components.number import RestoreNumber
+from homeassistant.const import EntityCategory
+from homeassistant.helpers.device_registry import DeviceInfo
+from .const import DOMAIN, CONF_MAC_ADDRESS
+from .chemistry import compute_isl, compute_active_chlorine
+
+_LOGGER = logging.getLogger(__name__)
+
+async def async_setup_entry(hass, entry, async_add_entities):
+    coordinator = hass.data[DOMAIN][entry.entry_id]
+    mac = entry.data[CONF_MAC_ADDRESS]
+    
+    hass.data.setdefault(DOMAIN, {})
+    if mac not in hass.data[DOMAIN]:
+        hass.data[DOMAIN][mac] = {}
+
+    async_add_entities([
+        FliprIntervalNumber(coordinator, mac),
+        FliprActiveIntervalNumber(coordinator, mac),
+        FliprWaterConfigNumber(coordinator, mac, "TAC : Alcalinité", "tac", 0, 500, 1, 100, "mdi:water-percent"),
+        FliprWaterConfigNumber(coordinator, mac, "TDS : Solides Dissous", "tds", 0, 5000, 10, 500, "mdi:blur"),
+        FliprWaterConfigNumber(coordinator, mac, "TH : Dureté Calcique", "th", 0, 800, 1, 200, "mdi:water-outline"),
+        FliprWaterConfigNumber(coordinator, mac, "CyA : Stabilisant", "cya", 0, 150, 1, 40, "mdi:shield-sun"),
+    ])
+
+class FliprIntervalNumber(RestoreNumber):
+    _attr_has_entity_name = True
+    def __init__(self, coordinator, mac):
+        self.coordinator = coordinator
+        self._mac = mac
+        self._attr_name = "Intervalle de lecture passive"
+        self._attr_unique_id = f"{mac}_scan_interval"
+        self._attr_native_min_value = 15
+        self._attr_native_max_value = 1440
+        self._attr_native_step = 1
+        self._attr_native_unit_of_measurement = "min"
+        self._attr_entity_category = EntityCategory.CONFIG
+        self._attr_icon = "mdi:timer-outline"
+        self._attr_mode = "box"
+        self._attr_device_info = DeviceInfo(identifiers={(DOMAIN, mac)}, name=f"Flipr {mac}", manufacturer="Flipr")
+
+    async def async_added_to_hass(self):
+        await super().async_added_to_hass()
+        last = await self.async_get_last_number_data()
+        val = int(float(last.native_value)) if last and last.native_value is not None else 75
+        self._attr_native_value = val
+        self.coordinator.update_interval = timedelta(minutes=val)
+
+    async def async_set_native_value(self, value):
+        val = int(float(value))
+        self._attr_native_value = val
+        self.coordinator.update_interval = timedelta(minutes=val)
+        self.async_write_ha_state()
+
+class FliprActiveIntervalNumber(RestoreNumber):
+    """Contrôle l'intervalle de déclenchement de la pompe (de 15 à 1440 min)."""
+    _attr_has_entity_name = True
+    def __init__(self, coordinator, mac):
+        self.coordinator = coordinator
+        self._mac = mac
+        self._attr_name = "Fréquence d'analyse"
+        self._attr_unique_id = f"{mac}_active_pump_interval"
+        self._attr_native_min_value = 15
+        self._attr_native_max_value = 1440
+        self._attr_native_step = 15
+        self._attr_native_unit_of_measurement = "min"
+        self._attr_entity_category = EntityCategory.CONFIG
+        self._attr_icon = "mdi:pump"
+        self._attr_mode = "box"
+        self._attr_device_info = DeviceInfo(identifiers={(DOMAIN, mac)}, name=f"Flipr {mac}", manufacturer="Flipr")
+
+    async def async_added_to_hass(self):
+        await super().async_added_to_hass()
+        last = await self.async_get_last_number_data()
+        val = int(float(last.native_value)) if last and last.native_value is not None else 75
+        self._attr_native_value = val
+        self.coordinator.hass.data[DOMAIN][self._mac]["active_interval"] = val
+
+    async def async_set_native_value(self, value):
+        val = int(float(value))
+        self._attr_native_value = val
+        self.coordinator.hass.data[DOMAIN][self._mac]["active_interval"] = val
+        
+        update_fn = self.coordinator.hass.data[DOMAIN][self._mac].get("update_active_interval")
+        if update_fn:
+            update_fn(val)
+            
+        self.async_write_ha_state()
+
+class FliprWaterConfigNumber(RestoreNumber):
+    _attr_has_entity_name = True
+    def __init__(self, coordinator, mac, name, key, min_val, max_val, step, default_val, icon):
+        self.coordinator = coordinator
+        self._mac = mac
+        self._key = key
+        self._attr_name = name
+        self._attr_unique_id = f"{mac}_{key}"
+        self._attr_native_min_value = min_val
+        self._attr_native_max_value = max_val
+        self._attr_native_step = step
+        self._attr_native_unit_of_measurement = "mg/L"
+        self._attr_icon = icon
+        self._default_val = default_val
+        self._attr_mode = "box"
+        self._attr_device_info = DeviceInfo(identifiers={(DOMAIN, mac)}, name=f"Flipr {mac}", manufacturer="Flipr")
+
+    async def async_added_to_hass(self):
+        await super().async_added_to_hass()
+        last = await self.async_get_last_number_data()
+        val = int(float(last.native_value)) if last and last.native_value is not None else self._default_val
+        self._attr_native_value = val
+        self.coordinator.hass.data[DOMAIN][self._mac][self._key] = val
+
+    async def async_set_native_value(self, value):
+        int_val = int(float(value))
+        self._attr_native_value = int_val
+        self.coordinator.hass.data[DOMAIN][self._mac][self._key] = int_val
+        self.async_write_ha_state()
+        
+        if self.coordinator.data:
+            new_data = dict(self.coordinator.data)
+            mac_data = self.coordinator.hass.data[DOMAIN].get(self._mac, {})
+            
+            tac = mac_data.get("tac", 0)
+            th = mac_data.get("th", 0)
+            tds = mac_data.get("tds", 0)
+            cya = mac_data.get("cya", 40)
+            
+            temp = new_data.get("temperature")
+            ph = new_data.get("ph")
+            orp = new_data.get("orp")
+            
+            if temp is not None and ph is not None:
+                new_data["isl"] = compute_isl(temp, ph, tac, th, tds)
+                entry = self.coordinator.hass.config_entries.async_get_entry(self.coordinator.config_entry.entry_id)
+                chlore_model = entry.options.get("chlore_model", "stabilized")
+                new_data["chlore_actif"] = compute_active_chlorine(orp, ph, temp, cya, chlore_model)
+                
+                self.coordinator.async_set_updated_data(new_data)

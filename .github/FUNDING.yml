@@ -1,0 +1,6 @@
+# Configuration pour le bouton "Sponsor" sur GitHub
+
+github: [Adrien40]
+buy_me_a_coffee: adrien40
+# Si tu as un PayPal, décommente la ligne ci-dessous et ajoute ton lien :
+# custom: ['https://www.paypal.me/TON_NOM']

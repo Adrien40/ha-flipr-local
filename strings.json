@@ -1,0 +1,75 @@
+{
+  "config": {
+    "flow_title": "{name}",
+    "step": {
+      "user": {
+        "title": "Configuration du Flipr",
+        "description": "Si l'adresse MAC n'est pas détectée automatiquement, utilisez une application type 'nRF Connect'. \n\nValeurs de calibration : Laissez par défaut si inconnues, modifiables via la roue crantée.",
+        "data": {
+          "mac_address": "Appareil détecté",
+          "ph_calib_7": "Valeur pH 7 (ex: 1600 mV ou 8.40)",
+          "ph_calib_4": "Valeur pH 4 (ex: 1900 mV ou 6.02)"
+        }
+      },
+      "manual": {
+        "title": "Saisie manuelle",
+        "description": "Entrez l'adresse MAC Bluetooth (ex: AA:BB:CC:DD:EE:FF).",
+        "data": {
+          "mac_address": "Adresse MAC Bluetooth"
+        }
+      }
+    },
+    "error": {
+      "cannot_connect": "Échec de connexion au Flipr",
+      "already_configured": "Cet appareil est déjà configuré",
+      "unknown": "Erreur inconnue"
+    },
+    "abort": {
+      "already_configured": "Cet appareil est déjà configuré"
+    }
+  },
+  "options": {
+    "step": {
+      "init": {
+        "title": "Options Flipr",
+        "description": "Ajustez la calibration et vos seuils d'alerte personnels.",
+        "data": {
+          "ph_calib_7": "Valeur pH 7 (ex: 1600 mV ou 8.40)",
+          "ph_ref_7": "Cible de la solution pH 7 (ex: 7.02)",
+          "ph_calib_4": "Valeur pH 4 (ex: 1900 mV ou 6.02)",
+          "ph_ref_4": "Cible de la solution pH 4 (ex: 4.00)",
+          "ph_min": "Seuil : pH Minimum (ex: 6.90)",
+          "ph_max": "Seuil : pH Maximum (ex: 7.50)",
+          "orp_min": "Seuil : Redox Minimum (mV)",
+          "temp_max": "Seuil : Température Maximum (°C)"
+        }
+      }
+    }
+  },
+  "entity": {
+    "sensor": {
+      "ph_raw": { "name": "pH Brut (mV)" },
+      "ph_usine": { "name": "pH Brut (Usine)" },
+      "chlore_actif": { "name": "Chlore Actif (HOCl)" },
+      "isl": { "name": "Indice de Langelier" },
+      "last_received": { "name": "Dernière mesure" },
+      "raw_frame": { "name": "Trame Brute" },
+      "rssi": { "name": "Signal Bluetooth" }
+    },
+    "button": {
+      "nouvelle_analyse": { "name": "Nouvelle Analyse (~60s)" },
+      "recup_derniere": { "name": "Récupérer dernière mesure" }
+    },
+    "number": {
+      "scan_interval": { "name": "Intervalle de lecture passive" },
+      "active_pump_interval": { "name": "Fréquence d'analyse" },
+      "tac": { "name": "TAC (Alcalinité)" },
+      "th": { "name": "TH (Dureté)" },
+      "tds": { "name": "TDS (Solides dissous)" },
+      "cya": { "name": "CyA (Stabilisant)" }
+    },
+    "select": {
+      "chlore_model": { "name": "Modèle de calcul du désinfectant" }
+    }
+  }
+}

@@ -1,0 +1,27 @@
+{
+  "domain": "flipr_local",
+  "name": "Flipr Local",
+  "bluetooth": [
+    {
+      "local_name": "Flipr*"
+    },
+    {
+      "local_name": "F3B*"
+    },
+    {
+      "service_uuid": "00000e18-0000-1000-8000-00805f9b34fb"
+    },
+    {
+      "service_uuid": "0000e302-0000-1000-8000-00805f9b34fb"
+    }
+  ],
+  "codeowners": ["@Adrien40"],
+  "config_flow": true,
+  "dependencies": ["bluetooth"],
+  "documentation": "https://github.com/Adrien40/ha-flipr-local",
+  "integration_type": "device",
+  "iot_class": "local_polling",
+  "requirements": ["bleak>=0.21.1", "bleak-retry-connector>=3.0.0"],
+  "version": "0.2.2",
+  "issue_tracker": "https://github.com/Adrien40/ha-flipr-local/issues"
+}

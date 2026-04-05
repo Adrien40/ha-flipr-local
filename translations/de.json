@@ -1,0 +1,75 @@
+{
+  "config": {
+    "flow_title": "{name}",
+    "step": {
+      "user": {
+        "title": "Flipr Konfiguration",
+        "description": "Wenn die MAC-Adresse nicht automatisch erkannt wird, verwenden Sie eine App wie 'nRF Connect'. \n\nKalibrierwerte: Bei Unkenntnis Standard belassen, anpassbar über das Zahnradsymbol.",
+        "data": {
+          "mac_address": "Erkanntes Gerät",
+          "ph_calib_7": "pH-7-Wert (z. B. 1600 mV oder 8,40)",
+          "ph_calib_4": "pH-4-Wert (z. B. 1900 mV oder 6,02)"
+        }
+      },
+      "manual": {
+        "title": "Manuelle Eingabe",
+        "description": "Geben Sie die Bluetooth-MAC-Adresse ein (z. B. AA:BB:CC:DD:EE:FF).",
+        "data": {
+          "mac_address": "Bluetooth-MAC-Adresse"
+        }
+      }
+    },
+    "error": {
+      "cannot_connect": "Verbindung zum Flipr fehlgeschlagen",
+      "already_configured": "Dieses Gerät ist bereits konfiguriert",
+      "unknown": "Unbekannter Fehler"
+    },
+    "abort": {
+      "already_configured": "Dieses Gerät ist bereits konfiguriert"
+    }
+  },
+  "options": {
+    "step": {
+      "init": {
+        "title": "Flipr Optionen",
+        "description": "Passen Sie die Kalibrierung und Ihre persönlichen Alarmschwellen an.",
+        "data": {
+          "ph_calib_7": "pH-7-Wert (z. B. 1600 mV oder 8,40)",
+          "ph_ref_7": "pH-7-Lösungsziel (z. B. 7,02)",
+          "ph_calib_4": "pH-4-Wert (z. B. 1900 mV oder 6,02)",
+          "ph_ref_4": "pH-4-Lösungsziel (z. B. 4,00)",
+          "ph_min": "Schwellenwert: Mindest-pH (z. B. 6,90)",
+          "ph_max": "Schwellenwert: Maximaler pH (z. B. 7,50)",
+          "orp_min": "Schwellenwert: Mindest-Redox (mV)",
+          "temp_max": "Schwellenwert: Maximale Temperatur (°C)"
+        }
+      }
+    }
+  },
+  "entity": {
+    "sensor": {
+      "ph_raw": { "name": "Roh-pH (mV)" },
+      "ph_usine": { "name": "Roh-pH (Werk)" },
+      "chlore_actif": { "name": "Aktives Chlor (HOCl)" },
+      "isl": { "name": "Langelier-Index" },
+      "last_received": { "name": "Letzte Messung" },
+      "raw_frame": { "name": "Rohrahmen" },
+      "rssi": { "name": "Bluetooth-Signal" }
+    },
+    "button": {
+      "nouvelle_analyse": { "name": "Neue Analyse (~60s)" },
+      "recup_derniere": { "name": "Letzte Messung abrufen" }
+    },
+    "number": {
+      "scan_interval": { "name": "Passives Scan-Intervall" },
+      "active_pump_interval": { "name": "Analysehäufigkeit" },
+      "tac": { "name": "TAC (Alkalinität)" },
+      "th": { "name": "TH (Härte)" },
+      "tds": { "name": "TDS (Gelöste Feststoffe)" },
+      "cya": { "name": "CyA (Stabilisator)" }
+    },
+    "select": {
+      "chlore_model": { "name": "Desinfektionsberechnungsmodell" }
+    }
+  }
+}
