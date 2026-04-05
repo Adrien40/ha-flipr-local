@@ -1,7 +1,7 @@
 # Copyright (c) 2026 Adrien40
 # This file is part of Flipr Local.
 
-"""Capteurs pour Flipr AnalysR."""
+"""Capteurs pour Flipr AnalysR 3."""
 from homeassistant.components.sensor import (
     SensorEntity, SensorDeviceClass, EntityCategory,
 )
@@ -21,7 +21,7 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry, async_add_e
         FliprSensor(coordinator, mac_address, "Température", "temperature", SensorDeviceClass.TEMPERATURE, UnitOfTemperature.CELSIUS, 2),
         FliprSensor(coordinator, mac_address, "pH", "ph", SensorDeviceClass.PH, None, 2),
         FliprSensor(coordinator, mac_address, "Redox", "orp", None, "mV"),
-        FliprSensor(coordinator, mac_address, "Chlore Actif (HOCl)", "chlore_actif", None, "mg/L", 2, icon="mdi:pool"),
+        FliprSensor(coordinator, mac_address, "Chlore Actif", "chlore_actif", None, "mg/L", 2, icon="mdi:pool"),
         FliprSensor(coordinator, mac_address, "Indice de Langelier", "isl", None, None, 2, icon="mdi:scale-balance"),
         FliprSensor(coordinator, mac_address, "Batterie", "battery", SensorDeviceClass.VOLTAGE, "mV", category=EntityCategory.DIAGNOSTIC, icon="mdi:battery"),
         FliprSensor(coordinator, mac_address, "pH Brut (mV)", "ph_raw", None, "mV", category=EntityCategory.DIAGNOSTIC, icon="mdi:flash-outline"),
@@ -46,8 +46,9 @@ class FliprSensor(CoordinatorEntity, SensorEntity):
         
         self._attr_device_info = DeviceInfo(
             identifiers={(DOMAIN, mac)}, 
-            name=f"Flipr {mac}", 
-            manufacturer="Flipr"
+            name="Flipr AnalysR 3", 
+            manufacturer="Flipr", 
+            model="AnalysR 3"
         )
 
     @property
