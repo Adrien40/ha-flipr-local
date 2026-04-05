@@ -1,0 +1,75 @@
+{
+  "config": {
+    "flow_title": "{name}",
+    "step": {
+      "user": {
+        "title": "Flipr-konfiguration",
+        "description": "Om MAC-adressen inte identifieras automatiskt, använd en app som 'nRF Connect'. \n\nKalibrationsvärden: Lämna standardvärden om de är okända, justerbara via kugghjulsikonen.",
+        "data": {
+          "mac_address": "Upptäckt enhet",
+          "ph_calib_7": "pH 7-värde (t.ex. 1600 mV eller 8,40)",
+          "ph_calib_4": "pH 4-värde (t.ex. 1900 mV eller 6,02)"
+        }
+      },
+      "manual": {
+        "title": "Manuell inmatning",
+        "description": "Ange Bluetooth MAC-adress (t.ex. AA:BB:CC:DD:EE:FF).",
+        "data": {
+          "mac_address": "Bluetooth MAC-adress"
+        }
+      }
+    },
+    "error": {
+      "cannot_connect": "Det gick inte att ansluta till Flipr",
+      "already_configured": "Den här enheten är redan konfigurerad",
+      "unknown": "Okänt fel"
+    },
+    "abort": {
+      "already_configured": "Den här enheten är redan konfigurerad"
+    }
+  },
+  "options": {
+    "step": {
+      "init": {
+        "title": "Flipr-alternativ",
+        "description": "Justera kalibrationen och dina personliga varningsgränser.",
+        "data": {
+          "ph_calib_7": "pH 7-värde (t.ex. 1600 mV eller 8,40)",
+          "ph_ref_7": "pH 7-lösningens målvärde (t.ex. 7,02)",
+          "ph_calib_4": "pH 4-värde (t.ex. 1900 mV eller 6,02)",
+          "ph_ref_4": "pH 4-lösningens målvärde (t.ex. 4,00)",
+          "ph_min": "Gräns: Minsta pH (t.ex. 6,90)",
+          "ph_max": "Gräns: Högsta pH (t.ex. 7,50)",
+          "orp_min": "Gräns: Minsta ORP (mV)",
+          "temp_max": "Gräns: Högsta temperatur (°C)"
+        }
+      }
+    }
+  },
+  "entity": {
+    "sensor": {
+      "ph_raw": { "name": "Rå-pH (mV)" },
+      "ph_usine": { "name": "Rå-pH (fabrik)" },
+      "chlore_actif": { "name": "Aktivt klor (HOCl)" },
+      "isl": { "name": "Langelier-index" },
+      "last_received": { "name": "Senaste mätning" },
+      "raw_frame": { "name": "Rå dataram" },
+      "rssi": { "name": "Bluetooth-signal" }
+    },
+    "button": {
+      "nouvelle_analyse": { "name": "Ny analys (~60s)" },
+      "recup_derniere": { "name": "Hämta senaste mätning" }
+    },
+    "number": {
+      "scan_interval": { "name": "Passivt skanningsintervall" },
+      "active_pump_interval": { "name": "Analysfrekvens" },
+      "tac": { "name": "TAC (Alkalinitet)" },
+      "th": { "name": "TH (Hårdhet)" },
+      "tds": { "name": "TDS (Lösta ämnen)" },
+      "cya": { "name": "CyA (Stabilisator)" }
+    },
+    "select": {
+      "chlore_model": { "name": "Beräkningsmodell för desinfektionsmedel" }
+    }
+  }
+}

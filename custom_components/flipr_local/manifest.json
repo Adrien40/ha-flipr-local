@@ -6,7 +6,16 @@
       "local_name": "Flipr*"
     },
     {
+      "local_name": "Flipr 01*"
+    },
+    {
       "local_name": "F3B*"
+    },
+    {
+      "local_name": "F3C*"
+    },
+    {
+      "local_name": "F2B*"
     },
     {
       "service_uuid": "00000e18-0000-1000-8000-00805f9b34fb"
@@ -22,6 +31,6 @@
   "integration_type": "device",
   "iot_class": "local_polling",
   "requirements": ["bleak>=0.21.1", "bleak-retry-connector>=4.0.0"],
-  "version": "0.2.6",
+  "version": "0.3.0",
   "issue_tracker": "https://github.com/Adrien40/ha-flipr-local/issues"
 }

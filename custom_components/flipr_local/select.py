@@ -3,15 +3,17 @@
 
 from homeassistant.components.select import SelectEntity
 from homeassistant.helpers.update_coordinator import CoordinatorEntity
-from .const import DOMAIN, CONF_MAC_ADDRESS
+from .const import DOMAIN, CONF_MAC_ADDRESS, CONF_CYA, get_flipr_model
 from .chemistry import compute_active_chlorine
 
 async def async_setup_entry(hass, entry, async_add_entities):
     coordinator = hass.data[DOMAIN][entry.entry_id]
-    async_add_entities([FliprModelSelect(coordinator, entry)], True)
+    model_name = entry.data.get("model") or get_flipr_model(entry.title)
+    
+    async_add_entities([FliprModelSelect(coordinator, entry, model_name)])
 
 class FliprModelSelect(CoordinatorEntity, SelectEntity):
-    def __init__(self, coordinator, entry):
+    def __init__(self, coordinator, entry, model_name):
         super().__init__(coordinator)
         self._entry = entry
         self._mac = entry.data[CONF_MAC_ADDRESS]
@@ -19,19 +21,7 @@ class FliprModelSelect(CoordinatorEntity, SelectEntity):
         self._attr_unique_id = f"{entry.entry_id}_chlore_model"
         self._attr_name = "Modèle de calcul du désinfectant"
         self._attr_icon = "mdi:flask-round-bottom"
-        
-        self._attr_device_info = {
-            "identifiers": {(DOMAIN, self._mac)},
-            "name": f"Flipr {self._mac}",
-            "manufacturer": "Flipr"
-        }
-        
-        self._attr_options = [
-            "Galets / Chlore Stabilisé", 
-            "Sticks / Sel Chlore Non Stabilisé",
-            "Brome",
-            "Calibration Personnalisée"
-        ]
+        self._attr_device_info = {"identifiers": {(DOMAIN, self._mac)}, "name": model_name, "manufacturer": "Flipr", "model": model_name}
         
         self._mapping = {
             "Galets / Chlore Stabilisé": "stabilized",
@@ -39,6 +29,7 @@ class FliprModelSelect(CoordinatorEntity, SelectEntity):
             "Brome": "bromine",
             "Calibration Personnalisée": "custom"
         }
+        self._attr_options = list(self._mapping.keys())
         self._reverse_mapping = {v: k for k, v in self._mapping.items()}
 
     @property
@@ -55,9 +46,12 @@ class FliprModelSelect(CoordinatorEntity, SelectEntity):
         if self.coordinator.data:
             new_data = dict(self.coordinator.data)
             mac_data = self.coordinator.hass.data[DOMAIN].get(self._mac, {})
-            cya = mac_data.get("cya", 40)
+            cya = mac_data.get(CONF_CYA, 40)
             
-            new_data["chlore_actif"] = compute_active_chlorine(
-                new_data["orp"], new_data["ph"], new_data["temperature"], cya, new_model
-            )
-            self.coordinator.async_set_updated_data(new_data)
+            orp = new_data.get("orp")
+            ph = new_data.get("ph")
+            temp = new_data.get("temperature")
+            
+            if all(v is not None for v in [orp, ph, temp]):
+                new_data["chlore_actif_hocl"] = compute_active_chlorine(orp, ph, temp, cya, new_model)
+                self.coordinator.async_set_updated_data(new_data)
