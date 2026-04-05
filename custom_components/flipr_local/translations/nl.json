@@ -1,0 +1,75 @@
+{
+  "config": {
+    "flow_title": "{name}",
+    "step": {
+      "user": {
+        "title": "Flipr configuratie",
+        "description": "Als het MAC-adres niet automatisch wordt gedetecteerd, gebruik dan een app zoals 'nRF Connect'. \n\nKalibriatiewaarden: laat de standaardwaarden staan als u ze niet kent, aanpasbaar via het tandwielpictogram.",
+        "data": {
+          "mac_address": "Gedetecteerd apparaat",
+          "ph_calib_7": "pH 7-waarde (bijv. 1600 mV of 8,40)",
+          "ph_calib_4": "pH 4-waarde (bijv. 1900 mV of 6,02)"
+        }
+      },
+      "manual": {
+        "title": "Handmatige invoer",
+        "description": "Voer het Bluetooth MAC-adres in (bijv. AA:BB:CC:DD:EE:FF).",
+        "data": {
+          "mac_address": "Bluetooth MAC-adres"
+        }
+      }
+    },
+    "error": {
+      "cannot_connect": "Verbinding met Flipr mislukt",
+      "already_configured": "Dit apparaat is al geconfigureerd",
+      "unknown": "Onbekende fout"
+    },
+    "abort": {
+      "already_configured": "Dit apparaat is al geconfigureerd"
+    }
+  },
+  "options": {
+    "step": {
+      "init": {
+        "title": "Flipr opties",
+        "description": "Pas de kalibratie en uw persoonlijke waarschuwingsdrempels aan.",
+        "data": {
+          "ph_calib_7": "pH 7-waarde (bijv. 1600 mV of 8,40)",
+          "ph_ref_7": "pH 7-oplossingsdoel (bijv. 7,02)",
+          "ph_calib_4": "pH 4-waarde (bijv. 1900 mV of 6,02)",
+          "ph_ref_4": "pH 4-oplossingsdoel (bijv. 4,00)",
+          "ph_min": "Drempel: minimale pH (bijv. 6,90)",
+          "ph_max": "Drempel: maximale pH (bijv. 7,50)",
+          "orp_min": "Drempel: minimale ORP (mV)",
+          "temp_max": "Drempel: maximale temperatuur (°C)"
+        }
+      }
+    }
+  },
+  "entity": {
+    "sensor": {
+      "ph_raw": { "name": "Ruwe pH (mV)" },
+      "ph_usine": { "name": "Ruwe pH (fabriek)" },
+      "chlore_actif": { "name": "Actief chloor (HOCl)" },
+      "isl": { "name": "Langelier-index" },
+      "last_received": { "name": "Laatste meting" },
+      "raw_frame": { "name": "Ruwe frame" },
+      "rssi": { "name": "Bluetooth-signaal" }
+    },
+    "button": {
+      "nouvelle_analyse": { "name": "Nieuwe analyse (~60s)" },
+      "recup_derniere": { "name": "Laatste meting ophalen" }
+    },
+    "number": {
+      "scan_interval": { "name": "Passief scaninterval" },
+      "active_pump_interval": { "name": "Analysefrequentie" },
+      "tac": { "name": "TAC (Alkaliteit)" },
+      "th": { "name": "TH (Hardheid)" },
+      "tds": { "name": "TDS (Opgeloste stoffen)" },
+      "cya": { "name": "CyA (Stabilisator)" }
+    },
+    "select": {
+      "chlore_model": { "name": "Desinfectantenberekeningsmodel" }
+    }
+  }
+}
