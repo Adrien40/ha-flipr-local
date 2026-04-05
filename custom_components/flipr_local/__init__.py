@@ -73,7 +73,7 @@ async def async_setup_entry(hass, entry):
         th_val = mac_data.get("th", 0)
         tds_val = mac_data.get("tds", 0)
         cya = float(entry.options.get(CONF_CYA) or entry.data.get(CONF_CYA, 40))
-        chlore_model = entry.options.get("chlore_model", "stabilized")
+        chlore_model = entry.options.get(CONF_CHLORE_MODEL, entry.data.get(CONF_CHLORE_MODEL, "stabilized"))
 
         service_info = async_last_service_info(hass, mac, connectable=True)
         rssi_val = service_info.rssi if service_info else getattr(device, "rssi", None)

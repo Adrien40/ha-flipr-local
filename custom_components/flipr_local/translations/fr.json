@@ -8,6 +8,7 @@
         "data": {
           "mac_address": "Appareil détecté",
           "use_gateway": "Je possède la Passerelle Wi-Fi Flipr (Désactive les interrogations Bluetooth actives pour préserver la batterie)",
+          "chlore_model": "Traitement de l'eau",
           "ph_calib_7": "Valeur pH 7 (ex: 1600 mV ou 8.40)",
           "ph_calib_4": "Valeur pH 4 (ex: 1900 mV ou 6.02)"
         }
@@ -36,6 +37,7 @@
         "description": "Ajustez la calibration et vos seuils d'alerte personnels.",
         "data": {
           "use_gateway": "Je possède la Passerelle Wi-Fi Flipr (Désactive les interrogations Bluetooth actives pour préserver la batterie)",
+          "chlore_model": "Traitement de l'eau",
           "ph_calib_7": "Valeur pH 7 (ex: 1600 mV ou 8.40)",
           "ph_ref_7": "Cible de la solution pH 7 (ex: 7.02)",
           "ph_calib_4": "Valeur pH 4 (ex: 1900 mV ou 6.02)",
@@ -46,6 +48,16 @@
           "temp_min": "Seuil : Température Minimum (°C)",
           "temp_max": "Seuil : Température Maximum (°C)"
         }
+      }
+    }
+  },
+  "selector": {
+    "chlore_model": {
+      "options": {
+        "stabilized": "Chlore stabilisé (Galets, granulés)",
+        "nernst": "Sel ou Chlore non stabilisé (Sticks, liquide)",
+        "bromine": "Brome",
+        "custom": "Modèle"
       }
     }
   },
