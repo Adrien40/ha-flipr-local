@@ -57,5 +57,5 @@ def compute_active_chlorine(orp, ph, temp, cya=40, model="stabilized"):
         return round(max(0.0, min(final_result, 15.0)), 2)
         
     except Exception as e:
-        _LOGGER.error("Erreur calcul Désinfectant : %s", e)
+        _LOGGER.error("Erreur lors du calcul du désinfectant : %s", e)
         return None

@@ -1,7 +1,6 @@
 # Copyright (c) 2026 Adrien40
 # This file is part of Flipr Local.
 
-"""Boutons pour Flipr"""
 import logging, asyncio
 from bleak import BleakClient
 from bleak_retry_connector import establish_connection
@@ -25,7 +24,6 @@ async def async_setup_entry(hass, entry, async_add_entities):
     ])
 
 class FliprActionTaskButton(CoordinatorEntity, ButtonEntity):
-    """Bouton qui gère l'envoi radio, l'attente, et déclenche la lecture."""
     _attr_has_entity_name = True
 
     def __init__(self, coordinator, mac, name, key, action_uuid, icon, model_name):
@@ -42,36 +40,32 @@ class FliprActionTaskButton(CoordinatorEntity, ButtonEntity):
         return True
 
     async def async_press(self) -> None:
-        """Lance le cycle de pompe en tâche de fond pour ne pas bloquer l'UI."""
         _LOGGER.info("Démarrage du cycle d'analyse pour %s", self._mac)
         self.hass.async_create_task(self._run_analysis_cycle())
 
     async def _run_analysis_cycle(self):
-        """La vraie séquence : Ecriture -> Attente -> Lecture."""
         device = async_ble_device_from_address(self.hass, self._mac, connectable=True)
         if not device:
             _LOGGER.error("Impossible de lancer l'analyse : Flipr hors de portée.")
             return
 
-        # 1. ENVOI DE L'ORDRE
         try:
             client = await establish_connection(BleakClient, device, self._mac)
-            await client.write_gatt_char(self._action_uuid, bytearray([0x01]), response=True)
-            await client.disconnect()
-            _LOGGER.info("Pompe activée. Attente de 45 secondes pour la chimie...")
+            try:
+                await client.write_gatt_char(self._action_uuid, bytearray([0x01]), response=True)
+                _LOGGER.info("Pompe activée. Attente de 45 secondes pour la chimie...")
+            finally:
+                await client.disconnect()
         except Exception as err:
             _LOGGER.error("Échec de l'activation de la pompe : %s", err)
             return
 
-        # 2. ATTENTE SILENCIEUSE (Pendant que l'interface HA est libre)
         await asyncio.sleep(45)
 
-        # 3. LECTURE DES DONNÉES
         _LOGGER.info("Chimie terminée. Demande de rafraîchissement au Coordinateur.")
         await self.coordinator.async_request_refresh()
 
 class FliprRefreshButton(CoordinatorEntity, ButtonEntity):
-    """Bouton simple pour forcer une lecture instantanée (sans pompe)."""
     _attr_has_entity_name = True
 
     def __init__(self, coordinator, mac, name, key, icon, model_name):

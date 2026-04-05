@@ -9,8 +9,8 @@
           "mac_address": "Appareil détecté",
           "use_gateway": "Je possède la Passerelle Wi-Fi Flipr (Désactive les interrogations Bluetooth actives pour préserver la batterie)",
           "chlore_model": "Traitement de l'eau",
-          "ph_calib_7": "Valeur pH 7 (ex: 1600 mV ou 8.40)",
-          "ph_calib_4": "Valeur pH 4 (ex: 1900 mV ou 6.02)"
+          "ph_calib_7": "Valeur pH 7 (ex : 1600 mV ou 8.40)",
+          "ph_calib_4": "Valeur pH 4 (ex : 1900 mV ou 6.02)"
         }
       },
       "manual": {
@@ -24,7 +24,8 @@
     "error": {
       "cannot_connect": "Échec de connexion au Flipr",
       "already_configured": "Cet appareil est déjà configuré",
-      "unknown": "Erreur inconnue"
+      "unknown": "Erreur inconnue",
+	  "invalid_mac": "Format invalide (ex : AA:BB:CC:DD:EE:FF)"
     },
     "abort": {
       "already_configured": "Cet appareil est déjà configuré"

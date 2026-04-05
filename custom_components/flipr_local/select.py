@@ -40,3 +40,4 @@ class FliprModelSelect(CoordinatorEntity, SelectEntity):
         new_options = dict(self.entry.options)
         new_options[CONF_CHLORE_MODEL] = option
         self.coordinator.hass.config_entries.async_update_entry(self.entry, options=new_options)
+        await self.coordinator.async_request_refresh()

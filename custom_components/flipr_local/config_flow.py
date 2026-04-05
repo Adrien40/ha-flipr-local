@@ -3,6 +3,7 @@
 
 """Gestion de la configuration et des options pour Flipr"""
 import voluptuous as vol
+import re
 from homeassistant import config_entries
 from homeassistant.components.bluetooth import BluetoothServiceInfoBleak, async_discovered_service_info
 from homeassistant.core import callback
@@ -15,6 +16,7 @@ from .const import (
 )
 
 MANUAL_ENTRY = "manual"
+MAC_PATTERN = re.compile(r"^([0-9A-F]{2}:){5}[0-9A-F]{2}$")
 
 class FliprConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
     VERSION = 1
@@ -88,7 +90,6 @@ class FliprConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
 
         schema[vol.Optional(CONF_USE_GATEWAY, default=True)] = bool
         
-        # Sélecteur mis à jour pour utiliser les traductions du strings.json
         schema[vol.Required(CONF_CHLORE_MODEL, default="stabilized")] = selector.SelectSelector(
             selector.SelectSelectorConfig(
                 options=[
@@ -117,10 +118,13 @@ class FliprConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
         errors = {}
         if user_input is not None:
             mac = user_input[CONF_MAC_ADDRESS].upper()
-            self._mac_address = mac
-            self._bt_name = None
-            self._discovered_name = "Flipr"
-            return await self.async_step_user(user_input)
+            if not MAC_PATTERN.match(mac):
+                errors[CONF_MAC_ADDRESS] = "invalid_mac"
+            else:
+                self._mac_address = mac
+                self._bt_name = None
+                self._discovered_name = "Flipr"
+                return await self.async_step_user(user_input=None)
 
         return self.async_show_form(
             step_id="manual",

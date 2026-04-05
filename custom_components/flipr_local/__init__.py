@@ -12,6 +12,7 @@ from .chemistry import compute_isl, compute_active_chlorine, get_mv_from_input, 
 from .const import *
 
 _LOGGER = logging.getLogger(__name__)
+
 PLATFORMS = ["sensor", "binary_sensor", "button", "number", "select"]
 
 async def update_listener(hass, entry):
@@ -42,10 +43,12 @@ async def async_setup_entry(hass, entry):
                     raise UpdateFailed("Flipr hors de portée Bluetooth")
 
                 client = await establish_connection(BleakClient, device, mac, max_attempts=3)
-                data = await client.read_gatt_char(FLIPR_CHARACTERISTIC_UUID)
-                await client.disconnect()
+                try:
+                    data = await client.read_gatt_char(FLIPR_CHARACTERISTIC_UUID)
+                finally:
+                    await client.disconnect()
                 
-        except (asyncio.TimeoutError, Exception) as err:
+        except Exception as err:
             if last_data: return last_data
             raise UpdateFailed(f"Erreur de communication : {err}")
 
@@ -114,5 +117,8 @@ async def async_setup_entry(hass, entry):
 async def async_unload_entry(hass, entry):
     ok = await hass.config_entries.async_unload_platforms(entry, PLATFORMS)
     if ok:
-        hass.data[DOMAIN].pop(entry.entry_id)
+        hass.data[DOMAIN].pop(entry.entry_id, None)
+        mac = entry.data.get(CONF_MAC_ADDRESS)
+        if mac and mac in hass.data[DOMAIN]:
+            hass.data[DOMAIN].pop(mac, None)
     return ok
