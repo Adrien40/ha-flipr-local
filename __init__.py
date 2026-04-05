@@ -1,7 +1,6 @@
 # Copyright (c) 2026 Adrien40
 # This file is part of Flipr Local.
 
-"""Initialisation Flipr"""
 import logging, asyncio
 from datetime import timedelta
 import homeassistant.util.dt as dt_util
@@ -9,7 +8,7 @@ from bleak import BleakClient
 from bleak_retry_connector import establish_connection
 from homeassistant.helpers.update_coordinator import DataUpdateCoordinator, UpdateFailed
 from homeassistant.components.bluetooth import async_ble_device_from_address, async_last_service_info
-from .chemistry import compute_isl, compute_active_chlorine, get_mv_from_input
+from .chemistry import compute_isl, compute_active_chlorine, get_mv_from_input, compute_ph_equilibrium
 from .const import *
 
 _LOGGER = logging.getLogger(__name__)
@@ -79,17 +78,32 @@ async def async_setup_entry(hass, entry):
         ph_usine = -0.0084494 * ph_raw_mv + 22.2083
         
         mac_data = hass.data[DOMAIN].get(mac, {})
+        tac_val = mac_data.get("tac", 0)
+        th_val = mac_data.get("th", 0)
+        tds_val = mac_data.get("tds", 0)
         cya = float(entry.options.get(CONF_CYA) or entry.data.get(CONF_CYA, 40))
         chlore_model = entry.options.get("chlore_model", "stabilized")
 
         service_info = async_last_service_info(hass, mac, connectable=True)
         rssi_val = service_info.rssi if service_info else getattr(device, "rssi", None)
 
+        isl_val = compute_isl(temp, ph_calc, tac_val, th_val, tds_val)
+        isl_statut = None
+        if isl_val is not None:
+            if isl_val < -0.3:
+                isl_statut = "Eau corrosive"
+            elif isl_val > 0.3:
+                isl_statut = "Eau entartrante"
+            else:
+                isl_statut = "Eau équilibrée"
+
         last_data = {
             "temperature": round(temp, 2), "ph": round(ph_calc, 2), "ph_raw": ph_raw_mv,
             "ph_usine": round(ph_usine, 2), "orp": round(orp), 
             "chlore_actif_hocl": compute_active_chlorine(orp, ph_calc, temp, cya, chlore_model),
-            "isl": compute_isl(temp, ph_calc, mac_data.get("tac", 0), mac_data.get("th", 0), mac_data.get("tds", 0)),
+            "ph_equilibre_cible": compute_ph_equilibrium(temp, tac_val, th_val, tds_val),
+            "isl": isl_val,
+            "isl_statut": isl_statut,
             "battery": int.from_bytes(data[11:13], 'little'), "rssi": rssi_val,
             "last_received": dt_util.utcnow(), "raw_frame": hex_frame
         }

@@ -11,7 +11,7 @@ from homeassistant.helpers import selector
 from .const import (
     DOMAIN, CONF_MAC_ADDRESS, CONF_PH_CALIB_4, CONF_PH_CALIB_7,
     CONF_PH_MIN, CONF_PH_MAX, CONF_ORP_MIN, CONF_TEMP_MIN, CONF_TEMP_MAX,
-    CONF_PH_REF_7, CONF_PH_REF_4
+    CONF_PH_REF_7, CONF_PH_REF_4, get_flipr_model
 )
 
 MANUAL_ENTRY = "manual"
@@ -21,14 +21,25 @@ class FliprConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
 
     def __init__(self):
         self._mac_address = None
-        self._discovered_name = "Flipr AnalysR 3"
+        self._bt_name = None
+        self._discovered_name = "Flipr"
+
+    def _get_display_name(self, bt_name, model):
+        """Génère un nom d'affichage combinant le modèle et le nom Bluetooth."""
+        if bt_name and bt_name != "Flipr" and not bt_name.startswith("Flipr Analys"):
+            return f"{model} ({bt_name})"
+        return model
 
     async def async_step_bluetooth(self, discovery_info: BluetoothServiceInfoBleak):
         await self.async_set_unique_id(discovery_info.address)
         self._abort_if_unique_id_configured()
         
         self._mac_address = discovery_info.address
-        self._discovered_name = discovery_info.name or f"Flipr {self._mac_address}"
+        self._bt_name = discovery_info.name or ""
+        
+        model = get_flipr_model(self._bt_name)
+        self._discovered_name = self._get_display_name(self._bt_name, model)
+        
         self.context["title_placeholders"] = {"name": self._discovered_name}
         
         return await self.async_step_user()
@@ -45,12 +56,28 @@ class FliprConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
             self._abort_if_unique_id_configured()
             
             user_input[CONF_MAC_ADDRESS] = final_mac
-            return self.async_create_entry(title=self._discovered_name, data=user_input)
+
+            # Recherche du nom BT si on vient d'une sélection manuelle
+            if not self._bt_name:
+                for info in async_discovered_service_info(self.hass, False):
+                    if info.address == final_mac and info.name:
+                        self._bt_name = info.name
+                        break
+            
+            model = get_flipr_model(self._bt_name)
+            user_input["model"] = model
+            
+            # Titre final de l'intégration dans Home Assistant
+            title = self._get_display_name(self._bt_name, model)
+            
+            return self.async_create_entry(title=title, data=user_input)
 
         discovered_devices = {MANUAL_ENTRY: "Entrer une adresse MAC manuellement"}
         for info in async_discovered_service_info(self.hass, False):
-            if info.name and (info.name.startswith("Flipr") or info.name.startswith("F3B")):
-                discovered_devices[info.address] = f"{info.name} ({info.address})"
+            if info.name and (info.name.startswith("Flipr") or info.name.startswith("F3") or info.name.startswith("F2") or info.name.startswith("F1") or info.name.startswith("F9")):
+                list_model = get_flipr_model(info.name)
+                display = self._get_display_name(info.name, list_model)
+                discovered_devices[info.address] = f"{display} ({info.address})"
 
         schema = {}
         if not self._mac_address:
@@ -75,7 +102,8 @@ class FliprConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
         if user_input is not None:
             mac = user_input[CONF_MAC_ADDRESS].upper()
             self._mac_address = mac
-            self._discovered_name = f"Flipr {mac}"
+            self._bt_name = None
+            self._discovered_name = "Flipr"
             return await self.async_step_user(user_input)
 
         return self.async_show_form(
@@ -101,7 +129,7 @@ class FliprOptionsFlowHandler(config_entries.OptionsFlow):
         ph_min = self.config_entry.options.get(CONF_PH_MIN, 6.90)
         ph_max = self.config_entry.options.get(CONF_PH_MAX, 7.50)
         orp_min = self.config_entry.options.get(CONF_ORP_MIN, 650)
-        temp_min = self.config_entry.options.get(CONF_TEMP_MIN, 6.0) # Ligne récupérée !
+        temp_min = self.config_entry.options.get(CONF_TEMP_MIN, 6.0)
         temp_max = self.config_entry.options.get(CONF_TEMP_MAX, 32.0)
         
         return self.async_show_form(
@@ -114,7 +142,7 @@ class FliprOptionsFlowHandler(config_entries.OptionsFlow):
                 vol.Required(CONF_PH_MIN, default=float(ph_min)): selector.NumberSelector(selector.NumberSelectorConfig(step=0.01, mode=selector.NumberSelectorMode.BOX)),
                 vol.Required(CONF_PH_MAX, default=float(ph_max)): selector.NumberSelector(selector.NumberSelectorConfig(step=0.01, mode=selector.NumberSelectorMode.BOX)),
                 vol.Required(CONF_ORP_MIN, default=int(orp_min)): selector.NumberSelector(selector.NumberSelectorConfig(step=1, mode=selector.NumberSelectorMode.BOX)),
-                vol.Required(CONF_TEMP_MIN, default=float(temp_min)): selector.NumberSelector(selector.NumberSelectorConfig(step=0.5, mode=selector.NumberSelectorMode.BOX)), # Ajouté au formulaire !
+                vol.Required(CONF_TEMP_MIN, default=float(temp_min)): selector.NumberSelector(selector.NumberSelectorConfig(step=0.5, mode=selector.NumberSelectorMode.BOX)),
                 vol.Required(CONF_TEMP_MAX, default=float(temp_max)): selector.NumberSelector(selector.NumberSelectorConfig(step=0.5, mode=selector.NumberSelectorMode.BOX)),
             })
         )

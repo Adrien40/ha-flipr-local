@@ -1,14 +1,13 @@
 # Copyright (c) 2026 Adrien40
 # This file is part of Flipr Local.
 
-"""Configuration et réglages pour Flipr"""
 import logging
 from datetime import timedelta
 from homeassistant.components.number import RestoreNumber
 from homeassistant.const import EntityCategory
 from homeassistant.helpers.device_registry import DeviceInfo
-from .const import DOMAIN, CONF_MAC_ADDRESS, CONF_CYA, CONF_USE_GATEWAY, CONF_SCAN_INTERVAL
-from .chemistry import compute_isl, compute_active_chlorine
+from .const import DOMAIN, CONF_MAC_ADDRESS, CONF_CYA, CONF_USE_GATEWAY, CONF_SCAN_INTERVAL, get_flipr_model
+from .chemistry import compute_isl, compute_active_chlorine, compute_ph_equilibrium
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -18,21 +17,23 @@ async def async_setup_entry(hass, entry, async_add_entities):
     entry_id = entry.entry_id
     use_gateway = entry.options.get(CONF_USE_GATEWAY, entry.data.get(CONF_USE_GATEWAY, False))
     
+    model_name = entry.data.get("model") or get_flipr_model(entry.title)
+    
     hass.data.setdefault(DOMAIN, {})
     if mac not in hass.data[DOMAIN]:
         hass.data[DOMAIN][mac] = {}
 
     async_add_entities([
-        FliprIntervalNumber(coordinator, mac, use_gateway),
-        FliprWaterConfigNumber(coordinator, mac, "TAC : Alcalinité", "tac", 0, 500, 1, 100, "mdi:water-percent", entry_id),
-        FliprWaterConfigNumber(coordinator, mac, "TDS : Solides Dissous", "tds", 0, 5000, 10, 500, "mdi:blur", entry_id),
-        FliprWaterConfigNumber(coordinator, mac, "TH : Dureté Calcique", "th", 0, 800, 1, 200, "mdi:water-outline", entry_id),
-        FliprWaterConfigNumber(coordinator, mac, "CyA : Stabilisant", CONF_CYA, 0, 150, 1, 40, "mdi:shield-sun", entry_id),
+        FliprIntervalNumber(coordinator, mac, use_gateway, model_name),
+        FliprWaterConfigNumber(coordinator, mac, "TAC : Alcalinité", "tac", 0, 500, 1, 100, "mdi:water-percent", entry_id, model_name),
+        FliprWaterConfigNumber(coordinator, mac, "TDS : Solides Dissous", "tds", 0, 5000, 10, 500, "mdi:blur", entry_id, model_name),
+        FliprWaterConfigNumber(coordinator, mac, "TH : Dureté Calcique", "th", 0, 800, 1, 200, "mdi:water-outline", entry_id, model_name),
+        FliprWaterConfigNumber(coordinator, mac, "CyA : Stabilisant", CONF_CYA, 0, 150, 1, 40, "mdi:shield-sun", entry_id, model_name),
     ])
 
 class FliprIntervalNumber(RestoreNumber):
     _attr_has_entity_name = True
-    def __init__(self, coordinator, mac, use_gateway):
+    def __init__(self, coordinator, mac, use_gateway, model_name):
         self.coordinator = coordinator
         self._mac = mac
         self._use_gateway = use_gateway
@@ -45,11 +46,10 @@ class FliprIntervalNumber(RestoreNumber):
         self._attr_entity_category = EntityCategory.CONFIG
         self._attr_icon = "mdi:timer-outline"
         self._attr_mode = "box"
-        self._attr_device_info = DeviceInfo(identifiers={(DOMAIN, mac)}, name=f"Flipr {mac}")
+        self._attr_device_info = DeviceInfo(identifiers={(DOMAIN, mac)}, name=model_name, manufacturer="Flipr", model=model_name)
 
     @property
     def available(self) -> bool:
-        """Grise le curseur si le mode Passerelle est activé."""
         return not self._use_gateway
 
     async def async_added_to_hass(self):
@@ -69,7 +69,7 @@ class FliprIntervalNumber(RestoreNumber):
 
 class FliprWaterConfigNumber(RestoreNumber):
     _attr_has_entity_name = True
-    def __init__(self, coordinator, mac, name, key, min_val, max_val, step, default_val, icon, entry_id):
+    def __init__(self, coordinator, mac, name, key, min_val, max_val, step, default_val, icon, entry_id, model_name):
         self.coordinator = coordinator
         self._mac = mac
         self._key = key
@@ -83,7 +83,7 @@ class FliprWaterConfigNumber(RestoreNumber):
         self._attr_icon = icon
         self._default_val = default_val
         self._attr_mode = "box"
-        self._attr_device_info = DeviceInfo(identifiers={(DOMAIN, mac)}, name=f"Flipr {mac}")
+        self._attr_device_info = DeviceInfo(identifiers={(DOMAIN, mac)}, name=model_name, manufacturer="Flipr", model=model_name)
 
     async def async_added_to_hass(self):
         await super().async_added_to_hass()
@@ -112,8 +112,20 @@ class FliprWaterConfigNumber(RestoreNumber):
             orp = new_data.get("orp")
             
             if temp is not None and ph is not None:
-                new_data["isl"] = compute_isl(temp, ph, tac, th, tds)
+                new_data["ph_equilibre_cible"] = compute_ph_equilibrium(temp, tac, th, tds)
+                isl_val = compute_isl(temp, ph, tac, th, tds)
+                new_data["isl"] = isl_val
+                
+                if isl_val is not None:
+                    if isl_val < -0.3:
+                        new_data["isl_statut"] = "Eau corrosive"
+                    elif isl_val > 0.3:
+                        new_data["isl_statut"] = "Eau entartrante"
+                    else:
+                        new_data["isl_statut"] = "Eau équilibrée"
+                
                 entry = self.coordinator.hass.config_entries.async_get_entry(self._entry_id)
                 chlore_model = entry.options.get("chlore_model", "stabilized")
                 new_data["chlore_actif_hocl"] = compute_active_chlorine(orp, ph, temp, cya, chlore_model)
+                
                 self.coordinator.async_set_updated_data(new_data)

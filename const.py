@@ -34,3 +34,14 @@ CONF_SCAN_INTERVAL = "scan_interval"
 # UUIDs Bluetooth
 FLIPR_CHARACTERISTIC_UUID = "00000006-0000-1000-8000-00805f9b34fb"
 FLIPR_COMMAND_UUID = "0000940d-0000-1000-8000-00805f9b34fb"
+
+def get_flipr_model(name: str | None) -> str:
+    """Détermine le modèle du Flipr en fonction de son nom."""
+    if not name:
+        return "Flipr"
+    name_upper = name.upper()
+    if name_upper.startswith("F3") or ("ANALYS" in name_upper and "3" in name_upper):
+        return "Flipr AnalysR 3"
+    if name_upper.startswith("F2") or ("ANALYS" in name_upper and "2" in name_upper):
+        return "Flipr AnalysR 2"
+    return "Flipr"

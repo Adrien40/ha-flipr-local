@@ -9,7 +9,7 @@ from homeassistant.components.bluetooth import async_ble_device_from_address
 from homeassistant.components.button import ButtonEntity
 from homeassistant.helpers.device_registry import DeviceInfo
 from homeassistant.helpers.update_coordinator import CoordinatorEntity
-from .const import DOMAIN, CONF_MAC_ADDRESS
+from .const import DOMAIN, CONF_MAC_ADDRESS, get_flipr_model
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -17,23 +17,25 @@ async def async_setup_entry(hass, entry, async_add_entities):
     coordinator = hass.data[DOMAIN][entry.entry_id]
     mac = entry.data[CONF_MAC_ADDRESS]
     
+    model_name = entry.data.get("model") or get_flipr_model(entry.title)
+    
     async_add_entities([
-        FliprActionTaskButton(coordinator, mac, "Nouvelle Analyse (~60s)", "nouvelle_analyse", "0000940d-0000-1000-8000-00805f9b34fb", "mdi:test-tube"),
-        FliprRefreshButton(coordinator, mac, "Récupérer dernière mesure", "recup_derniere", "mdi:cloud-download")
+        FliprActionTaskButton(coordinator, mac, "Nouvelle Analyse (~60s)", "nouvelle_analyse", "0000940d-0000-1000-8000-00805f9b34fb", "mdi:test-tube", model_name),
+        FliprRefreshButton(coordinator, mac, "Récupérer dernière mesure", "recup_derniere", "mdi:cloud-download", model_name)
     ])
 
 class FliprActionTaskButton(CoordinatorEntity, ButtonEntity):
     """Bouton qui gère l'envoi radio, l'attente, et déclenche la lecture."""
     _attr_has_entity_name = True
 
-    def __init__(self, coordinator, mac, name, key, action_uuid, icon):
+    def __init__(self, coordinator, mac, name, key, action_uuid, icon, model_name):
         super().__init__(coordinator)
         self._mac = mac
         self._attr_name = name
         self._attr_unique_id = f"{mac}_{key}"
         self._attr_icon = icon
         self._action_uuid = action_uuid
-        self._attr_device_info = DeviceInfo(identifiers={(DOMAIN, mac)}, name="Flipr AnalysR 3")
+        self._attr_device_info = DeviceInfo(identifiers={(DOMAIN, mac)}, name=model_name, manufacturer="Flipr", model=model_name)
 
     @property
     def available(self) -> bool:
@@ -72,13 +74,13 @@ class FliprRefreshButton(CoordinatorEntity, ButtonEntity):
     """Bouton simple pour forcer une lecture instantanée (sans pompe)."""
     _attr_has_entity_name = True
 
-    def __init__(self, coordinator, mac, name, key, icon):
+    def __init__(self, coordinator, mac, name, key, icon, model_name):
         super().__init__(coordinator)
         self._mac = mac
         self._attr_name = name
         self._attr_unique_id = f"{mac}_{key}"
         self._attr_icon = icon
-        self._attr_device_info = DeviceInfo(identifiers={(DOMAIN, mac)}, name="Flipr AnalysR 3")
+        self._attr_device_info = DeviceInfo(identifiers={(DOMAIN, mac)}, name=model_name, manufacturer="Flipr", model=model_name)
 
     @property
     def available(self) -> bool:
