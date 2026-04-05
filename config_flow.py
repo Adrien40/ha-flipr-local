@@ -86,7 +86,7 @@ class FliprConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
             else:
                 schema[vol.Required(CONF_MAC_ADDRESS)] = str
 
-        schema[vol.Optional(CONF_USE_GATEWAY, default=False)] = bool
+        schema[vol.Optional(CONF_USE_GATEWAY, default=True)] = bool
         schema.update({
             vol.Required(CONF_PH_CALIB_7, default=8.40): selector.NumberSelector(
                 selector.NumberSelectorConfig(step=0.01, mode=selector.NumberSelectorMode.BOX)
@@ -123,6 +123,7 @@ class FliprOptionsFlowHandler(config_entries.OptionsFlow):
         if user_input is not None:
             return self.async_create_entry(title="", data=user_input)
 
+        use_gw = self.config_entry.options.get(CONF_USE_GATEWAY, self.config_entry.data.get(CONF_USE_GATEWAY, True))
         c7 = self.config_entry.options.get(CONF_PH_CALIB_7) or self.config_entry.data.get(CONF_PH_CALIB_7) or 8.40
         c4 = self.config_entry.options.get(CONF_PH_CALIB_4) or self.config_entry.data.get(CONF_PH_CALIB_4) or 6.02
         ph_ref_7 = self.config_entry.options.get(CONF_PH_REF_7, 7.02)
@@ -136,6 +137,7 @@ class FliprOptionsFlowHandler(config_entries.OptionsFlow):
         return self.async_show_form(
             step_id="init",
             data_schema=vol.Schema({
+                vol.Optional(CONF_USE_GATEWAY, default=use_gw): bool,
                 vol.Required(CONF_PH_CALIB_7, default=float(c7)): selector.NumberSelector(selector.NumberSelectorConfig(step=0.01, mode=selector.NumberSelectorMode.BOX)),
                 vol.Required(CONF_PH_REF_7, default=float(ph_ref_7)): selector.NumberSelector(selector.NumberSelectorConfig(step=0.01, mode=selector.NumberSelectorMode.BOX)),
                 vol.Required(CONF_PH_CALIB_4, default=float(c4)): selector.NumberSelector(selector.NumberSelectorConfig(step=0.01, mode=selector.NumberSelectorMode.BOX)),

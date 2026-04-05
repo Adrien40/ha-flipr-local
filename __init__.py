@@ -12,16 +12,16 @@ from .chemistry import compute_isl, compute_active_chlorine, get_mv_from_input, 
 from .const import *
 
 _LOGGER = logging.getLogger(__name__)
-PLATFORMS = ["sensor", "binary_sensor", "button", "number", "select", "switch"]
+PLATFORMS = ["sensor", "binary_sensor", "button", "number", "select"]
 
 async def update_listener(hass, entry):
-    coordinator = hass.data[DOMAIN].get(entry.entry_id)
-    if coordinator:
-        await coordinator.async_refresh()
+    await hass.config_entries.async_reload(entry.entry_id)
 
 async def async_setup_entry(hass, entry):
     hass.data.setdefault(DOMAIN, {})
     mac = entry.data[CONF_MAC_ADDRESS]
+    
+    use_gateway = entry.options.get(CONF_USE_GATEWAY, entry.data.get(CONF_USE_GATEWAY, True))
     
     if mac not in hass.data[DOMAIN]:
         hass.data[DOMAIN][mac] = {}
@@ -32,9 +32,11 @@ async def async_setup_entry(hass, entry):
 
     async def async_update_data():
         nonlocal last_data
+        
         try:
             async with asyncio.timeout(60):
                 device = async_ble_device_from_address(hass, mac, connectable=True)
+                
                 if not device:
                     if last_data: return last_data
                     raise UpdateFailed("Flipr hors de portée Bluetooth")
@@ -94,19 +96,23 @@ async def async_setup_entry(hass, entry):
         }
         return last_data
 
+    interval = None if use_gateway else timedelta(minutes=75)
     coordinator = DataUpdateCoordinator(
         hass, _LOGGER, 
         name=f"Flipr {mac}", 
         update_method=async_update_data, 
-        update_interval=timedelta(minutes=75) 
+        update_interval=interval
     )
     
     hass.data[DOMAIN][entry.entry_id] = coordinator
+    
     await hass.config_entries.async_forward_entry_setups(entry, PLATFORMS)
     entry.async_create_background_task(hass, coordinator.async_request_refresh(), "Flipr_Init_Refresh")
+    
     return True
 
 async def async_unload_entry(hass, entry):
     ok = await hass.config_entries.async_unload_platforms(entry, PLATFORMS)
-    if ok: hass.data[DOMAIN].pop(entry.entry_id)
+    if ok:
+        hass.data[DOMAIN].pop(entry.entry_id)
     return ok

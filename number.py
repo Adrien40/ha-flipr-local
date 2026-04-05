@@ -15,8 +15,8 @@ async def async_setup_entry(hass, entry, async_add_entities):
     coordinator = hass.data[DOMAIN][entry.entry_id]
     mac = entry.data[CONF_MAC_ADDRESS]
     entry_id = entry.entry_id
-    use_gateway = entry.options.get(CONF_USE_GATEWAY, entry.data.get(CONF_USE_GATEWAY, False))
     
+    use_gateway = entry.options.get(CONF_USE_GATEWAY, entry.data.get(CONF_USE_GATEWAY, True))
     model_name = entry.data.get("model") or get_flipr_model(entry.title)
     
     hass.data.setdefault(DOMAIN, {})
@@ -51,7 +51,7 @@ class FliprIntervalNumber(RestoreNumber):
 
     @property
     def available(self) -> bool:
-        return not self._use_gateway
+        return self._use_gateway
 
     async def async_added_to_hass(self):
         await super().async_added_to_hass()
