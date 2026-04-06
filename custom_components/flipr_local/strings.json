@@ -52,6 +52,15 @@
       }
     }
   },
+  "selector": {
+    "chlore_model": {
+      "options": {
+        "chlorine": "Chlore / Sel",
+        "bromine": "Brome",
+        "custom": "Spécifique"
+      }
+    }
+  },
   "entity": {
     "sensor": {
       "ph_raw": { "name": "pH Brut (mV)" },

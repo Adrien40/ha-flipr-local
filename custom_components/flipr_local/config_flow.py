@@ -92,11 +92,7 @@ class FliprConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
         
         schema[vol.Required(CONF_CHLORE_MODEL, default="chlorine")] = selector.SelectSelector(
             selector.SelectSelectorConfig(
-                options=[
-                    {"value": "chlorine", "label": "chlorine"},
-                    {"value": "bromine", "label": "bromine"},
-                    {"value": "custom", "label": "custom"}
-                ],
+                options=["chlorine", "bromine", "custom"],
                 translation_key="chlore_model",
                 mode=selector.SelectSelectorMode.DROPDOWN
             )
@@ -142,7 +138,7 @@ class FliprOptionsFlowHandler(config_entries.OptionsFlow):
             return self.async_create_entry(title="", data=user_input)
 
         use_gw = self.config_entry.options.get(CONF_USE_GATEWAY, self.config_entry.data.get(CONF_USE_GATEWAY, True))
-        current_model = self.config_entry.options.get(CONF_CHLORE_MODEL, self.config_entry.data.get(CONF_CHLORE_MODEL, "stabilized"))
+        current_model = self.config_entry.options.get(CONF_CHLORE_MODEL, self.config_entry.data.get(CONF_CHLORE_MODEL, "chlorine"))
         c7 = self.config_entry.options.get(CONF_PH_CALIB_7) or self.config_entry.data.get(CONF_PH_CALIB_7) or 8.40
         c4 = self.config_entry.options.get(CONF_PH_CALIB_4) or self.config_entry.data.get(CONF_PH_CALIB_4) or 6.02
         ph_ref_7 = self.config_entry.options.get(CONF_PH_REF_7, 7.02)
@@ -159,11 +155,7 @@ class FliprOptionsFlowHandler(config_entries.OptionsFlow):
                 vol.Optional(CONF_USE_GATEWAY, default=use_gw): bool,
                 vol.Required(CONF_CHLORE_MODEL, default=current_model): selector.SelectSelector(
                     selector.SelectSelectorConfig(
-                        options=[
-                            {"value": "chlorine", "label": "chlorine"},
-                            {"value": "bromine", "label": "bromine"},
-                            {"value": "custom", "label": "custom"}
-                        ],
+                        options=["chlorine", "bromine", "custom"],
                         translation_key="chlore_model",
                         mode=selector.SelectSelectorMode.DROPDOWN
                     )
