@@ -147,4 +147,8 @@ async def async_unload_entry(hass, entry):
     ok = await hass.config_entries.async_unload_platforms(entry, PLATFORMS)
     if ok:
         hass.data[DOMAIN].pop(entry.entry_id, None)
+        # Rétablissement du nettoyage de la mémoire vive !
+        mac = entry.data.get(CONF_MAC_ADDRESS)
+        if mac and mac in hass.data[DOMAIN]:
+            hass.data[DOMAIN].pop(mac, None)
     return ok

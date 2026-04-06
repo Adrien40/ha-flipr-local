@@ -46,11 +46,13 @@ class FliprForceAnalysisButton(ButtonEntity):
             client = await establish_connection(BleakClient, device, self._mac, max_attempts=3)
             try:
                 await client.write_gatt_char(FLIPR_COMMAND_UUID, bytearray([0x01]), response=True)
+                
+                # NOUVEAU : On garde le client connecté pendant 55s pour bloquer la passerelle
+                await asyncio.sleep(55)
             finally:
                 await client.disconnect()
 
-            # Attente bloquante pour l'UI, le bouton affichera un spinner pendant 55s
-            await asyncio.sleep(55)
+            # L'eau est renouvelée, on lit les données
             await self.coordinator.async_request_refresh()
 
         except Exception as e:
