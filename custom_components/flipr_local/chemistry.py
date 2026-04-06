@@ -34,28 +34,35 @@ def compute_isl(temp, ph, tac, th, tds):
         return None
     return round(ph - phs, 2)
 
-def compute_active_chlorine(orp, ph, temp, cya=40, model="stabilized"):
+def compute_active_chlorine(orp, ph, temp, cya=40, model="chlorine"):
     if not all(v is not None for v in [orp, ph, temp]):
         return None
         
     try:
-        if model == "nernst":
-            resultat = math.exp((orp + (ph - 7.4) * 40 - 655) / 32)
-            return round(max(0.0, min(resultat, 15.0)), 2)
+        _cya = float(cya)
+
+        if model in ["chlorine", "stabilized", "nernst"]:
+            if _cya <= 0:
+                resultat = math.exp((orp + (ph - 7.4) * 40 - 655) / 32)
+                return round(max(0.0, min(resultat, 15.0)), 2)
+            else:
+                base_resultat = math.exp(-7.5 + (0.18 * ph) + (0.009 * orp) + (0.02 * temp))
+                _cya_clamped = max(5.0, min(_cya, 150.0))
+                ratio_evolution = 40.0 / _cya_clamped
+                final_result = base_resultat * ratio_evolution
+                return round(max(0.0, min(final_result, 15.0)), 2)
 
         if model == "bromine":
             base_resultat = math.exp((orp + (ph - 7.4) * 40 - 655) / 32) * 2.25
-        elif model == "custom":
+            return round(max(0.0, min(base_resultat, 15.0)), 2)
+            
+        if model == "custom":
             base_resultat = math.exp(-6.1715 + (0.1899 * ph) + (0.0081 * orp) + (0.0217 * temp))
-        else:
-            base_resultat = math.exp(-7.5 + (0.18 * ph) + (0.009 * orp) + (0.02 * temp))
-
-        _cya = max(5.0, min(float(cya), 150.0))
-        ratio_evolution = 40.0 / _cya
-        
-        final_result = base_resultat * ratio_evolution
-        return round(max(0.0, min(final_result, 15.0)), 2)
-        
+            _cya_clamped = max(5.0, min(_cya, 150.0))
+            ratio_evolution = 40.0 / _cya_clamped
+            final_result = base_resultat * ratio_evolution
+            return round(max(0.0, min(final_result, 15.0)), 2)
+            
     except Exception as e:
         _LOGGER.error("Erreur lors du calcul du désinfectant : %s", e)
         return None

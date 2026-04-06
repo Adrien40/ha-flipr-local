@@ -29,7 +29,6 @@ async def async_setup_entry(hass, entry):
     if mac not in hass.data[DOMAIN]:
         hass.data[DOMAIN][mac] = {}
         
-    # FIX ANTI-INCONNU : On récupère la mémoire de l'instant précédent
     last_data = hass.data[DOMAIN][mac].get("last_data", {})
 
     entry.async_on_unload(entry.add_update_listener(update_listener))
@@ -37,13 +36,27 @@ async def async_setup_entry(hass, entry):
     async def async_update_data():
         nonlocal last_data
         
+        # --- DEBUG BLE : Ce que HA voit dans son cache ---
+        _LOGGER.debug(
+            "Cache BLE HA pour %s — connectable: %s | non-connectable: %s",
+            mac,
+            async_ble_device_from_address(hass, mac, connectable=True),
+            async_ble_device_from_address(hass, mac, connectable=False),
+        )
+        
         try:
             async with asyncio.timeout(60):
                 device = async_ble_device_from_address(hass, mac, connectable=True)
                 
                 if not device:
-                    if last_data: return last_data
-                    raise UpdateFailed("Flipr hors de portée Bluetooth")
+                    device = async_ble_device_from_address(hass, mac, connectable=False)
+                    if device:
+                        _LOGGER.warning("Flipr %s trouvé en non-connectable. Tentative de connexion forcée...", mac)
+                    else:
+                        _LOGGER.warning("Flipr %s introuvable dans le cache BLE de Home Assistant.", mac)
+                        if last_data:
+                            return last_data
+                        raise UpdateFailed("Flipr hors de portée Bluetooth")
 
                 client = await establish_connection(BleakClient, device, mac, max_attempts=3)
                 try:
@@ -52,6 +65,7 @@ async def async_setup_entry(hass, entry):
                     await client.disconnect()
                 
         except Exception as err:
+            _LOGGER.error("Erreur de communication Bluetooth : %s", err)
             if last_data: return last_data
             raise UpdateFailed(f"Erreur de communication : {err}")
 
@@ -104,7 +118,7 @@ async def async_setup_entry(hass, entry):
             "ph_equilibre_cible": compute_ph_equilibrium(temp, tac_val, th_val, tds_val),
             "isl": isl_val, "isl_statut": isl_statut,
             "battery": int.from_bytes(data[11:13], 'little'), "rssi": rssi_val,
-            "last_received": heure_mesure,  # <-- On utilise la variable ici
+            "last_received": heure_mesure, 
             "raw_frame": hex_frame
         }
         

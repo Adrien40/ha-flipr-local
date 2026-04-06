@@ -19,7 +19,7 @@ class FliprModelSelect(CoordinatorEntity, SelectEntity):
     _attr_has_entity_name = True
     _attr_entity_category = EntityCategory.CONFIG
     _attr_translation_key = "chlore_model"
-    _attr_options = ["stabilized", "nernst", "bromine", "custom"]
+    _attr_options = ["chlorine", "bromine", "custom"]
 
     def __init__(self, coordinator, entry, mac, model_name):
         super().__init__(coordinator)
@@ -35,7 +35,7 @@ class FliprModelSelect(CoordinatorEntity, SelectEntity):
 
     @property
     def current_option(self):
-        return self.entry.options.get(CONF_CHLORE_MODEL, self.entry.data.get(CONF_CHLORE_MODEL, "stabilized"))
+        return self.entry.options.get(CONF_CHLORE_MODEL, self.entry.data.get(CONF_CHLORE_MODEL, "chlorine"))
 
     async def async_select_option(self, option: str) -> None:
         # 1. On recalcule la donnée tout de suite en local pour éviter le vide

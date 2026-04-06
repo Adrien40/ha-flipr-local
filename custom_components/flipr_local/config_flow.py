@@ -90,11 +90,10 @@ class FliprConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
 
         schema[vol.Optional(CONF_USE_GATEWAY, default=True)] = bool
         
-        schema[vol.Required(CONF_CHLORE_MODEL, default="stabilized")] = selector.SelectSelector(
+        schema[vol.Required(CONF_CHLORE_MODEL, default="chlorine")] = selector.SelectSelector(
             selector.SelectSelectorConfig(
                 options=[
-                    {"value": "stabilized", "label": "stabilized"},
-                    {"value": "nernst", "label": "nernst"},
+                    {"value": "chlorine", "label": "chlorine"},
                     {"value": "bromine", "label": "bromine"},
                     {"value": "custom", "label": "custom"}
                 ],
@@ -161,8 +160,7 @@ class FliprOptionsFlowHandler(config_entries.OptionsFlow):
                 vol.Required(CONF_CHLORE_MODEL, default=current_model): selector.SelectSelector(
                     selector.SelectSelectorConfig(
                         options=[
-                            {"value": "stabilized", "label": "stabilized"},
-                            {"value": "nernst", "label": "nernst"},
+                            {"value": "chlorine", "label": "chlorine"},
                             {"value": "bromine", "label": "bromine"},
                             {"value": "custom", "label": "custom"}
                         ],

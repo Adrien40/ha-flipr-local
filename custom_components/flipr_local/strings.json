@@ -25,7 +25,7 @@
       "cannot_connect": "Échec de connexion au Flipr",
       "already_configured": "Cet appareil est déjà configuré",
       "unknown": "Erreur inconnue",
-	  "invalid_mac": "Format invalide (ex : AA:BB:CC:DD:EE:FF)"
+      "invalid_mac": "Format invalide (ex : AA:BB:CC:DD:EE:FF)"
     },
     "abort": {
       "already_configured": "Cet appareil est déjà configuré"
@@ -49,16 +49,6 @@
           "temp_min": "Seuil : Température Minimum (°C)",
           "temp_max": "Seuil : Température Maximum (°C)"
         }
-      }
-    }
-  },
-  "selector": {
-    "chlore_model": {
-      "options": {
-        "stabilized": "Chlore stabilisé (Galets, granulés)",
-        "nernst": "Sel / Chlore non stabilisé (Sticks, liquide)",
-        "bromine": "Brome",
-        "custom": "Spécifique"
       }
     }
   },
@@ -87,10 +77,8 @@
     },
     "select": {
       "chlore_model": { 
-        "name": "Modèle de calcul du désinfectant",
         "state": {
-          "stabilized": "Chlore stabilisé",
-          "nernst": "Sel / Chlore non stabilisé",
+          "chlorine": "Chlore / Sel",
           "bromine": "Brome",
           "custom": "Spécifique"
         }

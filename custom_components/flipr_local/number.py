@@ -56,6 +56,9 @@ class FliprUpdateIntervalNumber(RestoreNumber):
         self._attr_native_value = val
         
         self.coordinator.update_interval = timedelta(minutes=val)
+        
+        if not getattr(self.coordinator, "_unsub_refresh", None):
+            self.coordinator._schedule_refresh()
 
     async def async_set_native_value(self, value):
         """Appliqué quand tu changes la valeur dans HA"""
@@ -63,6 +66,8 @@ class FliprUpdateIntervalNumber(RestoreNumber):
         self._attr_native_value = val
         
         self.coordinator.update_interval = timedelta(minutes=val)
+        
+        self.coordinator._schedule_refresh()
             
         self.async_write_ha_state()
 
@@ -85,6 +90,16 @@ class FliprWaterConfigNumber(RestoreNumber):
         self._attr_mode = "box"
         self._attr_entity_category = EntityCategory.CONFIG
         self._attr_device_info = DeviceInfo(identifiers={(DOMAIN, mac)}, name=model_name, manufacturer="Flipr", model=model_name)
+
+    @property
+    def available(self) -> bool:
+        """Désactive le curseur CyA (grisé) si le Brome est sélectionné."""
+        if self._key == CONF_CYA:
+            entry = self.coordinator.hass.config_entries.async_get_entry(self._entry_id)
+            if entry:
+                chlore_model = entry.options.get("chlore_model", entry.data.get("chlore_model", "chlorine"))
+                return chlore_model != "bromine"
+        return True
 
     async def async_added_to_hass(self):
         await super().async_added_to_hass()
@@ -126,7 +141,7 @@ class FliprWaterConfigNumber(RestoreNumber):
                         new_data["isl_statut"] = "Eau équilibrée"
                 
                 entry = self.coordinator.hass.config_entries.async_get_entry(self._entry_id)
-                chlore_model = entry.options.get("chlore_model", "stabilized")
+                chlore_model = entry.options.get("chlore_model", "chlorine") # J'ai mis "chlorine" par défaut ici aussi
                 new_data["chlore_actif_hocl"] = compute_active_chlorine(orp, ph, temp, cya, chlore_model)
                 
                 self.coordinator.async_set_updated_data(new_data)
