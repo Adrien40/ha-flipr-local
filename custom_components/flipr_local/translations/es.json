@@ -1,0 +1,266 @@
+{
+  "config": {
+    "flow_title": "{name}",
+    "step": {
+      "user": {
+        "title": "⚙️ Configuración de Flipr",
+        "description": "Si el Flipr no se detecta automáticamente, añade su dirección MAC Bluetooth. 📱 ¡Usa una aplicación móvil como 'nRF Connect' para encontrarla!\n\n🪫️ **Importante - Gestión de batería:**\n- **Con el Gateway Wi-Fi**: El Flipr cambiará al **Modo Eco** (2 medidas/día, visible en la app oficial).\n- Puedes cambiar esta configuración en la integración a través del icono del engranaje ⚙️.\n\n⚠️ Después de añadirlo, **espera unos 60 segundos** para que se actualicen los datos...",
+        "data": {
+          "mac_address": "🔎 Dispositivo detectado"
+        },
+        "sections": {
+          "general": {
+            "name": "⚙️ General",
+            "data": {
+              "use_gateway": "Usar con el Gateway Wi-Fi Flipr 🛜",
+              "chlorine_model": "🧪 Tratamiento del agua",
+              "cya": "💧 Nivel de estabilizante / CyA (mg/l)"
+            }
+          },
+          "probes_calibration": {
+            "name": "🧪 Calibración de Sondas",
+            "data": {
+              "ph_calib_7": "🟢 Valor pH 7 (ej: 1600 mV o 8.40)",
+              "ph_ref_7": "🎯 Objetivo solución pH 7 (ej: 7.02)",
+              "ph_calib_4": "🔴 Valor pH 4 (ej: 1900 mV o 6.02)",
+              "ph_ref_4": "🎯 Objetivo solución pH 4 (ej: 4.00)",
+              "orp_calib": "📏 Valor medido ORP (Redox) (ej: 650)",
+              "orp_ref": "🎯 Objetivo solución ORP (Redox) (ej: 650)",
+              "temp_offset": "🌡️ Compensación de Temperatura (°Celsius) (+/-)"
+            }
+          }
+        }
+      },
+      "manual": {
+        "title": "✍️ Entrada manual",
+        "description": "Introduce la dirección MAC Bluetooth (ej: AA:BB:CC:DD:EE:FF)",
+        "data": {
+          "mac_address": "🏷️ Dirección MAC Bluetooth"
+        }
+      }
+    },
+    "error": {
+      "cannot_connect": "❌ Fallo al conectar con Flipr",
+      "already_configured": "⚠️ Este dispositivo ya está configurado",
+      "unknown": "❓ Error desconocido",
+      "invalid_mac": "❌ Formato inválido (ej: AA:BB:CC:DD:EE:FF)",
+      "invalid_selection": "❌ Selección inválida. Por favor, elige un dispositivo.",
+      "ph_calibration_equal": "❌ Los valores de calibración de pH deben ser diferentes",
+      "ph_reference_equal": "❌ Los valores de referencia de pH deben ser diferentes",
+      "ph_slope_mismatch": "❌ Las pendientes de calibración y referencia deben coincidir",
+      "ph_mv_out_of_range": "❌ Los valores mV deben estar entre 500-3000",
+      "ph_ref_out_of_range": "❌ pH 4: 2.5-5.5, pH 7: 6.5-7.5",
+      "ph_threshold_error": "❌ El pH mínimo debe ser menor que el pH máximo",
+      "orp_threshold_error": "❌ El ORP (Redox) mínimo debe ser menor que el ORP máximo",
+      "temp_threshold_error": "❌ La temperatura mínima debe ser menor que la temperatura máxima"
+    },
+    "abort": {
+      "already_configured": "⚠️ Este dispositivo ya está configurado"
+    }
+  },
+  "options": {
+    "step": {
+      "init": {
+        "title": "🛠️ Opciones de Flipr",
+        "description": "Ajusta la calibración, el comportamiento y tus umbrales de alerta personales.",
+        "data": {},
+        "sections": {
+          "general": {
+            "name": "⚙️ General",
+            "data": {
+              "use_gateway": "Usar con el Gateway Wi-Fi Flipr 🛜",
+              "sync_mode": "🔄 Modo de sincronización (vía Gateway Flipr)",
+              "chlorine_model": "🧪 Tratamiento del agua",
+              "cya": "💧 Nivel de estabilizante / CyA (mg/l)"
+            }
+          },
+          "probes_calibration": {
+            "name": "🧪 Calibración de Sondas",
+            "data": {
+              "ph_calib_7": "🟢 Valor pH 7 (ej: 1600 mV o 8.40)",
+              "ph_ref_7": "🎯 Objetivo solución pH 7 (ej: 7.02)",
+              "ph_calib_4": "🔴 Valor pH 4 (ej: 1900 mV o 6.02)",
+              "ph_ref_4": "🎯 Objetivo solución pH 4 (ej: 4.00)",
+              "orp_calib": "📏 Valor medido ORP (Redox) (ej: 650)",
+              "orp_ref": "🎯 Objetivo solución ORP (Redox) (ej: 650)",
+              "temp_offset": "🌡️ Compensación de Temperatura (°Celsius) (+/-)"
+            }
+          },
+          "alert_thresholds": {
+            "name": "📊 Umbrales de Alerta",
+            "data": {
+              "ph_min": "📉 Umbral: pH Mínimo (ej: 6.90)",
+              "ph_max": "📈 Umbral: pH Máximo (ej: 7.50)",
+              "orp_min": "📉 Umbral: ORP (Redox) Mínimo (mV)",
+              "orp_max": "📈 Umbral: ORP (Redox) Máximo (mV)",
+              "temp_min": "❄️ Umbral: Temperatura Mínima (°Celsius)",
+              "temp_max": "🌡️ Umbral: Temperatura Máxima (°Celsius)"
+            }
+          }
+        }
+      },
+      "warning": {
+        "title": "⚠️ Advertencia de Batería",
+        "description": "Has elegido usar el **Gateway Wi-Fi** con un modo de sincronización alto (Normal o Boost).\n\nEsta combinación obliga al Flipr a comunicarse intensamente tanto con la Nube (vía su gateway) como con Home Assistant, lo que corre el riesgo de **agotar la batería rápidamente**.\n\nSe recomienda cambiar al modo Eco o Reposo.\n\nHaz clic en **Enviar** para forzar esta configuración, o en el botón de cerrar para modificarla."
+      }
+    },
+    "error": {
+      "ph_threshold_error": "❌ El pH mínimo debe ser menor que el pH máximo",
+      "orp_threshold_error": "❌ El ORP (Redox) mínimo debe ser menor que el ORP máximo",
+      "temp_threshold_error": "❌ La temperatura mínima debe ser menor que la temperatura máxima"
+    }
+  },
+  "selector": {
+    "chlorine_model": {
+      "options": {
+        "chlorine": "🧂 Cloro / Sal",
+        "bromine": "🟤 Bromo"
+      }
+    },
+    "sync_mode": {
+      "options": {
+        "0": "💤 Reposo (0 medidas/día) - ¡Alternativa con gateway también!",
+        "1": "🌊 Normal (20 medidas/día)",
+        "2": "🍃 Eco (2 medidas/día) - ¡Recomendado con gateway!",
+        "3": "🚀 Boost (700 medidas/día) - ¡Vigila tu batería!"
+      }
+    },
+    "mac_address_select": {
+      "options": {
+        "manual": "✍️ ¡Introduce la dirección MAC manualmente en la siguiente pantalla!"
+      }
+    }
+  },
+  "entity": {
+    "binary_sensor": {
+      "ph_status": {
+        "name": "Estado de pH"
+      },
+      "orp_status": {
+        "name": "Estado de ORP (Redox)"
+      },
+      "temperature_status": {
+        "name": "Estado de Temperatura"
+      }
+    },
+    "button": {
+      "force_analysis": {
+        "name": "Nuevo Análisis (~60s)"
+      }
+    },
+    "number": {
+      "scan_interval": {
+        "name": "Intervalo de análisis"
+      },
+      "tac": {
+        "name": "TAC (Alcalinidad)"
+      },
+      "th": {
+        "name": "TH (Dureza)"
+      },
+      "tds": {
+        "name": "TDS (Sólidos Disueltos Totales)"
+      },
+      "cya": {
+        "name": "CyA (Estabilizante)"
+      }
+    },
+    "select": {
+      "chlorine_model": {
+        "name": "🧪 Tratamiento del agua",
+        "state": {
+          "chlorine": "🧂 Cloro / Sal",
+          "bromine": "🟤 Bromo"
+        }
+      }
+    },
+    "sensor": {
+      "sync_mode_state": {
+        "name": "Modo de sincronización Gateway",
+        "state": {
+          "0": "💤 Reposo",
+          "1": "🌊 Normal",
+          "2": "🍃 Eco",
+          "3": "🚀 Boost"
+        }
+      },
+      "bluetooth_status": {
+        "name": "Estado Bluetooth",
+        "state": {
+          "waiting": "💤 Desconectado",
+          "connecting": "⏳ Conectando con Flipr...",
+          "waking_up": "🚀 Despertando el sistema...",
+          "requesting": "🗣️ Solicitando análisis...",
+          "reading": "📡 Escuchando trama...",
+          "writing_sync": "⚙️ Enviando configuración...",
+          "success": "✅ Análisis completo (Desconectado)",
+          "sync_applied": "✅ Configuración aplicada",
+          "error": "❌ Error de conexión",
+          "error_retry": "⏳ Error (Reintentando en 60s)",
+          "write_failed": "⚠️ Fallo en la escritura",
+          "paused": "⏸️ Análisis pausados",
+          "out_of_range": "📵 Señal perdida"
+        }
+      },
+      "next_analysis": {
+        "name": "Próximo análisis"
+      },
+      "temperature": {
+        "name": "Temperatura"
+      },
+      "ph": {
+        "name": "pH"
+      },
+      "orp": {
+        "name": "ORP (Redox)"
+      },
+      "battery": {
+        "name": "Batería (Voltaje)"
+      },
+      "battery_level": {
+        "name": "Batería"
+      },
+      "ph_raw": {
+        "name": "pH Bruto (mV)"
+      },
+      "factory_ph": {
+        "name": "pH Bruto (Fábrica)"
+      },
+      "estimated_free_chlorine": {
+        "name": "Cloro Libre Estimado (FC)"
+      },
+      "active_chlorine_hocl": {
+        "name": "Cloro Activo (HOCl)"
+      },
+      "lsi": {
+        "name": "Índice de Langelier"
+      },
+      "lsi_status": {
+        "name": "Estado del Índice de Langelier",
+        "state": {
+          "corrosive": "🔴 Agua Corrosiva (Ácida)",
+          "balanced": "🟢 Agua Perfectamente Equilibrada",
+          "scaling": "🟠 Agua Incrustante (Básica)",
+          "unknown": "⚪ Desconocido"
+        }
+      },
+      "target_equilibrium_ph": {
+        "name": "pH de Equilibrio (Taylor)"
+      },
+      "last_received": {
+        "name": "Último análisis"
+      },
+      "raw_frame": {
+        "name": "Trama Bruta"
+      },
+      "rssi": {
+        "name": "Señal Bluetooth"
+      }
+    },
+    "switch": {
+      "active_measures": {
+        "name": "Análisis automáticos"
+      }
+    }
+  }
+}

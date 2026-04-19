@@ -1,0 +1,266 @@
+{
+  "config": {
+    "flow_title": "{name}",
+    "step": {
+      "user": {
+        "title": "⚙️ Flipr 設定",
+        "description": "如果未自動偵測到 Flipr，請新增其藍牙 MAC 位址。📱 使用類似 'nRF Connect' 的行動應用程式來尋找它！\n\n🪫️ **重要提示 - 電池管理：**\n- **使用 Wi-Fi 閘道器時**：Flipr 將切換到 **Eco 模式**（每天 2 次測量，可在官方應用程式上查看）。\n- 您可以透過齒輪圖示在整合設定中變更此設定 ⚙️。\n\n⚠️ 新增後，**請等待大約 60 秒**以更新資料...",
+        "data": {
+          "mac_address": "🔎 已發現的裝置"
+        },
+        "sections": {
+          "general": {
+            "name": "⚙️ 一般",
+            "data": {
+              "use_gateway": "與 Flipr Wi-Fi 閘道器一起使用 🛜",
+              "chlorine_model": "🧪 水處理",
+              "cya": "💧 穩定劑水平 / CyA (mg/l)"
+            }
+          },
+          "probes_calibration": {
+            "name": "🧪 探頭校準",
+            "data": {
+              "ph_calib_7": "🟢 pH 7 值 (例如：1600 mV 或 8.40)",
+              "ph_ref_7": "🎯 pH 7 目標溶液 (例如：7.02)",
+              "ph_calib_4": "🔴 pH 4 值 (例如：1900 mV 或 6.02)",
+              "ph_ref_4": "🎯 pH 4 目標溶液 (例如：4.00)",
+              "orp_calib": "📏 ORP (氧化還原) 測量值 (例如：650)",
+              "orp_ref": "🎯 ORP (氧化還原) 目標溶液 (例如：650)",
+              "temp_offset": "🌡️ 溫度偏移 (°Celsius) (+/-)"
+            }
+          }
+        }
+      },
+      "manual": {
+        "title": "✍️ 手動輸入",
+        "description": "輸入藍牙 MAC 位址 (例如：AA:BB:CC:DD:EE:FF)",
+        "data": {
+          "mac_address": "🏷️ 藍牙 MAC 位址"
+        }
+      }
+    },
+    "error": {
+      "cannot_connect": "❌ 連線 Flipr 失敗",
+      "already_configured": "⚠️ 此裝置已設定",
+      "unknown": "❓ 未知錯誤",
+      "invalid_mac": "❌ 格式無效 (例如：AA:BB:CC:DD:EE:FF)",
+      "invalid_selection": "❌ 選擇無效。請選擇一個裝置。",
+      "ph_calibration_equal": "❌ pH 校準值必須不同",
+      "ph_reference_equal": "❌ pH 參考值必須不同",
+      "ph_slope_mismatch": "❌ 校準和參考斜率必須相符",
+      "ph_mv_out_of_range": "❌ mV 值必須在 500-3000 之間",
+      "ph_ref_out_of_range": "❌ pH 4: 2.5-5.5, pH 7: 6.5-7.5",
+      "ph_threshold_error": "❌ 最小 pH 必須小於最大 pH",
+      "orp_threshold_error": "❌ 最小 ORP (氧化還原) 必須小於最大 ORP",
+      "temp_threshold_error": "❌ 最低溫度必須低於最高溫度"
+    },
+    "abort": {
+      "already_configured": "⚠️ 此裝置已設定"
+    }
+  },
+  "options": {
+    "step": {
+      "init": {
+        "title": "🛠️ Flipr 選項",
+        "description": "調整校準、行為和您的個人警報閾值。",
+        "data": {},
+        "sections": {
+          "general": {
+            "name": "⚙️ 一般",
+            "data": {
+              "use_gateway": "與 Flipr Wi-Fi 閘道器一起使用 🛜",
+              "sync_mode": "🔄 同步模式 (透過 Flipr 閘道器)",
+              "chlorine_model": "🧪 水處理",
+              "cya": "💧 穩定劑水平 / CyA (mg/l)"
+            }
+          },
+          "probes_calibration": {
+            "name": "🧪 探頭校準",
+            "data": {
+              "ph_calib_7": "🟢 pH 7 值 (例如：1600 mV 或 8.40)",
+              "ph_ref_7": "🎯 pH 7 目標溶液 (例如：7.02)",
+              "ph_calib_4": "🔴 pH 4 值 (例如：1900 mV 或 6.02)",
+              "ph_ref_4": "🎯 pH 4 目標溶液 (例如：4.00)",
+              "orp_calib": "📏 ORP (氧化還原) 測量值 (例如：650)",
+              "orp_ref": "🎯 ORP (氧化還原) 目標溶液 (例如：650)",
+              "temp_offset": "🌡️ 溫度偏移 (°Celsius) (+/-)"
+            }
+          },
+          "alert_thresholds": {
+            "name": "📊 警報閾值",
+            "data": {
+              "ph_min": "📉 閾值：最小 pH (例如：6.90)",
+              "ph_max": "📈 閾值：最大 pH (例如：7.50)",
+              "orp_min": "📉 閾值：最小 ORP (氧化還原) (mV)",
+              "orp_max": "📈 閾值：最大 ORP (氧化還原) (mV)",
+              "temp_min": "❄️ 閾值：最低溫度 (°Celsius)",
+              "temp_max": "🌡️ 閾值：最高溫度 (°Celsius)"
+            }
+          }
+        }
+      },
+      "warning": {
+        "title": "⚠️ 電池警告",
+        "description": "您選擇了具有高同步模式（正常或增強）的 **Wi-Fi 閘道器**。\n\n這種組合迫使 Flipr 與雲端（透過其閘道器）和 Home Assistant 進行密集通訊，這可能會**快速耗盡電池**。\n\n建議切換到 Eco 或睡眠模式。\n\n點擊**提交**以強制使用此設定，或點擊關閉按鈕進行修改。"
+      }
+    },
+    "error": {
+      "ph_threshold_error": "❌ 最小 pH 必須小於最大 pH",
+      "orp_threshold_error": "❌ 最小 ORP (氧化還原) 必須小於最大 ORP",
+      "temp_threshold_error": "❌ 最低溫度必須低於最高溫度"
+    }
+  },
+  "selector": {
+    "chlorine_model": {
+      "options": {
+        "chlorine": "🧂 氯 / 鹽",
+        "bromine": "🟤 溴"
+      }
+    },
+    "sync_mode": {
+      "options": {
+        "0": "💤 睡眠 (0 次測量/天) - 閘道器的替代方案！",
+        "1": "🌊 正常 (20 次測量/天)",
+        "2": "🍃 Eco (2 次測量/天) - 推薦與閘道器一起使用！",
+        "3": "🚀 增強 (700 次測量/天) - 注意電池電量！"
+      }
+    },
+    "mac_address_select": {
+      "options": {
+        "manual": "✍️ 在下一個螢幕上手動輸入 MAC 位址！"
+      }
+    }
+  },
+  "entity": {
+    "binary_sensor": {
+      "ph_status": {
+        "name": "pH 狀態"
+      },
+      "orp_status": {
+        "name": "ORP (氧化還原) 狀態"
+      },
+      "temperature_status": {
+        "name": "溫度狀態"
+      }
+    },
+    "button": {
+      "force_analysis": {
+        "name": "新分析 (~60秒)"
+      }
+    },
+    "number": {
+      "scan_interval": {
+        "name": "分析間隔"
+      },
+      "tac": {
+        "name": "TAC (總鹼度)"
+      },
+      "th": {
+        "name": "TH (硬度)"
+      },
+      "tds": {
+        "name": "TDS (總溶解固體)"
+      },
+      "cya": {
+        "name": "CyA (穩定劑)"
+      }
+    },
+    "select": {
+      "chlorine_model": {
+        "name": "🧪 水處理",
+        "state": {
+          "chlorine": "🧂 氯 / 鹽",
+          "bromine": "🟤 溴"
+        }
+      }
+    },
+    "sensor": {
+      "sync_mode_state": {
+        "name": "閘道器同步模式",
+        "state": {
+          "0": "💤 睡眠",
+          "1": "🌊 正常",
+          "2": "🍃 Eco",
+          "3": "🚀 增強"
+        }
+      },
+      "bluetooth_status": {
+        "name": "藍牙狀態",
+        "state": {
+          "waiting": "💤 已斷開",
+          "connecting": "⏳ 正在連線 Flipr...",
+          "waking_up": "🚀 正在喚醒系統...",
+          "requesting": "🗣️ 請求分析...",
+          "reading": "📡 正在接收資料幀...",
+          "writing_sync": "⚙️ 發送設定...",
+          "success": "✅ 分析完成 (已斷開)",
+          "sync_applied": "✅ 設定已套用",
+          "error": "❌ 連線錯誤",
+          "error_retry": "⏳ 錯誤 (60秒後重試)",
+          "write_failed": "⚠️ 寫入失敗",
+          "paused": "⏸️ 分析已暫停",
+          "out_of_range": "📵 訊號遺失"
+        }
+      },
+      "next_analysis": {
+        "name": "下一次分析"
+      },
+      "temperature": {
+        "name": "溫度"
+      },
+      "ph": {
+        "name": "pH"
+      },
+      "orp": {
+        "name": "ORP (氧化還原)"
+      },
+      "battery": {
+        "name": "電池 (電壓)"
+      },
+      "battery_level": {
+        "name": "電池電量"
+      },
+      "ph_raw": {
+        "name": "原始 pH (mV)"
+      },
+      "factory_ph": {
+        "name": "原始 pH (出廠)"
+      },
+      "estimated_free_chlorine": {
+        "name": "估算餘氯 (FC)"
+      },
+      "active_chlorine_hocl": {
+        "name": "活性氯 (HOCl)"
+      },
+      "lsi": {
+        "name": "朗格里爾指數"
+      },
+      "lsi_status": {
+        "name": "朗格里爾指數狀態",
+        "state": {
+          "corrosive": "🔴 腐蝕性水質 (酸性)",
+          "balanced": "🟢 完美平衡的水質",
+          "scaling": "🟠 結垢性水質 (鹼性)",
+          "unknown": "⚪ 未知"
+        }
+      },
+      "target_equilibrium_ph": {
+        "name": "平衡 pH (Taylor)"
+      },
+      "last_received": {
+        "name": "最後一次分析"
+      },
+      "raw_frame": {
+        "name": "原始資料幀"
+      },
+      "rssi": {
+        "name": "藍牙訊號"
+      }
+    },
+    "switch": {
+      "active_measures": {
+        "name": "自動分析"
+      }
+    }
+  }
+}

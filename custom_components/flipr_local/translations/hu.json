@@ -1,0 +1,266 @@
+{
+  "config": {
+    "flow_title": "{name}",
+    "step": {
+      "user": {
+        "title": "⚙️ Flipr Konfiguráció",
+        "description": "Ha a Flipr nem található automatikusan, add meg a Bluetooth MAC-címét. 📱 Használj egy mobilalkalmazást, például a 'nRF Connect'-et a megkereséséhez!\n\n🪫️ **Fontos - Akkumulátorkezelés:**\n- **Wi-Fi Gateway használatával**: A Flipr **Eco módba** vált (2 mérés/nap, látható a hivatalos alkalmazásban).\n- Ezt a beállítást az integráció konfigurációjában módosíthatod a fogaskerék ikonnal ⚙️.\n\n⚠️ Hozzáadás után **várj kb. 60 másodpercet** az adatok frissítésére...",
+        "data": {
+          "mac_address": "🔎 Észlelt eszköz"
+        },
+        "sections": {
+          "general": {
+            "name": "⚙️ Általános",
+            "data": {
+              "use_gateway": "Használat Flipr Wi-Fi Gateway-jel 🛜",
+              "chlorine_model": "🧪 Vízkezelés",
+              "cya": "💧 Stabilizátor szint / CyA (mg/l)"
+            }
+          },
+          "probes_calibration": {
+            "name": "🧪 Szondák kalibrálása",
+            "data": {
+              "ph_calib_7": "🟢 pH 7 érték (pl. 1600 mV vagy 8.40)",
+              "ph_ref_7": "🎯 pH 7 céloldat (pl. 7.02)",
+              "ph_calib_4": "🔴 pH 4 érték (pl. 1900 mV vagy 6.02)",
+              "ph_ref_4": "🎯 pH 4 céloldat (pl. 4.00)",
+              "orp_calib": "📏 ORP (Redox) mért érték (pl. 650)",
+              "orp_ref": "🎯 ORP (Redox) céloldat (pl. 650)",
+              "temp_offset": "🌡️ Hőmérséklet eltolás (°Celsius) (+/-)"
+            }
+          }
+        }
+      },
+      "manual": {
+        "title": "✍️ Kézi bevitel",
+        "description": "Add meg a Bluetooth MAC-címet (pl. AA:BB:CC:DD:EE:FF)",
+        "data": {
+          "mac_address": "🏷️ Bluetooth MAC-cím"
+        }
+      }
+    },
+    "error": {
+      "cannot_connect": "❌ Nem sikerült csatlakozni a Flipr-hez",
+      "already_configured": "⚠️ Ez az eszköz már be van állítva",
+      "unknown": "❓ Ismeretlen hiba",
+      "invalid_mac": "❌ Érvénytelen formátum (pl. AA:BB:CC:DD:EE:FF)",
+      "invalid_selection": "❌ Érvénytelen kiválasztás. Kérjük, válassz egy eszközt.",
+      "ph_calibration_equal": "❌ A pH kalibrációs értékeknek eltérőnek kell lenniük",
+      "ph_reference_equal": "❌ A pH referenciaértékeknek eltérőnek kell lenniük",
+      "ph_slope_mismatch": "❌ A kalibrációs és referencia meredekségeknek egyezniük kell",
+      "ph_mv_out_of_range": "❌ Az mV értékeknek 500-3000 között kell lenniük",
+      "ph_ref_out_of_range": "❌ pH 4: 2.5-5.5, pH 7: 6.5-7.5",
+      "ph_threshold_error": "❌ A minimum pH-nak kisebbnek kell lennie a maximum pH-nál",
+      "orp_threshold_error": "❌ A minimum ORP-nek (Redox) kisebbnek kell lennie a maximum ORP-nél",
+      "temp_threshold_error": "❌ A minimum hőmérsékletnek alacsonyabbnak kell lennie a maximum hőmérsékletnél"
+    },
+    "abort": {
+      "already_configured": "⚠️ Ez az eszköz már be van állítva"
+    }
+  },
+  "options": {
+    "step": {
+      "init": {
+        "title": "🛠️ Flipr Opciók",
+        "description": "Állítsd be a kalibrációt, a viselkedést és a személyes riasztási küszöböket.",
+        "data": {},
+        "sections": {
+          "general": {
+            "name": "⚙️ Általános",
+            "data": {
+              "use_gateway": "Használat Flipr Wi-Fi Gateway-jel 🛜",
+              "sync_mode": "🔄 Szinkronizálási mód (Flipr Gateway-en keresztül)",
+              "chlorine_model": "🧪 Vízkezelés",
+              "cya": "💧 Stabilizátor szint / CyA (mg/l)"
+            }
+          },
+          "probes_calibration": {
+            "name": "🧪 Szondák kalibrálása",
+            "data": {
+              "ph_calib_7": "🟢 pH 7 érték (pl. 1600 mV vagy 8.40)",
+              "ph_ref_7": "🎯 pH 7 céloldat (pl. 7.02)",
+              "ph_calib_4": "🔴 pH 4 érték (pl. 1900 mV vagy 6.02)",
+              "ph_ref_4": "🎯 pH 4 céloldat (pl. 4.00)",
+              "orp_calib": "📏 ORP (Redox) mért érték (pl. 650)",
+              "orp_ref": "🎯 ORP (Redox) céloldat (pl. 650)",
+              "temp_offset": "🌡️ Hőmérséklet eltolás (°Celsius) (+/-)"
+            }
+          },
+          "alert_thresholds": {
+            "name": "📊 Riasztási küszöbök",
+            "data": {
+              "ph_min": "📉 Küszöb: Minimum pH (pl. 6.90)",
+              "ph_max": "📈 Küszöb: Maximum pH (pl. 7.50)",
+              "orp_min": "📉 Küszöb: Minimum ORP (Redox) (mV)",
+              "orp_max": "📈 Küszöb: Maximum ORP (Redox) (mV)",
+              "temp_min": "❄️ Küszöb: Minimum Hőmérséklet (°Celsius)",
+              "temp_max": "🌡️ Küszöb: Maximum Hőmérséklet (°Celsius)"
+            }
+          }
+        }
+      },
+      "warning": {
+        "title": "⚠️ Akkumulátor Figyelmeztetés",
+        "description": "Úgy döntöttél, hogy a **Wi-Fi Gateway-t** magas szinkronizálási módban (Normál vagy Boost) használod.\n\nEz a kombináció arra kényszeríti a Flipr-t, hogy intenzíven kommunikáljon mind a felhővel (a gateway-en keresztül), mind a Home Assistanttal, ami az **akkumulátor gyors lemerülésének veszélyével** jár.\n\nJavasolt az Eco vagy Alvó módra váltás.\n\nKattints a **Küldés** gombra a konfiguráció kényszerítéséhez, vagy a bezárás gombra a módosításhoz."
+      }
+    },
+    "error": {
+      "ph_threshold_error": "❌ A minimum pH-nak kisebbnek kell lennie a maximum pH-nál",
+      "orp_threshold_error": "❌ A minimum ORP-nek (Redox) kisebbnek kell lennie a maximum ORP-nél",
+      "temp_threshold_error": "❌ A minimum hőmérsékletnek alacsonyabbnak kell lennie a maximum hőmérsékletnél"
+    }
+  },
+  "selector": {
+    "chlorine_model": {
+      "options": {
+        "chlorine": "🧂 Klór / Só",
+        "bromine": "🟤 Bróm"
+      }
+    },
+    "sync_mode": {
+      "options": {
+        "0": "💤 Alvó (0 mérés/nap) - Alternatíva gateway-jel is!",
+        "1": "🌊 Normál (20 mérés/nap)",
+        "2": "🍃 Eco (2 mérés/nap) - Ajánlott gateway-jel!",
+        "3": "🚀 Boost (700 mérés/nap) - Vigyázz az akkura!"
+      }
+    },
+    "mac_address_select": {
+      "options": {
+        "manual": "✍️ Add meg a MAC-címet manuálisan a következő képernyőn!"
+      }
+    }
+  },
+  "entity": {
+    "binary_sensor": {
+      "ph_status": {
+        "name": "pH Státusz"
+      },
+      "orp_status": {
+        "name": "ORP (Redox) Státusz"
+      },
+      "temperature_status": {
+        "name": "Hőmérséklet Státusz"
+      }
+    },
+    "button": {
+      "force_analysis": {
+        "name": "Új Elemzés (~60s)"
+      }
+    },
+    "number": {
+      "scan_interval": {
+        "name": "Elemzési időköz"
+      },
+      "tac": {
+        "name": "TAC (Lúgosság)"
+      },
+      "th": {
+        "name": "TH (Keménység)"
+      },
+      "tds": {
+        "name": "TDS (Összes oldott anyag)"
+      },
+      "cya": {
+        "name": "CyA (Stabilizátor)"
+      }
+    },
+    "select": {
+      "chlorine_model": {
+        "name": "🧪 Vízkezelés",
+        "state": {
+          "chlorine": "🧂 Klór / Só",
+          "bromine": "🟤 Bróm"
+        }
+      }
+    },
+    "sensor": {
+      "sync_mode_state": {
+        "name": "Gateway szink. mód",
+        "state": {
+          "0": "💤 Alvó",
+          "1": "🌊 Normál",
+          "2": "🍃 Eco",
+          "3": "🚀 Boost"
+        }
+      },
+      "bluetooth_status": {
+        "name": "Bluetooth Státusz",
+        "state": {
+          "waiting": "💤 Leválasztva",
+          "connecting": "⏳ Kapcsolódás a Flipr-hez...",
+          "waking_up": "🚀 Rendszer ébresztése...",
+          "requesting": "🗣️ Elemzés kérése...",
+          "reading": "📡 Várakozás adatra...",
+          "writing_sync": "⚙️ Konfiguráció küldése...",
+          "success": "✅ Elemzés kész (Leválasztva)",
+          "sync_applied": "✅ Konfiguráció alkalmazva",
+          "error": "❌ Kapcsolati hiba",
+          "error_retry": "⏳ Hiba (Újrapróbálkozás 60 mp múlva)",
+          "write_failed": "⚠️ Írási hiba",
+          "paused": "⏸️ Elemzések szüneteltetve",
+          "out_of_range": "📵 Jel elveszett"
+        }
+      },
+      "next_analysis": {
+        "name": "Következő elemzés"
+      },
+      "temperature": {
+        "name": "Hőmérséklet"
+      },
+      "ph": {
+        "name": "pH"
+      },
+      "orp": {
+        "name": "ORP (Redox)"
+      },
+      "battery": {
+        "name": "Akkumulátor (Feszültség)"
+      },
+      "battery_level": {
+        "name": "Akkumulátor"
+      },
+      "ph_raw": {
+        "name": "Nyers pH (mV)"
+      },
+      "factory_ph": {
+        "name": "Nyers pH (Gyári)"
+      },
+      "estimated_free_chlorine": {
+        "name": "Becsült Szabad Klór (FC)"
+      },
+      "active_chlorine_hocl": {
+        "name": "Aktív Klór (HOCl)"
+      },
+      "lsi": {
+        "name": "Langelier Index"
+      },
+      "lsi_status": {
+        "name": "Langelier Index Státusz",
+        "state": {
+          "corrosive": "🔴 Korrozív víz (Savas)",
+          "balanced": "🟢 Tökéletesen kiegyensúlyozott víz",
+          "scaling": "🟠 Vízkövesedő víz (Lúgos)",
+          "unknown": "⚪ Ismeretlen"
+        }
+      },
+      "target_equilibrium_ph": {
+        "name": "Egyensúlyi pH (Taylor)"
+      },
+      "last_received": {
+        "name": "Utolsó elemzés"
+      },
+      "raw_frame": {
+        "name": "Nyers Adat"
+      },
+      "rssi": {
+        "name": "Bluetooth Jel"
+      }
+    },
+    "switch": {
+      "active_measures": {
+        "name": "Automatikus elemzések"
+      }
+    }
+  }
+}

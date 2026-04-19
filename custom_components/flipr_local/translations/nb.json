@@ -1,0 +1,266 @@
+{
+  "config": {
+    "flow_title": "{name}",
+    "step": {
+      "user": {
+        "title": "⚙️ Flipr Konfigurasjon",
+        "description": "Hvis Flipr ikke oppdages automatisk, legg til Bluetooth MAC-adressen dens. 📱 Bruk en mobilapp som 'nRF Connect' for å finne den!\n\n🪫️ **Viktig - Batteristyring:**\n- **Med Wi-Fi Gateway**: Flipr vil bytte til **Eco-modus** (2 målinger/dag, synlig i den offisielle appen).\n- Du kan endre denne innstillingen i integrasjonskonfigurasjonen via tannhjulikonet ⚙️.\n\n⚠️ Etter at du har lagt den til, **vent ca. 60 sekunder** på at dataene oppdateres...",
+        "data": {
+          "mac_address": "🔎 Oppdaget enhet"
+        },
+        "sections": {
+          "general": {
+            "name": "⚙️ Generelt",
+            "data": {
+              "use_gateway": "Bruk med Flipr Wi-Fi Gateway 🛜",
+              "chlorine_model": "🧪 Vannbehandling",
+              "cya": "💧 Stabilisatornivå / CyA (mg/l)"
+            }
+          },
+          "probes_calibration": {
+            "name": "🧪 Sondekalibrering",
+            "data": {
+              "ph_calib_7": "🟢 pH 7 verdi (f.eks. 1600 mV eller 8.40)",
+              "ph_ref_7": "🎯 pH 7 løsningsmål (f.eks. 7.02)",
+              "ph_calib_4": "🔴 pH 4 verdi (f.eks. 1900 mV eller 6.02)",
+              "ph_ref_4": "🎯 pH 4 løsningsmål (f.eks. 4.00)",
+              "orp_calib": "📏 ORP (Redox) Målt Verdi (f.eks. 650)",
+              "orp_ref": "🎯 ORP (Redox) Løsningsmål (f.eks. 650)",
+              "temp_offset": "🌡️ Temperaturforskyvning (°Celsius) (+/-)"
+            }
+          }
+        }
+      },
+      "manual": {
+        "title": "✍️ Manuell inntasting",
+        "description": "Skriv inn Bluetooth MAC-adresse (f.eks. AA:BB:CC:DD:EE:FF)",
+        "data": {
+          "mac_address": "🏷️ Bluetooth MAC-adresse"
+        }
+      }
+    },
+    "error": {
+      "cannot_connect": "❌ Kunne ikke koble til Flipr",
+      "already_configured": "⚠️ Denne enheten er allerede konfigurert",
+      "unknown": "❓ Ukjent feil",
+      "invalid_mac": "❌ Ugyldig format (f.eks. AA:BB:CC:DD:EE:FF)",
+      "invalid_selection": "❌ Ugyldig valg. Vennligst velg en enhet.",
+      "ph_calibration_equal": "❌ pH-kalibreringsverdier må være forskjellige",
+      "ph_reference_equal": "❌ pH-referanseverdier må være forskjellige",
+      "ph_slope_mismatch": "❌ Kalibrerings- og referansehellinger må stemme overens",
+      "ph_mv_out_of_range": "❌ mV-verdier må være mellom 500-3000",
+      "ph_ref_out_of_range": "❌ pH 4: 2.5-5.5, pH 7: 6.5-7.5",
+      "ph_threshold_error": "❌ Minimum pH må være mindre enn maksimum pH",
+      "orp_threshold_error": "❌ Minimum ORP (Redox) må være mindre enn maksimum ORP",
+      "temp_threshold_error": "❌ Minimumstemperatur må være lavere enn maksimumstemperatur"
+    },
+    "abort": {
+      "already_configured": "⚠️ Denne enheten er allerede konfigurert"
+    }
+  },
+  "options": {
+    "step": {
+      "init": {
+        "title": "🛠️ Flipr Alternativer",
+        "description": "Juster kalibrering, oppførsel og dine personlige varslingsgrenser.",
+        "data": {},
+        "sections": {
+          "general": {
+            "name": "⚙️ Generelt",
+            "data": {
+              "use_gateway": "Bruk med Flipr Wi-Fi Gateway 🛜",
+              "sync_mode": "🔄 Synkroniseringsmodus (via Flipr Gateway)",
+              "chlorine_model": "🧪 Vannbehandling",
+              "cya": "💧 Stabilisatornivå / CyA (mg/l)"
+            }
+          },
+          "probes_calibration": {
+            "name": "🧪 Sondekalibrering",
+            "data": {
+              "ph_calib_7": "🟢 pH 7 verdi (f.eks. 1600 mV eller 8.40)",
+              "ph_ref_7": "🎯 pH 7 løsningsmål (f.eks. 7.02)",
+              "ph_calib_4": "🔴 pH 4 verdi (f.eks. 1900 mV eller 6.02)",
+              "ph_ref_4": "🎯 pH 4 løsningsmål (f.eks. 4.00)",
+              "orp_calib": "📏 ORP (Redox) Målt Verdi (f.eks. 650)",
+              "orp_ref": "🎯 ORP (Redox) Løsningsmål (f.eks. 650)",
+              "temp_offset": "🌡️ Temperaturforskyvning (°Celsius) (+/-)"
+            }
+          },
+          "alert_thresholds": {
+            "name": "📊 Varslingsgrenser",
+            "data": {
+              "ph_min": "📉 Grense: Minimum pH (f.eks. 6.90)",
+              "ph_max": "📈 Grense: Maksimum pH (f.eks. 7.50)",
+              "orp_min": "📉 Grense: Minimum ORP (Redox) (mV)",
+              "orp_max": "📈 Grense: Maksimum ORP (Redox) (mV)",
+              "temp_min": "❄️ Grense: Minimum Temperatur (°Celsius)",
+              "temp_max": "🌡️ Grense: Maksimum Temperatur (°Celsius)"
+            }
+          }
+        }
+      },
+      "warning": {
+        "title": "⚠️ Batteri Advarsel",
+        "description": "Du har valgt å bruke **Wi-Fi Gateway** med en høy synkroniseringsmodus (Normal eller Boost).\n\nDenne kombinasjonen tvinger Flipr til å kommunisere intensivt med både skyen (via gatewayen) og Home Assistant, noe som risikerer å **tømme batteriet raskt**.\n\nDet anbefales å bytte til Eco- eller Dvalemodus.\n\nKlikk på **Send inn** for å tvinge frem denne konfigurasjonen, eller på lukkeknappen for å endre."
+      }
+    },
+    "error": {
+      "ph_threshold_error": "❌ Minimum pH må være mindre enn maksimum pH",
+      "orp_threshold_error": "❌ Minimum ORP (Redox) må være mindre enn maksimum ORP",
+      "temp_threshold_error": "❌ Minimumstemperatur må være lavere enn maksimumstemperatur"
+    }
+  },
+  "selector": {
+    "chlorine_model": {
+      "options": {
+        "chlorine": "🧂 Klor / Salt",
+        "bromine": "🟤 Brom"
+      }
+    },
+    "sync_mode": {
+      "options": {
+        "0": "💤 Dvale (0 målinger/dag) - Alternativ også med gateway!",
+        "1": "🌊 Normal (20 målinger/dag)",
+        "2": "🍃 Eco (2 målinger/dag) - Anbefalt med gateway!",
+        "3": "🚀 Boost (700 målinger/dag) - Følg med på batteriet!"
+      }
+    },
+    "mac_address_select": {
+      "options": {
+        "manual": "✍️ Skriv inn MAC-adresse manuelt på neste skjerm!"
+      }
+    }
+  },
+  "entity": {
+    "binary_sensor": {
+      "ph_status": {
+        "name": "pH Status"
+      },
+      "orp_status": {
+        "name": "ORP (Redox) Status"
+      },
+      "temperature_status": {
+        "name": "Temperatur Status"
+      }
+    },
+    "button": {
+      "force_analysis": {
+        "name": "Ny Analyse (~60s)"
+      }
+    },
+    "number": {
+      "scan_interval": {
+        "name": "Analyseintervall"
+      },
+      "tac": {
+        "name": "TAC (Alkalinitet)"
+      },
+      "th": {
+        "name": "TH (Hardhet)"
+      },
+      "tds": {
+        "name": "TDS (Totalt Oppløste Stoffer)"
+      },
+      "cya": {
+        "name": "CyA (Stabilisator)"
+      }
+    },
+    "select": {
+      "chlorine_model": {
+        "name": "🧪 Vannbehandling",
+        "state": {
+          "chlorine": "🧂 Klor / Salt",
+          "bromine": "🟤 Brom"
+        }
+      }
+    },
+    "sensor": {
+      "sync_mode_state": {
+        "name": "Gateway sync modus",
+        "state": {
+          "0": "💤 Dvale",
+          "1": "🌊 Normal",
+          "2": "🍃 Eco",
+          "3": "🚀 Boost"
+        }
+      },
+      "bluetooth_status": {
+        "name": "Bluetooth Status",
+        "state": {
+          "waiting": "💤 Frakoblet",
+          "connecting": "⏳ Kobler til Flipr...",
+          "waking_up": "🚀 Vekker systemet...",
+          "requesting": "🗣️ Ber om analyse...",
+          "reading": "📡 Lytter etter ramme...",
+          "writing_sync": "⚙️ Sender konfigurasjon...",
+          "success": "✅ Analyse fullført (Frakoblet)",
+          "sync_applied": "✅ Konfigurasjon brukt",
+          "error": "❌ Tilkoblingsfeil",
+          "error_retry": "⏳ Feil (Prøver igjen om 60s)",
+          "write_failed": "⚠️ Skriving mislyktes",
+          "paused": "⏸️ Analyser satt på pause",
+          "out_of_range": "📵 Signal mistet"
+        }
+      },
+      "next_analysis": {
+        "name": "Neste analyse"
+      },
+      "temperature": {
+        "name": "Temperatur"
+      },
+      "ph": {
+        "name": "pH"
+      },
+      "orp": {
+        "name": "ORP (Redox)"
+      },
+      "battery": {
+        "name": "Batteri (Spenning)"
+      },
+      "battery_level": {
+        "name": "Batteri"
+      },
+      "ph_raw": {
+        "name": "Rå pH (mV)"
+      },
+      "factory_ph": {
+        "name": "Rå pH (Fabrikk)"
+      },
+      "estimated_free_chlorine": {
+        "name": "Estimert Fritt Klor (FC)"
+      },
+      "active_chlorine_hocl": {
+        "name": "Aktivt Klor (HOCl)"
+      },
+      "lsi": {
+        "name": "Langelier Index"
+      },
+      "lsi_status": {
+        "name": "Langelier Index Status",
+        "state": {
+          "corrosive": "🔴 Etsende Vann (Surt)",
+          "balanced": "🟢 Perfekt Balansert Vann",
+          "scaling": "🟠 Kalkdannende Vann (Basisk)",
+          "unknown": "⚪ Ukjent"
+        }
+      },
+      "target_equilibrium_ph": {
+        "name": "Likevekts pH (Taylor)"
+      },
+      "last_received": {
+        "name": "Siste analyse"
+      },
+      "raw_frame": {
+        "name": "Rå Ramme"
+      },
+      "rssi": {
+        "name": "Bluetooth Signal"
+      }
+    },
+    "switch": {
+      "active_measures": {
+        "name": "Automatiske analyser"
+      }
+    }
+  }
+}

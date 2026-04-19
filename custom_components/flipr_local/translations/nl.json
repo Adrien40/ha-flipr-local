@@ -1,0 +1,268 @@
+{
+  "config": {
+    "flow_title": "{name}",
+    "step": {
+      "user": {
+        "title": "⚙️ Flipr Configuratie",
+        "description": "Als de Flipr niet automatisch wordt gedetecteerd, voeg dan het Bluetooth MAC-adres toe. 📱 Gebruik een mobiele app zoals 'nRF Connect' om het te vinden!\n\n🪫️ **Belangrijk - Batterijbeheer:**\n- **Met de Wi-Fi Gateway**: De Flipr schakelt over naar de **Eco-modus** (2 metingen/dag, zichtbaar in de officiële app).\n- U kunt deze instelling wijzigen in de integratieconfiguratie via het tandwielpictogram ⚙️.\n\n⚠️ Wacht na het toevoegen **ongeveer 60 seconden** tot de gegevens zijn bijgewerkt...",
+        "data": {
+          "mac_address": "🔎 Gedetecteerd apparaat"
+        },
+        "sections": {
+          "general": {
+            "name": "⚙️ Algemeen",
+            "data": {
+              "use_gateway": "Gebruiken met de Flipr Wi-Fi Gateway 🛜",
+              "chlorine_model": "🧪 Waterbehandeling",
+              "cya": "💧 Stabilisator niveau / CyA (mg/l)"
+            }
+          },
+          "probes_calibration": {
+            "name": "🧪 Sonde Kalibratie",
+            "data": {
+              "ph_calib_7": "🟢 pH 7 waarde (bijv. 1600 mV of 8.40)",
+              "ph_ref_7": "🎯 pH 7 doeloplossing (bijv. 7.02)",
+              "ph_calib_4": "🔴 pH 4 waarde (bijv. 1900 mV of 6.02)",
+              "ph_ref_4": "🎯 pH 4 doeloplossing (bijv. 4.00)",
+              "orp_calib": "📏 ORP (Redox) Gemeten Waarde (bijv. 650)",
+              "orp_ref": "🎯 ORP (Redox) Doeloplossing (bijv. 650)",
+              "temp_offset": "🌡️ Temperatuurcompensatie (°Celsius) (+/-)"
+            }
+          }
+        }
+      },
+      "manual": {
+        "title": "✍️ Handmatige invoer",
+        "description": "Voer het Bluetooth MAC-adres in (bijv. AA:BB:CC:DD:EE:FF)",
+        "data": {
+          "mac_address": "🏷️ Bluetooth MAC-adres"
+        }
+      }
+    },
+    "error": {
+      "cannot_connect": "❌ Kan geen verbinding maken met Flipr",
+      "already_configured": "⚠️ Dit apparaat is al geconfigureerd",
+      "unknown": "❓ Onbekende fout",
+      "invalid_mac": "❌ Ongeldig formaat (bijv. AA:BB:CC:DD:EE:FF)",
+      "invalid_selection": "❌ Ongeldige selectie. Kies een apparaat.",
+      "ph_calibration_equal": "❌ pH kalibratiewaarden moeten verschillend zijn",
+      "ph_reference_equal": "❌ pH referentiewaarden moeten verschillend zijn",
+      "ph_slope_mismatch": "❌ Kalibratie- en referentiehellingen moeten overeenkomen",
+      "ph_mv_out_of_range": "❌ mV-waarden moeten tussen 500-3000 liggen",
+      "ph_ref_out_of_range": "❌ pH 4: 2.5-5.5, pH 7: 6.5-7.5",
+      "ph_threshold_error": "❌ Minimum pH moet kleiner zijn dan maximum pH",
+      "orp_threshold_error": "❌ Minimum ORP (Redox) moet kleiner zijn dan maximum ORP",
+      "temp_threshold_error": "❌ Minimumtemperatuur moet lager zijn dan maximumtemperatuur"
+    },
+    "abort": {
+      "already_configured": "⚠️ Dit apparaat is al geconfigureerd"
+    }
+  },
+  "options": {
+    "step": {
+      "init": {
+        "title": "🛠️ Flipr Opties",
+        "description": "Pas kalibratie, gedrag en uw persoonlijke waarschuwingsdrempels aan.",
+        "data": {},
+        "sections": {
+          "general": {
+            "name": "⚙️ Algemeen",
+            "data": {
+              "use_gateway": "Gebruiken met de Flipr Wi-Fi Gateway 🛜",
+              "sync_mode": "🔄 Synchronisatiemodus (via Flipr Gateway)",
+              "chlorine_model": "🧪 Waterbehandeling",
+              "cya": "💧 Stabilisator niveau / CyA (mg/l)"
+            }
+          },
+          "probes_calibration": {
+            "name": "🧪 Sonde Kalibratie",
+            "data": {
+              "ph_calib_7": "🟢 pH 7 waarde (bijv. 1600 mV of 8.40)",
+              "ph_ref_7": "🎯 pH 7 doeloplossing (bijv. 7.02)",
+              "ph_calib_4": "🔴 pH 4 waarde (bijv. 1900 mV of 6.02)",
+              "ph_ref_4": "🎯 pH 4 doeloplossing (bijv. 4.00)",
+              "orp_calib": "📏 ORP (Redox) Gemeten Waarde (bijv. 650)",
+              "orp_ref": "🎯 ORP (Redox) Doeloplossing (bijv. 650)",
+              "temp_offset": "🌡️ Temperatuurcompensatie (°Celsius) (+/-)"
+            }
+          }
+        },
+        "sections": {
+          "alert_thresholds": {
+            "name": "📊 Waarschuwingsdrempels",
+            "data": {
+              "ph_min": "📉 Drempel: Minimum pH (bijv. 6.90)",
+              "ph_max": "📈 Drempel: Maximum pH (bijv. 7.50)",
+              "orp_min": "📉 Drempel: Minimum ORP (Redox) (mV)",
+              "orp_max": "📈 Drempel: Maximum ORP (Redox) (mV)",
+              "temp_min": "❄️ Drempel: Minimum Temperatuur (°Celsius)",
+              "temp_max": "🌡️ Drempel: Maximum Temperatuur (°Celsius)"
+            }
+          }
+        }
+      },
+      "warning": {
+        "title": "⚠️ Batterij Waarschuwing",
+        "description": "U heeft ervoor gekozen om de **Wi-Fi Gateway** te gebruiken met een hoge synchronisatiemodus (Normaal of Boost).\n\nDeze combinatie dwingt de Flipr om intensief te communiceren met zowel de Cloud (via zijn gateway) als Home Assistant, wat het risico met zich meebrengt dat **de batterij snel leegloopt**.\n\nHet wordt aanbevolen om over te schakelen naar de Eco- of Slaapstand.\n\nKlik op **Indienen** om deze configuratie te forceren, of op de sluitknop om te wijzigen."
+      }
+    },
+    "error": {
+      "ph_threshold_error": "❌ Minimum pH moet kleiner zijn dan maximum pH",
+      "orp_threshold_error": "❌ Minimum ORP (Redox) moet kleiner zijn dan maximum ORP",
+      "temp_threshold_error": "❌ Minimumtemperatuur moet lager zijn dan maximumtemperatuur"
+    }
+  },
+  "selector": {
+    "chlorine_model": {
+      "options": {
+        "chlorine": "🧂 Chloor / Zout",
+        "bromine": "🟤 Broom"
+      }
+    },
+    "sync_mode": {
+      "options": {
+        "0": "💤 Slaap (0 metingen/dag) - Alternatief ook met gateway!",
+        "1": "🌊 Normaal (20 metingen/dag)",
+        "2": "🍃 Eco (2 metingen/dag) - Aanbevolen met gateway!",
+        "3": "🚀 Boost (700 metingen/dag) - Let op je batterij!"
+      }
+    },
+    "mac_address_select": {
+      "options": {
+        "manual": "✍️ Voer MAC-adres handmatig in op het volgende scherm!"
+      }
+    }
+  },
+  "entity": {
+    "binary_sensor": {
+      "ph_status": {
+        "name": "pH Status"
+      },
+      "orp_status": {
+        "name": "ORP (Redox) Status"
+      },
+      "temperature_status": {
+        "name": "Temperatuur Status"
+      }
+    },
+    "button": {
+      "force_analysis": {
+        "name": "Nieuwe Analyse (~60s)"
+      }
+    },
+    "number": {
+      "scan_interval": {
+        "name": "Analyse-interval"
+      },
+      "tac": {
+        "name": "TAC (Alkaliteit)"
+      },
+      "th": {
+        "name": "TH (Hardheid)"
+      },
+      "tds": {
+        "name": "TDS (Totaal Opgeloste Stoffen)"
+      },
+      "cya": {
+        "name": "CyA (Stabilisator)"
+      }
+    },
+    "select": {
+      "chlorine_model": {
+        "name": "🧪 Waterbehandeling",
+        "state": {
+          "chlorine": "🧂 Chloor / Zout",
+          "bromine": "🟤 Broom"
+        }
+      }
+    },
+    "sensor": {
+      "sync_mode_state": {
+        "name": "Gateway sync modus",
+        "state": {
+          "0": "💤 Slaap",
+          "1": "🌊 Normaal",
+          "2": "🍃 Eco",
+          "3": "🚀 Boost"
+        }
+      },
+      "bluetooth_status": {
+        "name": "Bluetooth Status",
+        "state": {
+          "waiting": "💤 Verbroken",
+          "connecting": "⏳ Verbinden met Flipr...",
+          "waking_up": "🚀 Systeem ontwaken...",
+          "requesting": "🗣️ Analyse aanvragen...",
+          "reading": "📡 Luisteren naar frame...",
+          "writing_sync": "⚙️ Configuratie verzenden...",
+          "success": "✅ Analyse voltooid (Verbroken)",
+          "sync_applied": "✅ Configuratie toegepast",
+          "error": "❌ Verbindingsfout",
+          "error_retry": "⏳ Fout (Opnieuw proberen in 60s)",
+          "write_failed": "⚠️ Schrijven mislukt",
+          "paused": "⏸️ Analyses gepauzeerd",
+          "out_of_range": "📵 Signaal verloren"
+        }
+      },
+      "next_analysis": {
+        "name": "Volgende analyse"
+      },
+      "temperature": {
+        "name": "Temperatuur"
+      },
+      "ph": {
+        "name": "pH"
+      },
+      "orp": {
+        "name": "ORP (Redox)"
+      },
+      "battery": {
+        "name": "Batterij (Voltage)"
+      },
+      "battery_level": {
+        "name": "Batterij"
+      },
+      "ph_raw": {
+        "name": "Ruw pH (mV)"
+      },
+      "factory_ph": {
+        "name": "Ruw pH (Fabriek)"
+      },
+      "estimated_free_chlorine": {
+        "name": "Geschat Vrij Chloor (FC)"
+      },
+      "active_chlorine_hocl": {
+        "name": "Actief Chloor (HOCl)"
+      },
+      "lsi": {
+        "name": "Langelier Index"
+      },
+      "lsi_status": {
+        "name": "Langelier Index Status",
+        "state": {
+          "corrosive": "🔴 Corrosief Water (Zuur)",
+          "balanced": "🟢 Perfect Gebalanceerd Water",
+          "scaling": "🟠 Kalkaanslag Water (Basisch)",
+          "unknown": "⚪ Onbekend"
+        }
+      },
+      "target_equilibrium_ph": {
+        "name": "Evenwicht pH (Taylor)"
+      },
+      "last_received": {
+        "name": "Laatste analyse"
+      },
+      "raw_frame": {
+        "name": "Ruw Frame"
+      },
+      "rssi": {
+        "name": "Bluetooth Signaal"
+      }
+    },
+    "switch": {
+      "active_measures": {
+        "name": "Automatische analyses"
+      }
+    }
+  }
+}

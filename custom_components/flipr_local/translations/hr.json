@@ -1,0 +1,266 @@
+{
+  "config": {
+    "flow_title": "{name}",
+    "step": {
+      "user": {
+        "title": "⚙️ Flipr Konfiguracija",
+        "description": "Ako Flipr nije automatski otkriven, dodajte njegovu Bluetooth MAC adresu. 📱 Koristite mobilnu aplikaciju poput 'nRF Connect' da biste je pronašli!\n\n🪫️ **Važno - Upravljanje baterijom:**\n- **S Wi-Fi pristupnikom (Gateway)**: Flipr će se prebaciti u **Eco način rada** (2 mjerenja dnevno, vidljivo u službenoj aplikaciji).\n- Ovu postavku možete promijeniti u konfiguraciji integracije putem ikone zupčanika ⚙️.\n\n⚠️ Nakon dodavanja, **pričekajte oko 60 sekundi** da se podaci ažuriraju...",
+        "data": {
+          "mac_address": "🔎 Otkriveni uređaj"
+        },
+        "sections": {
+          "general": {
+            "name": "⚙️ Općenito",
+            "data": {
+              "use_gateway": "Koristi s Flipr Wi-Fi Gatewayem 🛜",
+              "chlorine_model": "🧪 Tretman vode",
+              "cya": "💧 Razina stabilizatora / CyA (mg/l)"
+            }
+          },
+          "probes_calibration": {
+            "name": "🧪 Kalibracija sondi",
+            "data": {
+              "ph_calib_7": "🟢 Vrijednost pH 7 (npr. 1600 mV ili 8.40)",
+              "ph_ref_7": "🎯 Ciljna otopina pH 7 (npr. 7.02)",
+              "ph_calib_4": "🔴 Vrijednost pH 4 (npr. 1900 mV ili 6.02)",
+              "ph_ref_4": "🎯 Ciljna otopina pH 4 (npr. 4.00)",
+              "orp_calib": "📏 Izmjerena vrijednost ORP (Redox) (npr. 650)",
+              "orp_ref": "🎯 Ciljna otopina ORP (Redox) (npr. 650)",
+              "temp_offset": "🌡️ Odstupanje temperature (°Celsius) (+/-)"
+            }
+          }
+        }
+      },
+      "manual": {
+        "title": "✍️ Ručni unos",
+        "description": "Unesite Bluetooth MAC adresu (npr. AA:BB:CC:DD:EE:FF)",
+        "data": {
+          "mac_address": "🏷️ Bluetooth MAC adresa"
+        }
+      }
+    },
+    "error": {
+      "cannot_connect": "❌ Povezivanje s Fliprom nije uspjelo",
+      "already_configured": "⚠️ Ovaj uređaj je već konfiguriran",
+      "unknown": "❓ Nepoznata pogreška",
+      "invalid_mac": "❌ Nevažeći format (npr. AA:BB:CC:DD:EE:FF)",
+      "invalid_selection": "❌ Nevažeći odabir. Molimo odaberite uređaj.",
+      "ph_calibration_equal": "❌ Vrijednosti kalibracije pH moraju biti različite",
+      "ph_reference_equal": "❌ Referentne vrijednosti pH moraju biti različite",
+      "ph_slope_mismatch": "❌ Nagibi kalibracije i referenci moraju se podudarati",
+      "ph_mv_out_of_range": "❌ Vrijednosti mV moraju biti između 500-3000",
+      "ph_ref_out_of_range": "❌ pH 4: 2.5-5.5, pH 7: 6.5-7.5",
+      "ph_threshold_error": "❌ Minimalni pH mora biti manji od maksimalnog pH",
+      "orp_threshold_error": "❌ Minimalni ORP (Redox) mora biti manji od maksimalnog ORP",
+      "temp_threshold_error": "❌ Minimalna temperatura mora biti niža od maksimalne temperature"
+    },
+    "abort": {
+      "already_configured": "⚠️ Ovaj uređaj je već konfiguriran"
+    }
+  },
+  "options": {
+    "step": {
+      "init": {
+        "title": "🛠️ Flipr Opcije",
+        "description": "Prilagodite kalibraciju, ponašanje i svoje osobne pragove upozorenja.",
+        "data": {},
+        "sections": {
+          "general": {
+            "name": "⚙️ Općenito",
+            "data": {
+              "use_gateway": "Koristi s Flipr Wi-Fi Gatewayem 🛜",
+              "sync_mode": "🔄 Način sinkronizacije (putem Flipr Gatewaya)",
+              "chlorine_model": "🧪 Tretman vode",
+              "cya": "💧 Razina stabilizatora / CyA (mg/l)"
+            }
+          },
+          "probes_calibration": {
+            "name": "🧪 Kalibracija sondi",
+            "data": {
+              "ph_calib_7": "🟢 Vrijednost pH 7 (npr. 1600 mV ili 8.40)",
+              "ph_ref_7": "🎯 Ciljna otopina pH 7 (npr. 7.02)",
+              "ph_calib_4": "🔴 Vrijednost pH 4 (npr. 1900 mV ili 6.02)",
+              "ph_ref_4": "🎯 Ciljna otopina pH 4 (npr. 4.00)",
+              "orp_calib": "📏 Izmjerena vrijednost ORP (Redox) (npr. 650)",
+              "orp_ref": "🎯 Ciljna otopina ORP (Redox) (npr. 650)",
+              "temp_offset": "🌡️ Odstupanje temperature (°Celsius) (+/-)"
+            }
+          },
+          "alert_thresholds": {
+            "name": "📊 Pragovi upozorenja",
+            "data": {
+              "ph_min": "📉 Prag: Minimalni pH (npr. 6.90)",
+              "ph_max": "📈 Prag: Maksimalni pH (npr. 7.50)",
+              "orp_min": "📉 Prag: Minimalni ORP (Redox) (mV)",
+              "orp_max": "📈 Prag: Maksimalni ORP (Redox) (mV)",
+              "temp_min": "❄️ Prag: Minimalna temperatura (°Celsius)",
+              "temp_max": "🌡️ Prag: Maksimalna temperatura (°Celsius)"
+            }
+          }
+        }
+      },
+      "warning": {
+        "title": "⚠️ Upozorenje za bateriju",
+        "description": "Odabrali ste koristiti **Wi-Fi Gateway** s visokim načinom sinkronizacije (Normalno ili Boost).\n\nOva kombinacija prisiljava Flipr da intenzivno komunicira s Cloudom (preko svog pristupnika) i s Home Assistantom, što riskira **brzo pražnjenje baterije**.\n\nPreporučuje se prebacivanje u Eco način rada ili Mirovanje.\n\nKliknite **Pošalji** kako biste primijenili ovu konfiguraciju ili gumb za zatvaranje za promjenu."
+      }
+    },
+    "error": {
+      "ph_threshold_error": "❌ Minimalni pH mora biti manji od maksimalnog pH",
+      "orp_threshold_error": "❌ Minimalni ORP (Redox) mora biti manji od maksimalnog ORP",
+      "temp_threshold_error": "❌ Minimalna temperatura mora biti niža od maksimalne temperature"
+    }
+  },
+  "selector": {
+    "chlorine_model": {
+      "options": {
+        "chlorine": "🧂 Klor / Sol",
+        "bromine": "🟤 Brom"
+      }
+    },
+    "sync_mode": {
+      "options": {
+        "0": "💤 Mirovanje (0 mjerenja/dan) - Alternativa i s gatewayem!",
+        "1": "🌊 Normalno (20 mjerenja/dan)",
+        "2": "🍃 Eco (2 mjerenja/dan) - Preporučeno s gatewayem!",
+        "3": "🚀 Boost (700 mjerenja/dan) - Pazite na bateriju!"
+      }
+    },
+    "mac_address_select": {
+      "options": {
+        "manual": "✍️ Unesite MAC adresu ručno na sljedećem zaslonu!"
+      }
+    }
+  },
+  "entity": {
+    "binary_sensor": {
+      "ph_status": {
+        "name": "Status pH"
+      },
+      "orp_status": {
+        "name": "Status ORP (Redox)"
+      },
+      "temperature_status": {
+        "name": "Status temperature"
+      }
+    },
+    "button": {
+      "force_analysis": {
+        "name": "Nova analiza (~60s)"
+      }
+    },
+    "number": {
+      "scan_interval": {
+        "name": "Interval analize"
+      },
+      "tac": {
+        "name": "TAC (Alkalnost)"
+      },
+      "th": {
+        "name": "TH (Tvrdoća)"
+      },
+      "tds": {
+        "name": "TDS (Ukupno otopljene tvari)"
+      },
+      "cya": {
+        "name": "CyA (Stabilizator)"
+      }
+    },
+    "select": {
+      "chlorine_model": {
+        "name": "🧪 Tretman vode",
+        "state": {
+          "chlorine": "🧂 Klor / Sol",
+          "bromine": "🟤 Brom"
+        }
+      }
+    },
+    "sensor": {
+      "sync_mode_state": {
+        "name": "Način sync. gatewaya",
+        "state": {
+          "0": "💤 Mirovanje",
+          "1": "🌊 Normalno",
+          "2": "🍃 Eco",
+          "3": "🚀 Boost"
+        }
+      },
+      "bluetooth_status": {
+        "name": "Bluetooth status",
+        "state": {
+          "waiting": "💤 Odspojeno",
+          "connecting": "⏳ Povezivanje s Fliprom...",
+          "waking_up": "🚀 Buđenje sustava...",
+          "requesting": "🗣️ Zahtjev za analizu...",
+          "reading": "📡 Slušanje okvira...",
+          "writing_sync": "⚙️ Slanje konfiguracije...",
+          "success": "✅ Analiza dovršena (Odspojeno)",
+          "sync_applied": "✅ Konfiguracija primijenjena",
+          "error": "❌ Pogreška u povezivanju",
+          "error_retry": "⏳ Pogreška (Ponovni pokušaj za 60s)",
+          "write_failed": "⚠️ Zapisivanje nije uspjelo",
+          "paused": "⏸️ Analize pauzirane",
+          "out_of_range": "📵 Gubitak signala"
+        }
+      },
+      "next_analysis": {
+        "name": "Sljedeća analiza"
+      },
+      "temperature": {
+        "name": "Temperatura"
+      },
+      "ph": {
+        "name": "pH"
+      },
+      "orp": {
+        "name": "ORP (Redox)"
+      },
+      "battery": {
+        "name": "Baterija (Napon)"
+      },
+      "battery_level": {
+        "name": "Baterija"
+      },
+      "ph_raw": {
+        "name": "Sirovi pH (mV)"
+      },
+      "factory_ph": {
+        "name": "Sirovi pH (Tvornički)"
+      },
+      "estimated_free_chlorine": {
+        "name": "Procijenjeni slobodni klor (FC)"
+      },
+      "active_chlorine_hocl": {
+        "name": "Aktivni klor (HOCl)"
+      },
+      "lsi": {
+        "name": "Langelierov indeks"
+      },
+      "lsi_status": {
+        "name": "Status Langelierovog indeksa",
+        "state": {
+          "corrosive": "🔴 Korozivna voda (Kisela)",
+          "balanced": "🟢 Savršeno uravnotežena voda",
+          "scaling": "🟠 Voda koja stvara kamenac (Bazična)",
+          "unknown": "⚪ Nepoznato"
+        }
+      },
+      "target_equilibrium_ph": {
+        "name": "Ravnotežni pH (Taylor)"
+      },
+      "last_received": {
+        "name": "Zadnja analiza"
+      },
+      "raw_frame": {
+        "name": "Sirovi okvir"
+      },
+      "rssi": {
+        "name": "Bluetooth signal"
+      }
+    },
+    "switch": {
+      "active_measures": {
+        "name": "Automatske analize"
+      }
+    }
+  }
+}

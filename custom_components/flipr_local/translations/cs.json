@@ -1,0 +1,266 @@
+{
+  "config": {
+    "flow_title": "{name}",
+    "step": {
+      "user": {
+        "title": "⚙️ Konfigurace Flipr",
+        "description": "Pokud není Flipr nalezen automaticky, přidejte jeho Bluetooth MAC adresu. 📱 K jejímu nalezení použijte mobilní aplikaci jako 'nRF Connect'!\n\n🪫️ **Důležité - Správa baterie:**\n- **S Wi-Fi bránou**: Flipr se přepne do **Eko režimu** (2 měření/den, viditelné v oficiální aplikaci).\n- Toto nastavení můžete změnit v konfiguraci integrace přes ikonu ozubeného kola ⚙️.\n\n⚠️ Po přidání **počkejte asi 60 sekund** na aktualizaci dat...",
+        "data": {
+          "mac_address": "🔎 Nalezené zařízení"
+        },
+        "sections": {
+          "general": {
+            "name": "⚙️ Obecné",
+            "data": {
+              "use_gateway": "Použít s Wi-Fi bránou Flipr 🛜",
+              "chlorine_model": "🧪 Úprava vody",
+              "cya": "💧 Úroveň stabilizátoru / CyA (mg/l)"
+            }
+          },
+          "probes_calibration": {
+            "name": "🧪 Kalibrace sond",
+            "data": {
+              "ph_calib_7": "🟢 Hodnota pH 7 (např. 1600 mV nebo 8.40)",
+              "ph_ref_7": "🎯 Cílový roztok pH 7 (např. 7.02)",
+              "ph_calib_4": "🔴 Hodnota pH 4 (např. 1900 mV nebo 6.02)",
+              "ph_ref_4": "🎯 Cílový roztok pH 4 (např. 4.00)",
+              "orp_calib": "📏 Naměřená hodnota ORP (Redox) (např. 650)",
+              "orp_ref": "🎯 Cílový roztok ORP (Redox) (např. 650)",
+              "temp_offset": "🌡️ Posun teploty (°Celsius) (+/-)"
+            }
+          }
+        }
+      },
+      "manual": {
+        "title": "✍️ Ruční zadání",
+        "description": "Zadejte Bluetooth MAC adresu (např. AA:BB:CC:DD:EE:FF)",
+        "data": {
+          "mac_address": "🏷️ Bluetooth MAC adresa"
+        }
+      }
+    },
+    "error": {
+      "cannot_connect": "❌ Nepodařilo se připojit k Flipr",
+      "already_configured": "⚠️ Toto zařízení je již nakonfigurováno",
+      "unknown": "❓ Neznámá chyba",
+      "invalid_mac": "❌ Neplatný formát (např. AA:BB:CC:DD:EE:FF)",
+      "invalid_selection": "❌ Neplatný výběr. Vyberte prosím zařízení.",
+      "ph_calibration_equal": "❌ Kalibrační hodnoty pH musí být odlišné",
+      "ph_reference_equal": "❌ Referenční hodnoty pH musí být odlišné",
+      "ph_slope_mismatch": "❌ Směrnice kalibrace a reference se musí shodovat",
+      "ph_mv_out_of_range": "❌ Hodnoty mV musí být mezi 500-3000",
+      "ph_ref_out_of_range": "❌ pH 4: 2.5-5.5, pH 7: 6.5-7.5",
+      "ph_threshold_error": "❌ Minimální pH musí být menší než maximální pH",
+      "orp_threshold_error": "❌ Minimální ORP (Redox) musí být menší než maximální ORP",
+      "temp_threshold_error": "❌ Minimální teplota musí být nižší než maximální teplota"
+    },
+    "abort": {
+      "already_configured": "⚠️ Toto zařízení je již nakonfigurováno"
+    }
+  },
+  "options": {
+    "step": {
+      "init": {
+        "title": "🛠️ Možnosti Flipr",
+        "description": "Upravte kalibraci, chování a osobní limity výstrah.",
+        "data": {},
+        "sections": {
+          "general": {
+            "name": "⚙️ Obecné",
+            "data": {
+              "use_gateway": "Použít s Wi-Fi bránou Flipr 🛜",
+              "sync_mode": "🔄 Režim synchronizace (přes bránu Flipr)",
+              "chlorine_model": "🧪 Úprava vody",
+              "cya": "💧 Úroveň stabilizátoru / CyA (mg/l)"
+            }
+          },
+          "probes_calibration": {
+            "name": "🧪 Kalibrace sond",
+            "data": {
+              "ph_calib_7": "🟢 Hodnota pH 7 (např. 1600 mV nebo 8.40)",
+              "ph_ref_7": "🎯 Cílový roztok pH 7 (např. 7.02)",
+              "ph_calib_4": "🔴 Hodnota pH 4 (např. 1900 mV nebo 6.02)",
+              "ph_ref_4": "🎯 Cílový roztok pH 4 (např. 4.00)",
+              "orp_calib": "📏 Naměřená hodnota ORP (Redox) (např. 650)",
+              "orp_ref": "🎯 Cílový roztok ORP (Redox) (např. 650)",
+              "temp_offset": "🌡️ Posun teploty (°Celsius) (+/-)"
+            }
+          },
+          "alert_thresholds": {
+            "name": "📊 Limity výstrah",
+            "data": {
+              "ph_min": "📉 Limit: Minimální pH (např. 6.90)",
+              "ph_max": "📈 Limit: Maximální pH (např. 7.50)",
+              "orp_min": "📉 Limit: Minimální ORP (Redox) (mV)",
+              "orp_max": "📈 Limit: Maximální ORP (Redox) (mV)",
+              "temp_min": "❄️ Limit: Minimální teplota (°Celsius)",
+              "temp_max": "🌡️ Limit: Maximální teplota (°Celsius)"
+            }
+          }
+        }
+      },
+      "warning": {
+        "title": "⚠️ Upozornění na baterii",
+        "description": "Rozhodli jste se použít **Wi-Fi bránu** s vysokým režimem synchronizace (Normální nebo Boost).\n\nTato kombinace nutí Flipr k intenzivní komunikaci jak s Cloudem (přes bránu), tak s Home Assistant, což může způsobit **rychlé vybití baterie**.\n\nDoporučuje se přepnout do Eko režimu nebo Režimu spánku.\n\nKlikněte na **Odeslat** pro vynucení této konfigurace, nebo na tlačítko zavřít pro změnu."
+      }
+    },
+    "error": {
+      "ph_threshold_error": "❌ Minimální pH musí být menší než maximální pH",
+      "orp_threshold_error": "❌ Minimální ORP (Redox) musí být menší než maximální ORP",
+      "temp_threshold_error": "❌ Minimální teplota musí být nižší než maximální teplota"
+    }
+  },
+  "selector": {
+    "chlorine_model": {
+      "options": {
+        "chlorine": "🧂 Chlor / Sůl",
+        "bromine": "🟤 Brom"
+      }
+    },
+    "sync_mode": {
+      "options": {
+        "0": "💤 Spánek (0 měření/den) - Alternativa i s bránou!",
+        "1": "🌊 Normální (20 měření/den)",
+        "2": "🍃 Eko (2 měření/den) - Doporučeno s bránou!",
+        "3": "🚀 Boost (700 měření/den) - Pozor na baterii!"
+      }
+    },
+    "mac_address_select": {
+      "options": {
+        "manual": "✍️ Zadejte MAC adresu ručně na další obrazovce!"
+      }
+    }
+  },
+  "entity": {
+    "binary_sensor": {
+      "ph_status": {
+        "name": "Stav pH"
+      },
+      "orp_status": {
+        "name": "Stav ORP (Redox)"
+      },
+      "temperature_status": {
+        "name": "Stav teploty"
+      }
+    },
+    "button": {
+      "force_analysis": {
+        "name": "Nová analýza (~60s)"
+      }
+    },
+    "number": {
+      "scan_interval": {
+        "name": "Interval analýzy"
+      },
+      "tac": {
+        "name": "TAC (Alkalinita)"
+      },
+      "th": {
+        "name": "TH (Tvrdost)"
+      },
+      "tds": {
+        "name": "TDS (Celkové rozpuštěné pevné látky)"
+      },
+      "cya": {
+        "name": "CyA (Stabilizátor)"
+      }
+    },
+    "select": {
+      "chlorine_model": {
+        "name": "🧪 Úprava vody",
+        "state": {
+          "chlorine": "🧂 Chlor / Sůl",
+          "bromine": "🟤 Brom"
+        }
+      }
+    },
+    "sensor": {
+      "sync_mode_state": {
+        "name": "Režim sync. brány",
+        "state": {
+          "0": "💤 Spánek",
+          "1": "🌊 Normální",
+          "2": "🍃 Eko",
+          "3": "🚀 Boost"
+        }
+      },
+      "bluetooth_status": {
+        "name": "Stav Bluetooth",
+        "state": {
+          "waiting": "💤 Odpojeno",
+          "connecting": "⏳ Připojování k Flipr...",
+          "waking_up": "🚀 Probouzení systému...",
+          "requesting": "🗣️ Požadavek na analýzu...",
+          "reading": "📡 Čekání na rámec...",
+          "writing_sync": "⚙️ Odesílání konfigurace...",
+          "success": "✅ Analýza dokončena (Odpojeno)",
+          "sync_applied": "✅ Konfigurace aplikována",
+          "error": "❌ Chyba připojení",
+          "error_retry": "⏳ Chyba (Opakování za 60s)",
+          "write_failed": "⚠️ Zápis selhal",
+          "paused": "⏸️ Analýzy pozastaveny",
+          "out_of_range": "📵 Ztráta signálu"
+        }
+      },
+      "next_analysis": {
+        "name": "Další analýza"
+      },
+      "temperature": {
+        "name": "Teplota"
+      },
+      "ph": {
+        "name": "pH"
+      },
+      "orp": {
+        "name": "ORP (Redox)"
+      },
+      "battery": {
+        "name": "Baterie (Napětí)"
+      },
+      "battery_level": {
+        "name": "Baterie"
+      },
+      "ph_raw": {
+        "name": "Surové pH (mV)"
+      },
+      "factory_ph": {
+        "name": "Surové pH (Z výroby)"
+      },
+      "estimated_free_chlorine": {
+        "name": "Odhadovaný volný chlor (FC)"
+      },
+      "active_chlorine_hocl": {
+        "name": "Aktivní chlor (HOCl)"
+      },
+      "lsi": {
+        "name": "Langelierův index"
+      },
+      "lsi_status": {
+        "name": "Stav Langelierova indexu",
+        "state": {
+          "corrosive": "🔴 Korozivní voda (Kyselá)",
+          "balanced": "🟢 Dokonale vyvážená voda",
+          "scaling": "🟠 Voda tvořící vodní kámen (Zásaditá)",
+          "unknown": "⚪ Neznámo"
+        }
+      },
+      "target_equilibrium_ph": {
+        "name": "Rovnovážné pH (Taylor)"
+      },
+      "last_received": {
+        "name": "Poslední analýza"
+      },
+      "raw_frame": {
+        "name": "Surový rámec"
+      },
+      "rssi": {
+        "name": "Bluetooth Signál"
+      }
+    },
+    "switch": {
+      "active_measures": {
+        "name": "Automatické analýzy"
+      }
+    }
+  }
+}
