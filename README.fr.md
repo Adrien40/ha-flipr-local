@@ -183,7 +183,7 @@ Une fois l'appareil ajouté, vous pouvez cliquer sur **Configurer** ⚙️ pour 
 <details>
 <summary>⚠️ Voir les problèmes fréquents</summary>
   
-* **Erreurs Bluetooth fréquentes** : L'intégration gère automatiquement les tentatives de connexion. Si le capteur indique `Signal Perdu`, le Flipr est hors de portée. Rapprochez votre antenne ou [installez un Proxy Bluetooth ESPHome](https://esphome.github.io/bluetooth-proxies/) au plus près du bassin (nécessite juste un ESP32 (10€) et un chargeur USB).
+* **Erreurs Bluetooth fréquentes** : L'intégration gère automatiquement les tentatives de connexion. Si le capteur indique `Signal Perdu`, le Flipr est hors de portée. Rapprochez votre antenne ou [installez un Proxy Bluetooth ESPHome](https://esphome.github.io/bluetooth-proxies/) au plus près du bassin (nécessite juste un ESP32 (~10€) et un chargeur USB).
 * **Chlore Libre et Actif en "Inconnu"** : Si vous avez sélectionné "Brome" dans les options, c'est le comportement normal. Le brome ne se calcule pas comme le chlore. Fiez-vous à la valeur de la sonde Redox (ORP).
 * **Je n'ai pas de stabilisant** : Réglez simplement l'entité `CyA (Stabilisant)` sur `0`. Le calcul chimique s'adaptera automatiquement.
 
