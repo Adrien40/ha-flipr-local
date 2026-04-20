@@ -60,7 +60,7 @@ Flipr Local permet de remplacer le cloud par une solution de **local control**, 
 * 🏷️ **Modèles supportés** : Flipr AnalysR (Toutes versions Bluetooth - avec ou sans abonnement).
 * 🌐 **Usage flexible** : Compatible avec ou sans la passerelle Wi-Fi Flipr Connect.
 * 🏅 **Testé sur** : Validé sur **Flipr AnalysR 3**.
-* 🛠️ **Matériel requis** : Bluetooth interne, clé USB Bluetooth ou **Bluetooth Proxy ESPHome** (fortement recommandé).
+* 🛠️ **Matériel requis** : Bluetooth interne, clé USB Bluetooth ou **Bluetooth Proxy ESPHome** (Fortement recommandé, [installation facile ici](https://esphome.github.io/bluetooth-proxies/)).
 * 📶 **Qualité du signal** : Un signal **RSSI stable (idéalement supérieur à -75 dBm)** est indispensable pour garantir la connexion au Flipr. Les tests montrent qu'un signal inférieur à **-80 dBm** peut entraîner des échecs fréquents. 
 * ⏱️ **Temps réel** : Une entité `sensor.*_signal_bluetooth`, utilisant l'écoute passive de Home Assistant, vous permet de surveiller la force du signal en temps réel sans vider la batterie de la sonde !
 
@@ -183,7 +183,7 @@ Une fois l'appareil ajouté, vous pouvez cliquer sur **Configurer** ⚙️ pour 
 <details>
 <summary>⚠️ Voir les problèmes fréquents</summary>
   
-* **Erreurs Bluetooth fréquentes** : L'intégration gère automatiquement les tentatives de connexion. Si le capteur indique `Signal Perdu`, rapprochez votre proxy Bluetooth (comme un ESPHome) du bassin.
+* **Erreurs Bluetooth fréquentes** : L'intégration gère automatiquement les tentatives de connexion. Si le capteur indique `Signal Perdu`, le Flipr est hors de portée. Rapprochez votre antenne ou [installez un Proxy Bluetooth ESPHome](https://esphome.github.io/bluetooth-proxies/) au plus près du bassin (nécessite juste un ESP32 (10€) et un chargeur USB).
 * **Chlore Libre et Actif en "Inconnu"** : Si vous avez sélectionné "Brome" dans les options, c'est le comportement normal. Le brome ne se calcule pas comme le chlore. Fiez-vous à la valeur de la sonde Redox (ORP).
 * **Je n'ai pas de stabilisant** : Réglez simplement l'entité `CyA (Stabilisant)` sur `0`. Le calcul chimique s'adaptera automatiquement.
 
