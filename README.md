@@ -60,7 +60,7 @@ Flipr Local lets you replace the cloud with a **local control** solution, provid
 * 🏷️ **Supported Models**: Flipr AnalysR (All Bluetooth versions - with or without a subscription).
 * 🌐 **Flexible Usage**: Works with or without the Flipr Connect Wi-Fi gateway.
 * 🏅 **Tested on**: Validated with **Flipr AnalysR 3**.
-* 🛠️ **Hardware Required**: Internal Bluetooth, a USB Bluetooth dongle, or an **ESPHome Bluetooth Proxy** (highly recommended).
+* 🛠️ **Required Hardware**: Internal Bluetooth, USB Bluetooth dongle, or **ESPHome Bluetooth Proxy** (Highly recommended, [easy installation here](https://esphome.github.io/bluetooth-proxies/)).
 * 📶 **Signal Quality**: A stable **RSSI signal (ideally above -75 dBm)** is critical to ensure connection to the Flipr. Testing shows that signals below **-80 dBm** can cause frequent failures.
 * ⏱️ **Real-time Monitoring**: A `sensor.*_signal_bluetooth` entity, using passive listening in Home Assistant, lets you monitor the signal strength in real-time without draining the probe's battery!
 
@@ -183,7 +183,7 @@ Once the device is added, you can click on **Configure** ⚙️ to:
 <details>
 <summary>⚠️ View common issues</summary>
   
-* **Frequent Bluetooth Errors**: The integration automatically handles connection retries. If the sensor shows `Signal Lost`, move your Bluetooth proxy (like an ESPHome) closer to the pool.
+* **Frequent Bluetooth errors**: The integration automatically handles connection retries. If the sensor shows `Signal Lost`, the Flipr is out of range. Move your antenna closer or [install an ESPHome Bluetooth Proxy](https://esphome.github.io/bluetooth-proxies/) as close to the pool as possible (only requires an ESP32 (~10€) and a USB charger).
 * **Free and Active Chlorine show "Unknown"**: If you selected "Bromine" in the options, this is normal behavior. Bromine is not calculated the same way as chlorine. Rely on the ORP (Redox) probe value.
 * **I don't use stabilizer**: Simply set the `CyA (Stabilizer)` entity to `0`. The chemical calculation will adapt automatically.
 
