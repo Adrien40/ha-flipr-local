@@ -200,7 +200,7 @@ If your Flipr probes are dead, you can replace them yourself!
 
 **Hardware required:**
 1. Replacement probes (pH and ORP) with a BNC connector (Recommended dimensions: **12 mm diameter, 15-16 cm long**).
-2. Two adapter cables (**Pigtails**): `Right-angle MCX Male (90°) to BNC Female`. *The right-angle connector is essential to be able to close the Flipr cover.*
+2. Two adapter cables (**Pigtails**): `Right-angle MMCX Male (90°) to BNC Female`. *The right-angle connector is essential to be able to close the Flipr cover.*
 
 **Quick Procedure:**
 Remove the old probes, clean the white base. Plug the MCX adapters into the motherboard (`PH` and `ORP` ports). Pass the new probes through the original holes (12 mm), connect them to the BNC cables. Calibrate via Home Assistant, and you're good to go!
