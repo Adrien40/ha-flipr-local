@@ -200,7 +200,7 @@ Si les sondes de votre Flipr sont HS, vous pouvez les remplacer vous-même !
 
 **Matériel requis :**
 1. Des sondes de remplacement (pH et ORP) avec connecteur BNC (Dimensions recommandées : **12 mm de diamètre, 15-16 cm de long**).
-2. Deux câbles adaptateurs (**Pigtails**) : `MCX Mâle coudé (90°) vers BNC Femelle`. *Le connecteur coudé est indispensable pour pouvoir refermer le capot du Flipr.*
+2. Deux câbles adaptateurs (**Pigtails**) : `MMCX Mâle coudé (90°) vers BNC Femelle`. *Le connecteur coudé est indispensable pour pouvoir refermer le capot du Flipr.*
 
 **Procédure rapide :**
 Retirez les anciennes sondes, nettoyez la base blanche. Branchez les adaptateurs MCX sur la carte mère (Ports `PH` et `ORP`). Passez les nouvelles sondes dans les trous d'origine (12 mm), connectez-les aux câbles BNC. Calibrez via Home Assistant, et c'est reparti !
