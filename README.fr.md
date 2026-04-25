@@ -1,4 +1,4 @@
-[![English](https://img.shields.io/badge/Language-English-red)](#) [![Français](https://img.shields.io/badge/Langue-Fran%C3%A7ais-blue)](#)
+[![English](https://img.shields.io/badge/Language-English-red)](README.md) [![Français](https://img.shields.io/badge/Langue-Fran%C3%A7ais-blue)](#)
 
 # Flipr Local pour Home Assistant 🐬
 [![hacs_badge](https://img.shields.io/badge/HACS-Custom-orange.svg)](https://github.com/hacs/integration)
