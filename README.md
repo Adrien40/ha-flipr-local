@@ -203,7 +203,7 @@ If your Flipr probes are dead, you can replace them yourself!
 2. Two adapter cables (**Pigtails**): `Right-angle MMCX Male (90°) to BNC Female`. *The right-angle connector is essential to be able to close the Flipr cover.*
 
 **Quick Procedure:**
-Remove the old probes, clean the white base. Plug the MCX adapters into the motherboard (`PH` and `ORP` ports). Pass the new probes through the original holes (12 mm), connect them to the BNC cables. Calibrate via Home Assistant, and you're good to go!
+Remove the old probes, clean the white base. Plug the MMCX adapters into the motherboard (`PH` and `ORP` ports). Pass the new probes through the original holes (12 mm), connect them to the BNC cables. Calibrate via Home Assistant, and you're good to go!
 
 </details>
 
