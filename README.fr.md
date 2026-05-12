@@ -59,7 +59,7 @@ Flipr Local permet de remplacer le cloud par une solution de **local control**, 
 ### ✅ Compatibilité
 * 🏷️ **Modèles supportés** : Flipr AnalysR (Toutes versions Bluetooth - avec ou sans abonnement).
 * 🌐 **Usage flexible** : Compatible avec ou sans la passerelle Wi-Fi Flipr Connect.
-* 🏅 **Testé sur** : Validé sur **Flipr AnalysR 3**.
+* 🏅 **Testé sur** : Validé sur **Flipr AnalysR 3** et **Flipr Start Max**.
 * 🛠️ **Matériel requis** : Bluetooth interne, clé USB Bluetooth ou **Bluetooth Proxy ESPHome** (Fortement recommandé, [installation facile ici](https://esphome.github.io/bluetooth-proxies/)).
 * 📶 **Qualité du signal** : Un signal **RSSI stable (idéalement supérieur à -75 dBm)** est indispensable pour garantir la connexion au Flipr. Les tests montrent qu'un signal inférieur à **-80 dBm** peut entraîner des échecs fréquents. 
 * ⏱️ **Temps réel** : Une entité `sensor.*_signal_bluetooth`, utilisant l'écoute passive de Home Assistant, vous permet de surveiller la force du signal en temps réel sans vider la batterie de la sonde !
