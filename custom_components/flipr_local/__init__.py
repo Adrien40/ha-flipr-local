@@ -86,6 +86,7 @@ from .const import (
     DEFAULT_ORP_CALIB,
     DEFAULT_ORP_REF,
     BLE_RECENTLY_SEEN_THRESHOLD_S,
+    get_flipr_model,
 )
 
 _LOGGER = logging.getLogger(__name__)
@@ -301,7 +302,7 @@ class FliprDataCoordinator(DataUpdateCoordinator):
             self._recalc_cancel()
             self._recalc_cancel = None
 
-        # FIX: Cancel the debounce timer BEFORE saving. If the timer already fired and
+        # Cancel the debounce timer BEFORE saving. If the timer already fired and
         # spawned _do_save as a background task, that task checks _is_shutdown and bails
         # out cleanly. The authoritative save is the direct call below.
         if self._save_cancel:
@@ -524,7 +525,7 @@ class FliprDataCoordinator(DataUpdateCoordinator):
             )
         )
 
-        # FIX: use `k not in self.data` to correctly detect keys that are new (not yet
+        # Use `k not in self.data` to correctly detect keys that are new (not yet
         # present in self.data) even when their computed value is None. The previous
         # `self.data.get(k) != v` would silently skip a new key whose value is None,
         # since get() also returns None for missing keys — identical but not the same.
@@ -643,7 +644,8 @@ class FliprDataCoordinator(DataUpdateCoordinator):
 
         old_raw_frame_hex = self.data.get("raw_frame") or ""
         try:
-            # FIX: use EXPECTED_FRAME_HEX_LEN constant instead of magic number 26
+            # Use EXPECTED_FRAME_HEX_LEN constant instead of magic number 26.
+            # A Flipr BLE frame is always 13 bytes → 26 hex characters when encoded.
             old_raw_frame_bytes = (
                 bytes.fromhex(old_raw_frame_hex)
                 if len(old_raw_frame_hex) == EXPECTED_FRAME_HEX_LEN
@@ -657,6 +659,10 @@ class FliprDataCoordinator(DataUpdateCoordinator):
             )
             old_raw_frame_bytes = b""
 
+        # Identify model once before connecting to drive both connection options
+        # and the data-reading strategy, without any GATT introspection.
+        is_start_max = get_flipr_model(device.name).startswith("Flipr Start")
+
         client: BleakClient | None = None
         notify_started = False
         received_payload: bytes | None = None
@@ -668,7 +674,13 @@ class FliprDataCoordinator(DataUpdateCoordinator):
                 self._set_bt_status(BT_STATUS_CONNECTING)
 
                 client = await asyncio.wait_for(
-                    establish_connection(BleakClient, device, self.mac, max_attempts=3),
+                    establish_connection(
+                        BleakClient,
+                        device,
+                        self.mac,
+                        max_attempts=3,
+                        **({"use_services_cache": False} if is_start_max else {}),
+                    ),
                     timeout=TIMEOUT_BLE_CONN,
                 )
 
@@ -683,16 +695,18 @@ class FliprDataCoordinator(DataUpdateCoordinator):
                             self.safe_mac,
                         )
 
-                await client.start_notify(
-                    FLIPR_CHARACTERISTIC_UUID, notification_handler
-                )
-                notify_started = True
+                if not is_start_max:
+                    await client.start_notify(
+                        FLIPR_CHARACTERISTIC_UUID, notification_handler
+                    )
+                    notify_started = True
 
                 reference_frame_bytes = old_raw_frame_bytes
 
                 for attempt in range(1, 3):
-                    while not received_data_queue.empty():
-                        received_data_queue.get_nowait()
+                    if not is_start_max:
+                        while not received_data_queue.empty():
+                            received_data_queue.get_nowait()
 
                     if cmd_type == "mode":
                         self._set_bt_status(BT_STATUS_WRITING_SYNC)
@@ -746,41 +760,84 @@ class FliprDataCoordinator(DataUpdateCoordinator):
                     self._set_bt_status(BT_STATUS_READING)
 
                     try:
-                        timeout_limit = loop.time() + 60.0
-                        while True:
-                            time_left = timeout_limit - loop.time()
-                            if time_left <= 0:
-                                raise asyncio.TimeoutError()
+                        if not is_start_max:
+                            timeout_limit = loop.time() + 60.0
+                            while True:
+                                time_left = timeout_limit - loop.time()
+                                if time_left <= 0:
+                                    raise asyncio.TimeoutError()
 
-                            payload = await asyncio.wait_for(
-                                received_data_queue.get(), timeout=time_left
+                                payload = await asyncio.wait_for(
+                                    received_data_queue.get(), timeout=time_left
+                                )
+
+                                if len(payload) == 13 and (
+                                    not reference_frame_bytes
+                                    or payload != reference_frame_bytes
+                                ):
+                                    received_payload = payload
+                                    break
+
+                            if received_payload:
+                                break
+
+                        else:
+                            _LOGGER.info(
+                                "Flipr %s: Start Max detected. Holding silent connection for 35s to allow internal measurement...",
+                                self.safe_mac,
                             )
+                            await asyncio.sleep(35.0)
 
-                            if len(payload) == 13:
-                                if cmd_type == "mode":
-                                    if (
+                            for read_retry in range(3):
+                                if read_retry > 0:
+                                    _LOGGER.debug(
+                                        "Flipr %s: Frame unchanged, waiting 8s more...",
+                                        self.safe_mac,
+                                    )
+                                    await asyncio.sleep(8.0)
+
+                                try:
+                                    payload = await client.read_gatt_char(
+                                        FLIPR_CHARACTERISTIC_UUID
+                                    )
+                                    _LOGGER.debug(
+                                        "Flipr %s: Read attempt %d: %s | REF: %s",
+                                        self.safe_mac,
+                                        read_retry + 1,
+                                        payload.hex().upper(),
+                                        reference_frame_bytes.hex().upper()
+                                        if reference_frame_bytes
+                                        else "NONE",
+                                    )
+
+                                    if len(payload) == 13 and (
                                         not reference_frame_bytes
                                         or payload != reference_frame_bytes
                                     ):
                                         received_payload = payload
                                         break
-                                else:
-                                    received_payload = payload
-                                    break
+                                except Exception as read_err:
+                                    _LOGGER.debug(
+                                        "Flipr %s: Error reading after silent wait: %s",
+                                        self.safe_mac,
+                                        read_err,
+                                    )
 
-                        if received_payload:
-                            break
+                            if received_payload:
+                                break
+
+                            raise asyncio.TimeoutError()
 
                     except asyncio.TimeoutError:
                         _LOGGER.warning(
-                            "Timeout waiting for notification from Flipr %s on attempt %d/2.",
+                            "Timeout waiting for new data from Flipr %s on attempt %d/2.",
                             self.safe_mac,
                             attempt,
                         )
 
                 if not received_payload:
                     return self._handle_ble_error(
-                        "No notification received from Flipr after 120 seconds.",
+                        "No valid data received from Flipr after 120 seconds.",
                         BT_STATUS_ERROR,
                     )
 
@@ -846,7 +903,7 @@ class FliprDataCoordinator(DataUpdateCoordinator):
         hex_frame = data.hex().upper()
 
         if hex_frame.startswith("0000"):
-            # FIX: device in standby — reset retry_count so it doesn't accumulate
+            # Device in standby — reset retry_count so it doesn't accumulate
             # across standby cycles and cause spurious retry escalation.
             self.retry_count = 0
             return self._handle_ble_error(
