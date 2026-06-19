@@ -436,6 +436,11 @@ class FliprConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
                 errors[CONF_MAC_ADDRESS] = "invalid_mac"
             else:
                 self._mac_address = mac_raw.upper()
+                # Set the unique_id (and reject duplicates) here, mirroring the
+                # bluetooth discovery step. Without this, a purely manual entry never
+                # got a unique_id, so the same Flipr could be configured twice.
+                await self.async_set_unique_id(self._mac_address)
+                self._abort_if_unique_id_configured()
                 self._bt_name = None
                 self._discovered_name = "Flipr"
                 # Resume the user step with the previously entered values (if any),
