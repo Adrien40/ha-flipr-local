@@ -474,7 +474,10 @@ class FliprNextAnalysisSensor(CoordinatorEntity, SensorEntity):
         if not last or not interval:
             return None
         if last.tzinfo is None:
-            last = dt_util.as_utc(last)
+            # last_received is always stored as UTC, so a naive value (e.g. legacy
+            # restored data) must be tagged as UTC, not reinterpreted as local time
+            # the way dt_util.as_utc would do.
+            last = last.replace(tzinfo=dt_util.UTC)
         next_dt = last + interval
         if next_dt < dt_util.utcnow():
             return None
