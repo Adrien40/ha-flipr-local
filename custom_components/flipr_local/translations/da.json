@@ -105,6 +105,12 @@
       }
     },
     "error": {
+      "unknown": "❓ Ukendt fejl",
+      "ph_calibration_equal": "❌ pH kalibreringsværdier skal være forskellige",
+      "ph_reference_equal": "❌ pH referenceværdier skal være forskellige",
+      "ph_slope_mismatch": "❌ Kalibrerings- og referencehældninger skal matche",
+      "ph_mv_out_of_range": "❌ mV værdier skal være mellem 500-3000",
+      "ph_ref_out_of_range": "❌ pH 4: 2.5-5.5, pH 7: 6.5-7.5",
       "ph_threshold_error": "❌ Minimum pH skal være mindre end maksimum pH",
       "orp_threshold_error": "❌ Minimum ORP (Redox) skal være mindre end maksimum ORP",
       "temp_threshold_error": "❌ Minimumstemperatur skal være lavere end maksimumstemperatur"

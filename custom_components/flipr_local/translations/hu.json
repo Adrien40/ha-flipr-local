@@ -105,6 +105,12 @@
       }
     },
     "error": {
+      "unknown": "❓ Ismeretlen hiba",
+      "ph_calibration_equal": "❌ A pH kalibrációs értékeknek eltérőnek kell lenniük",
+      "ph_reference_equal": "❌ A pH referenciaértékeknek eltérőnek kell lenniük",
+      "ph_slope_mismatch": "❌ A kalibrációs és referencia meredekségeknek egyezniük kell",
+      "ph_mv_out_of_range": "❌ Az mV értékeknek 500-3000 között kell lenniük",
+      "ph_ref_out_of_range": "❌ pH 4: 2.5-5.5, pH 7: 6.5-7.5",
       "ph_threshold_error": "❌ A minimum pH-nak kisebbnek kell lennie a maximum pH-nál",
       "orp_threshold_error": "❌ A minimum ORP-nek (Redox) kisebbnek kell lennie a maximum ORP-nél",
       "temp_threshold_error": "❌ A minimum hőmérsékletnek alacsonyabbnak kell lennie a maximum hőmérsékletnél"

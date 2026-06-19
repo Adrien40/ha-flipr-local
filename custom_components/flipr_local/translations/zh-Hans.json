@@ -105,6 +105,12 @@
       }
     },
     "error": {
+      "unknown": "❓ 未知错误",
+      "ph_calibration_equal": "❌ pH 校准值必须不同",
+      "ph_reference_equal": "❌ pH 参考值必须不同",
+      "ph_slope_mismatch": "❌ 校准和参考斜率必须匹配",
+      "ph_mv_out_of_range": "❌ mV 值必须在 500-3000 之间",
+      "ph_ref_out_of_range": "❌ pH 4: 2.5-5.5, pH 7: 6.5-7.5",
       "ph_threshold_error": "❌ 最小 pH 必须小于最大 pH",
       "orp_threshold_error": "❌ 最小 ORP (氧化还原) 必须小于最大 ORP",
       "temp_threshold_error": "❌ 最低温度必须低于最高温度"

@@ -105,6 +105,12 @@
       }
     },
     "error": {
+      "unknown": "❓ Onbekende fout",
+      "ph_calibration_equal": "❌ pH kalibratiewaarden moeten verschillend zijn",
+      "ph_reference_equal": "❌ pH referentiewaarden moeten verschillend zijn",
+      "ph_slope_mismatch": "❌ Kalibratie- en referentiehellingen moeten overeenkomen",
+      "ph_mv_out_of_range": "❌ mV-waarden moeten tussen 500-3000 liggen",
+      "ph_ref_out_of_range": "❌ pH 4: 2.5-5.5, pH 7: 6.5-7.5",
       "ph_threshold_error": "❌ Minimum pH moet kleiner zijn dan maximum pH",
       "orp_threshold_error": "❌ Minimum ORP (Redox) moet kleiner zijn dan maximum ORP",
       "temp_threshold_error": "❌ Minimumtemperatuur moet lager zijn dan maximumtemperatuur"

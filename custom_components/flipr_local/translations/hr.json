@@ -105,6 +105,12 @@
       }
     },
     "error": {
+      "unknown": "❓ Nepoznata pogreška",
+      "ph_calibration_equal": "❌ Vrijednosti kalibracije pH moraju biti različite",
+      "ph_reference_equal": "❌ Referentne vrijednosti pH moraju biti različite",
+      "ph_slope_mismatch": "❌ Nagibi kalibracije i referenci moraju se podudarati",
+      "ph_mv_out_of_range": "❌ Vrijednosti mV moraju biti između 500-3000",
+      "ph_ref_out_of_range": "❌ pH 4: 2.5-5.5, pH 7: 6.5-7.5",
       "ph_threshold_error": "❌ Minimalni pH mora biti manji od maksimalnog pH",
       "orp_threshold_error": "❌ Minimalni ORP (Redox) mora biti manji od maksimalnog ORP",
       "temp_threshold_error": "❌ Minimalna temperatura mora biti niža od maksimalne temperature"

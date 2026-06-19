@@ -105,6 +105,12 @@
       }
     },
     "error": {
+      "unknown": "❓ Error desconocido",
+      "ph_calibration_equal": "❌ Los valores de calibración de pH deben ser diferentes",
+      "ph_reference_equal": "❌ Los valores de referencia de pH deben ser diferentes",
+      "ph_slope_mismatch": "❌ Las pendientes de calibración y referencia deben coincidir",
+      "ph_mv_out_of_range": "❌ Los valores mV deben estar entre 500-3000",
+      "ph_ref_out_of_range": "❌ pH 4: 2.5-5.5, pH 7: 6.5-7.5",
       "ph_threshold_error": "❌ El pH mínimo debe ser menor que el pH máximo",
       "orp_threshold_error": "❌ El ORP (Redox) mínimo debe ser menor que el ORP máximo",
       "temp_threshold_error": "❌ La temperatura mínima debe ser menor que la temperatura máxima"

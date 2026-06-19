@@ -105,6 +105,12 @@
       }
     },
     "error": {
+      "unknown": "❓ Neznámá chyba",
+      "ph_calibration_equal": "❌ Kalibrační hodnoty pH musí být odlišné",
+      "ph_reference_equal": "❌ Referenční hodnoty pH musí být odlišné",
+      "ph_slope_mismatch": "❌ Směrnice kalibrace a reference se musí shodovat",
+      "ph_mv_out_of_range": "❌ Hodnoty mV musí být mezi 500-3000",
+      "ph_ref_out_of_range": "❌ pH 4: 2.5-5.5, pH 7: 6.5-7.5",
       "ph_threshold_error": "❌ Minimální pH musí být menší než maximální pH",
       "orp_threshold_error": "❌ Minimální ORP (Redox) musí být menší než maximální ORP",
       "temp_threshold_error": "❌ Minimální teplota musí být nižší než maximální teplota"
