@@ -128,6 +128,11 @@ class FliprUpdateIntervalNumber(CoordinatorEntity, RestoreNumber):
         val = max(self._attr_native_min_value, min(val, self._attr_native_max_value))
         self._attr_native_value = val
         self.coordinator.update_interval = timedelta(minutes=val)
+        # Re-arm the coordinator polling timer so the new interval takes effect now
+        # instead of only after the next poll on the old interval. Without this, the
+        # running timer keeps the previous cadence and the next-analysis sensor would
+        # advertise a time the coordinator is not actually going to honor yet.
+        self.coordinator._schedule_refresh()
         self.async_write_ha_state()
         # Trigger a volatile (no-save) coordinator update so that FliprNextAnalysisSensor
         # recalculates its value based on the new interval without writing to disk.
