@@ -42,7 +42,7 @@ class FliprForceAnalysisButton(CoordinatorEntity, ButtonEntity):
         self._attr_device_info = flipr_device_info(mac, model_name)
 
     async def async_press(self) -> None:
-        if self.coordinator._is_shutdown:
+        if self.coordinator.is_shutdown:
             _LOGGER.debug(
                 "Ignoring button press for %s: coordinator is shutting down",
                 self.coordinator.safe_mac,

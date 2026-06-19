@@ -13,9 +13,9 @@ _CYA_HOCl_MAX_FACTOR = 50.0
 def get_mv_from_input(val: float | int | str) -> float:
     try:
         val_f = float(val)
-    except (ValueError, TypeError):
+    except (ValueError, TypeError) as err:
         _LOGGER.error("Invalid calibration value: %s", val)
-        raise ValueError("Invalid format")
+        raise ValueError(f"Invalid calibration value: {val!r}") from err
 
     if 2.0 <= val_f <= 14.0:
         mv = round((val_f - PH_FACTORY_OFFSET) / PH_FACTORY_SLOPE)
@@ -30,7 +30,7 @@ def get_mv_from_input(val: float | int | str) -> float:
 
 
 def _compute_ph_s(temp_c: float, tac_c: float, th_c: float, tds_c: float) -> float:
-    # FIX 🔴 : suppression de la conversion °F/Rankine — on utilise directement Kelvin
+    # Temperature term uses Kelvin directly (no °F/Rankine conversion).
     a = (math.log10(max(1.0, tds_c)) - 1) / 10
     b = -13.12 * math.log10(temp_c + 273.15) + 34.55
     c = math.log10(max(1.0, th_c)) - 0.4
@@ -76,7 +76,8 @@ def estimate_free_chlorine(orp: float, ph: float, cya: float = 40.0) -> float | 
             )
         effective_orp = max(415.0, orp)
         amplifier = 657 - (51 * ph)
-        # FIX 🟡 : pas de abs() — un amplifier négatif (pH > 12.88) est aussi invalide
+        # No abs() here: a negative amplifier (pH > 12.88) is also invalid and is
+        # floored to a small positive value to keep the exponent well-defined.
         if amplifier < 0.1:
             amplifier = 0.1
 
@@ -107,7 +108,7 @@ def estimate_free_chlorine(orp: float, ph: float, cya: float = 40.0) -> float | 
         return None
 
 
-# FIX 🟡 : annotation corrigée float -> float | None, cohérente avec le check défensif interne
+# Return type is float | None, consistent with the internal None guard below.
 def compute_active_chlorine_from_fc(
     fc_estimated: float | None, ph: float, temp_c: float, cya: float
 ) -> float | None:

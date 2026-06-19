@@ -175,6 +175,10 @@ class FliprDataCoordinator(DataUpdateCoordinator):
         return self._entry_id
 
     @property
+    def is_shutdown(self) -> bool:
+        return self._is_shutdown
+
+    @property
     def entry(self) -> ConfigEntry | None:
         return self.hass.config_entries.async_get_entry(self._entry_id)
 
@@ -1065,7 +1069,7 @@ async def update_listener(hass: HomeAssistant, entry: ConfigEntry) -> None:
     if (mode_changed or gw_changed) and new_use_gw and new_sync_mode is not None:
         coordinator.set_pending_cmd("mode", int(new_sync_mode))
         coordinator.request_one_shot_analysis()
-        if coordinator._is_shutdown:
+        if coordinator.is_shutdown:
             _LOGGER.debug(
                 "Skipping sync mode refresh for %s: coordinator is shutting down",
                 coordinator.safe_mac,

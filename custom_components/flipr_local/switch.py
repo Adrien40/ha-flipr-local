@@ -69,7 +69,7 @@ class FliprActiveMeasuresSwitch(CoordinatorEntity, SwitchEntity):
                 "bluetooth_status": BT_STATUS_WAITING,
             }
         )
-        if self.coordinator._is_shutdown:
+        if self.coordinator.is_shutdown:
             return
         entry = self.hass.config_entries.async_get_entry(self.coordinator.entry_id)
         if not entry:
