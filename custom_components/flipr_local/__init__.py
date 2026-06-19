@@ -338,6 +338,8 @@ class FliprDataCoordinator(DataUpdateCoordinator):
 
         def _schedule_save_callback() -> None:
             self._save_cancel = None  # handle has fired — clear before spawning task
+            if self._is_shutdown:
+                return
             entry = self.hass.config_entries.async_get_entry(entry_id)
             if entry:
                 entry.async_create_background_task(
@@ -351,7 +353,9 @@ class FliprDataCoordinator(DataUpdateCoordinator):
         )
 
     async def _do_save(self) -> None:
-        self._save_cancel = None
+        # NOTE: do not touch self._save_cancel here. The scheduler callback owns
+        # it and may have already installed a new timer handle by the time this
+        # coroutine runs; clearing it would leak that handle (uncancellable timer).
         if self._is_shutdown:
             return
         try:
