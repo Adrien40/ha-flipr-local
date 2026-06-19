@@ -848,12 +848,18 @@ class FliprDataCoordinator(DataUpdateCoordinator):
                 if not is_init_done:
                     self._init_done = True
 
-                # Only reset if _pending_cmd_type hasn't been changed by update_listener
-                # during this BLE cycle (race condition guard).
-                # is_init_done guard: on the init cycle, cmd_type comes from config (not
-                # from _pending_cmd_type), so the equality check would be accidentally True
-                # even if update_listener wrote a new "mode" command during the cycle.
-                if is_init_done and self._pending_cmd_type == cmd_type:
+                # Only reset if the pending command hasn't been changed by
+                # update_listener during this BLE cycle (race condition guard).
+                # Compare BOTH type and value: a new "mode" command with a different
+                # value written mid-cycle must survive, otherwise the user's sync-mode
+                # change would be silently clobbered back to "analyze".
+                # is_init_done guard: on the init cycle, cmd_type/cmd_val come from
+                # config (not from _pending_cmd_*), so the equality check could be
+                # accidentally True even if update_listener wrote a new command.
+                if is_init_done and (self._pending_cmd_type, self._pending_cmd_val) == (
+                    cmd_type,
+                    cmd_val,
+                ):
                     self._pending_cmd_type = "analyze"
                     self._pending_cmd_val = 0x01
 
