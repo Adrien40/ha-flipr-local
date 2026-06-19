@@ -88,13 +88,24 @@ def _flatten_sections(user_input: dict) -> dict:
 
 
 def validate_calibration(data: dict) -> dict | tuple[str, str]:
-    try:
-        raw_c4 = _to_float(data.get(CONF_PH_CALIB_4, DEFAULT_PH_CALIB_4))
-        raw_c7 = _to_float(data.get(CONF_PH_CALIB_7, DEFAULT_PH_CALIB_7))
-        ref4 = _to_float(data.get(CONF_PH_REF_4, DEFAULT_PH_REF_4))
-        ref7 = _to_float(data.get(CONF_PH_REF_7, DEFAULT_PH_REF_7))
-    except (ValueError, TypeError):
-        return (CONF_PH_CALIB_4, "unknown")
+    # Parse each pH field individually so a parsing error is attributed to the
+    # field that actually failed, instead of always blaming ph_calib_4.
+    ph_field_defaults = (
+        (CONF_PH_CALIB_4, DEFAULT_PH_CALIB_4),
+        (CONF_PH_CALIB_7, DEFAULT_PH_CALIB_7),
+        (CONF_PH_REF_4, DEFAULT_PH_REF_4),
+        (CONF_PH_REF_7, DEFAULT_PH_REF_7),
+    )
+    parsed_ph: dict[str, float] = {}
+    for field, default in ph_field_defaults:
+        try:
+            parsed_ph[field] = _to_float(data.get(field, default))
+        except (ValueError, TypeError):
+            return (field, "unknown")
+    raw_c4 = parsed_ph[CONF_PH_CALIB_4]
+    raw_c7 = parsed_ph[CONF_PH_CALIB_7]
+    ref4 = parsed_ph[CONF_PH_REF_4]
+    ref7 = parsed_ph[CONF_PH_REF_7]
 
     try:
         if CONF_PH_MIN in data and CONF_PH_MAX in data:
