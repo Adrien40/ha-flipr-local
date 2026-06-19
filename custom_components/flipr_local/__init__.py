@@ -211,14 +211,18 @@ class FliprDataCoordinator(DataUpdateCoordinator):
         self._pending_cmd_type = cmd_type
         self._pending_cmd_val = cmd_val
 
+    def _cancel_pending_retry(self) -> None:
+        """Cancel an armed retry timer, if any (e.g. when going out of range)."""
+        if self._retry_cancel:
+            self._retry_cancel()
+            self._retry_cancel = None
+
     @callback
     def _on_ble_unavailable(self, _info: BluetoothServiceInfoBleak) -> None:
         _LOGGER.debug("Flipr %s: BLE signal lost", self.safe_mac)
         self._ble_available = False
         self._set_bt_status(BT_STATUS_OUT_OF_RANGE)
-        if self._retry_cancel:
-            self._retry_cancel()
-            self._retry_cancel = None
+        self._cancel_pending_retry()
         self.retry_count = 0
 
     @callback
@@ -597,6 +601,7 @@ class FliprDataCoordinator(DataUpdateCoordinator):
             )
             self._set_bt_status(BT_STATUS_OUT_OF_RANGE)
             self.retry_count = 0
+            self._cancel_pending_retry()
             if self.data.get("ph_raw") is not None:
                 return dict(self.data)
             raise UpdateFailed(
@@ -615,6 +620,7 @@ class FliprDataCoordinator(DataUpdateCoordinator):
             )
             self._set_bt_status(BT_STATUS_OUT_OF_RANGE)
             self.retry_count = 0
+            self._cancel_pending_retry()
             if self.data.get("ph_raw") is not None:
                 return dict(self.data)
             raise UpdateFailed(
@@ -889,6 +895,7 @@ class FliprDataCoordinator(DataUpdateCoordinator):
                         self.safe_mac,
                     )
                     self.retry_count = 0
+                    self._cancel_pending_retry()
                     self._set_bt_status(BT_STATUS_OUT_OF_RANGE)
                     if self.data.get("ph_raw") is not None:
                         return dict(self.data)
