@@ -14,7 +14,7 @@
             "data": {
               "use_gateway": "与 Flipr Wi-Fi 网关一起使用 🛜",
               "chlorine_model": "🧪 水处理",
-              "cya": "💧 稳定剂水平 / CyA (mg/l)"
+              "cya": "💧 稳定剂浓度 / CyA (mg/l)"
             }
           },
           "probes_calibration": {
@@ -71,7 +71,7 @@
               "use_gateway": "与 Flipr Wi-Fi 网关一起使用 🛜",
               "sync_mode": "🔄 同步模式 (通过 Flipr 网关)",
               "chlorine_model": "🧪 水处理",
-              "cya": "💧 稳定剂水平 / CyA (mg/l)"
+              "cya": "💧 稳定剂浓度 / CyA (mg/l)"
             }
           },
           "probes_calibration": {

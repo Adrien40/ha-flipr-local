@@ -85,9 +85,7 @@
               "orp_ref": "🎯 Alvo solução ORP (Redox) (ex: 650)",
               "temp_offset": "🌡️ Compensação de Temperatura (°Celsius) (+/-)"
             }
-          }
-        },
-        "sections": {
+          },
           "alert_thresholds": {
             "name": "📊 Limites de Alerta",
             "data": {

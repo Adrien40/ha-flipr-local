@@ -14,7 +14,7 @@
             "data": {
               "use_gateway": "Brug med Flipr Wi-Fi Gateway 🛜",
               "chlorine_model": "🧪 Vandbehandling",
-              "cya": "💧 Stabilisator niveau / CyA (mg/l)"
+              "cya": "💧 Stabilisatorniveau / CyA (mg/l)"
             }
           },
           "probes_calibration": {
@@ -71,7 +71,7 @@
               "use_gateway": "Brug med Flipr Wi-Fi Gateway 🛜",
               "sync_mode": "🔄 Synkroniseringstilstand (via Flipr Gateway)",
               "chlorine_model": "🧪 Vandbehandling",
-              "cya": "💧 Stabilisator niveau / CyA (mg/l)"
+              "cya": "💧 Stabilisatorniveau / CyA (mg/l)"
             }
           },
           "probes_calibration": {

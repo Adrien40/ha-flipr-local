@@ -18,7 +18,7 @@
             }
           },
           "probes_calibration": {
-            "name": "🧪 Kalibracja Sond",
+            "name": "🧪 Kalibracja sond",
             "data": {
               "ph_calib_7": "🟢 Wartość pH 7 (np. 1600 mV lub 8.40)",
               "ph_ref_7": "🎯 Cel roztworu pH 7 (np. 7.02)",
@@ -26,7 +26,7 @@
               "ph_ref_4": "🎯 Cel roztworu pH 4 (np. 4.00)",
               "orp_calib": "📏 Zmierzona wartość ORP (Redox) (np. 650)",
               "orp_ref": "🎯 Cel roztworu ORP (Redox) (np. 650)",
-              "temp_offset": "🌡️ Przesunięcie Temperatury (°Celsius) (+/-)"
+              "temp_offset": "🌡️ Przesunięcie temperatury (°Celsius) (+/-)"
             }
           }
         }
@@ -75,7 +75,7 @@
             }
           },
           "probes_calibration": {
-            "name": "🧪 Kalibracja Sond",
+            "name": "🧪 Kalibracja sond",
             "data": {
               "ph_calib_7": "🟢 Wartość pH 7 (np. 1600 mV lub 8.40)",
               "ph_ref_7": "🎯 Cel roztworu pH 7 (np. 7.02)",
@@ -83,24 +83,24 @@
               "ph_ref_4": "🎯 Cel roztworu pH 4 (np. 4.00)",
               "orp_calib": "📏 Zmierzona wartość ORP (Redox) (np. 650)",
               "orp_ref": "🎯 Cel roztworu ORP (Redox) (np. 650)",
-              "temp_offset": "🌡️ Przesunięcie Temperatury (°Celsius) (+/-)"
+              "temp_offset": "🌡️ Przesunięcie temperatury (°Celsius) (+/-)"
             }
           },
           "alert_thresholds": {
-            "name": "📊 Progi Ostrzegawcze",
+            "name": "📊 Progi ostrzegawcze",
             "data": {
               "ph_min": "📉 Próg: Minimalne pH (np. 6.90)",
               "ph_max": "📈 Próg: Maksymalne pH (np. 7.50)",
               "orp_min": "📉 Próg: Minimalne ORP (Redox) (mV)",
               "orp_max": "📈 Próg: Maksymalne ORP (Redox) (mV)",
-              "temp_min": "❄️ Próg: Minimalna Temperatura (°Celsius)",
-              "temp_max": "🌡️ Próg: Maksymalna Temperatura (°Celsius)"
+              "temp_min": "❄️ Próg: Minimalna temperatura (°Celsius)",
+              "temp_max": "🌡️ Próg: Maksymalna temperatura (°Celsius)"
             }
           }
         }
       },
       "warning": {
-        "title": "⚠️ Ostrzeżenie o Baterii",
+        "title": "⚠️ Ostrzeżenie o baterii",
         "description": "Wybrałeś użycie **Bramki Wi-Fi** z wysokim trybem synchronizacji (Normalny lub Boost).\n\nTa kombinacja zmusza Flipr do intensywnej komunikacji zarówno z Chmurą (przez bramkę), jak i Home Assistant, co grozi **szybkim rozładowaniem baterii**.\n\nZaleca się przełączenie na tryb Eco lub Uśpienia.\n\nKliknij **Prześlij**, aby wymusić tę konfigurację, lub przycisk zamknięcia, aby zmienić."
       }
     },
@@ -140,12 +140,12 @@
         "name": "Status ORP (Redox)"
       },
       "temperature_status": {
-        "name": "Status Temperatury"
+        "name": "Status temperatury"
       }
     },
     "button": {
       "force_analysis": {
-        "name": "Nowa Analiza (~60s)"
+        "name": "Nowa analiza (~60s)"
       }
     },
     "number": {
@@ -159,7 +159,7 @@
         "name": "TH (Twardość)"
       },
       "tds": {
-        "name": "TDS (Całkowita Ilość Substancji Rozpuszczonych)"
+        "name": "TDS (Całkowita ilość substancji rozpuszczonych)"
       },
       "cya": {
         "name": "CyA (Stabilizator)"
@@ -193,10 +193,10 @@
           "requesting": "🗣️ Żądanie analizy...",
           "reading": "📡 Nasłuchiwanie ramki...",
           "writing_sync": "⚙️ Wysyłanie konfiguracji...",
-          "success": "✅ Analiza zakończona (Rozłączono)",
+          "success": "✅ Analiza zakończona (rozłączono)",
           "sync_applied": "✅ Konfiguracja zastosowana",
           "error": "❌ Błąd połączenia",
-          "error_retry": "⏳ Błąd (Ponowienie za 60s)",
+          "error_retry": "⏳ Błąd (ponowienie za 60s)",
           "write_failed": "⚠️ Zapis nie powiódł się",
           "paused": "⏸️ Analizy wstrzymane",
           "out_of_range": "📵 Sygnał utracony"
@@ -215,7 +215,7 @@
         "name": "ORP (Redox)"
       },
       "battery": {
-        "name": "Bateria (Napięcie)"
+        "name": "Bateria (napięcie)"
       },
       "battery_level": {
         "name": "Bateria"
@@ -224,23 +224,23 @@
         "name": "Surowe pH (mV)"
       },
       "factory_ph": {
-        "name": "Surowe pH (Fabryka)"
+        "name": "Surowe pH (fabryka)"
       },
       "estimated_free_chlorine": {
-        "name": "Szacowany Wolny Chlor (FC)"
+        "name": "Szacowany wolny chlor (FC)"
       },
       "active_chlorine_hocl": {
-        "name": "Aktywny Chlor (HOCl)"
+        "name": "Aktywny chlor (HOCl)"
       },
       "lsi": {
         "name": "Indeks Langeliera"
       },
       "lsi_status": {
-        "name": "Status Indeksu Langeliera",
+        "name": "Status indeksu Langeliera",
         "state": {
-          "corrosive": "🔴 Woda Korozyjna (Kwaśna)",
-          "balanced": "🟢 Woda Idealnie Zbilansowana",
-          "scaling": "🟠 Woda Tworząca Kamień (Zasadowa)",
+          "corrosive": "🔴 Woda korozyjna (kwaśna)",
+          "balanced": "🟢 Woda idealnie zbilansowana",
+          "scaling": "🟠 Woda tworząca kamień (zasadowa)",
           "unknown": "⚪ Nieznany"
         }
       },
@@ -251,7 +251,7 @@
         "name": "Ostatnia analiza"
       },
       "raw_frame": {
-        "name": "Surowa Ramka"
+        "name": "Surowa ramka"
       },
       "rssi": {
         "name": "Sygnał Bluetooth"

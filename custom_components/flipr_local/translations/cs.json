@@ -254,7 +254,7 @@
         "name": "Surový rámec"
       },
       "rssi": {
-        "name": "Bluetooth Signál"
+        "name": "Signál Bluetooth"
       }
     },
     "switch": {

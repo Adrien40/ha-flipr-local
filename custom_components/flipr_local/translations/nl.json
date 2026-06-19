@@ -14,11 +14,11 @@
             "data": {
               "use_gateway": "Gebruiken met de Flipr Wi-Fi Gateway 🛜",
               "chlorine_model": "🧪 Waterbehandeling",
-              "cya": "💧 Stabilisator niveau / CyA (mg/l)"
+              "cya": "💧 Stabilisatorniveau / CyA (mg/l)"
             }
           },
           "probes_calibration": {
-            "name": "🧪 Sonde Kalibratie",
+            "name": "🧪 Sondekalibratie",
             "data": {
               "ph_calib_7": "🟢 pH 7 waarde (bijv. 1600 mV of 8.40)",
               "ph_ref_7": "🎯 pH 7 doeloplossing (bijv. 7.02)",
@@ -71,11 +71,11 @@
               "use_gateway": "Gebruiken met de Flipr Wi-Fi Gateway 🛜",
               "sync_mode": "🔄 Synchronisatiemodus (via Flipr Gateway)",
               "chlorine_model": "🧪 Waterbehandeling",
-              "cya": "💧 Stabilisator niveau / CyA (mg/l)"
+              "cya": "💧 Stabilisatorniveau / CyA (mg/l)"
             }
           },
           "probes_calibration": {
-            "name": "🧪 Sonde Kalibratie",
+            "name": "🧪 Sondekalibratie",
             "data": {
               "ph_calib_7": "🟢 pH 7 waarde (bijv. 1600 mV of 8.40)",
               "ph_ref_7": "🎯 pH 7 doeloplossing (bijv. 7.02)",
@@ -85,9 +85,7 @@
               "orp_ref": "🎯 ORP (Redox) Doeloplossing (bijv. 650)",
               "temp_offset": "🌡️ Temperatuurcompensatie (°Celsius) (+/-)"
             }
-          }
-        },
-        "sections": {
+          },
           "alert_thresholds": {
             "name": "📊 Waarschuwingsdrempels",
             "data": {
@@ -178,7 +176,7 @@
     },
     "sensor": {
       "sync_mode_state": {
-        "name": "Gateway sync modus",
+        "name": "Gateway-synchronisatiemodus",
         "state": {
           "0": "💤 Slaap",
           "1": "🌊 Normaal",
