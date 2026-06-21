@@ -33,6 +33,7 @@ from .chemistry import (
     get_mv_from_input,
     compute_ph_equilibrium,
 )
+from .battery import battery_percent_from_mv
 from .const import (
     DOMAIN,
     PLATFORMS,
@@ -99,8 +100,6 @@ _BAT_MIN_PLAUSIBLE = BATTERY_MIN_MV - 500
 _BAT_MAX_PLAUSIBLE = BATTERY_MAX_MV + 500
 _PH_MV_MIN_PLAUSIBLE = 500
 _PH_MV_MAX_PLAUSIBLE = 3000
-
-_BATTERY_DENOM = max(BATTERY_MAX_MV - BATTERY_MIN_MV, 1)
 
 
 def _store_key(mac: str) -> str:
@@ -947,9 +946,9 @@ class FliprDataCoordinator(DataUpdateCoordinator):
             else now
         )
 
-        bat_pct: int = round(
-            max(0.0, min((bat_raw - BATTERY_MIN_MV) / _BATTERY_DENOM * 100.0, 100.0))
-        )
+        # Li-SOCl2 state-of-charge from the cell voltage (see battery.py). A linear
+        # map is not usable for this chemistry because of its flat discharge plateau.
+        bat_pct: int = battery_percent_from_mv(bat_raw)
 
         new_data: dict[str, Any] = {
             **self.data,

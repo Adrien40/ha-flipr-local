@@ -50,6 +50,9 @@ SAVE_DEBOUNCE_DELAY = 2.0
 
 BLE_RECENTLY_SEEN_THRESHOLD_S: int = 120
 
+# Plausibility anchors for the raw battery voltage (a wider window is derived
+# from these in __init__.py). The actual state-of-charge curve for the Li-SOCl2
+# cell lives in battery.py.
 BATTERY_MIN_MV = 2500
 BATTERY_MAX_MV = 3600
 
