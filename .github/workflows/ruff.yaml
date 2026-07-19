@@ -18,9 +18,9 @@ jobs:
       - name: Install Ruff
         uses: astral-sh/ruff-action@v1
         with:
-          args: "check" # Vérifie les erreurs de logique et de style
+          args: "check"
 
       - name: Check formatting with Ruff
         uses: astral-sh/ruff-action@v1
         with:
-          args: "format --check" # Vérifie que le code respecte les règles d'espacement
+          args: "format --check"
