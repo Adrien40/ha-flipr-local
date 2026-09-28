@@ -1,5 +1,19 @@
 # Flipr Local - Journal des modifications
 
+## 1.2.1
+
+🐬🐬🐬🐬🐬🐬🐬🐬🐬🐬
+
+### 🧰 Maintenance
+- Le manifest déclare maintenant l'échelle de qualité `platinum` (`quality_scale.yaml` documentait déjà toutes les règles). De nouveaux tests garantissent la cohérence entre le manifest, le fichier d'échelle de qualité et les changelogs.
+- Tests : les deux tests de planification ne dépendent plus de l'heure (ils pouvaient échouer au hasard quand un créneau était à moins de 10 secondes) ; 8 tests de plus (508 au total), `config_flow.py` entièrement couvert.
+- Les commentaires et docstrings du dépôt sont maintenant en anglais.
+
+### 📚 Documentation
+- README : les badges de CI pointent maintenant vers le dépôt réel.
+
+🐬🐬🐬🐬🐬🐬🐬🐬🐬🐬
+
 ## 1.2.0
 
 🐬🐬🐬🐬🐬🐬🐬🐬🐬🐬

@@ -74,9 +74,10 @@
   "integration_type": "device",
   "iot_class": "local_polling",
   "issue_tracker": "https://github.com/Adrien40/ha-flipr-local/issues",
+  "quality_scale": "platinum",
   "requirements": [
     "bleak>=0.21.1",
     "bleak-retry-connector>=4.0.0"
   ],
-  "version": "1.2.0"
+  "version": "1.2.1"
 }

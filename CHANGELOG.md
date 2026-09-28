@@ -1,5 +1,19 @@
 # Flipr Local - Changelog
 
+## 1.2.1
+
+🐬🐬🐬🐬🐬🐬🐬🐬🐬🐬
+
+### 🧰 Maintenance
+- The manifest now declares the `platinum` quality scale (`quality_scale.yaml` already documented every rule). New tests keep the manifest, the quality scale file and the changelogs consistent.
+- Tests: the two scheduling tests no longer depend on the time of day (they could fail at random when a slot was less than 10 seconds away); 8 more tests (508 in total), `config_flow.py` fully covered.
+- Comments and docstrings in the repository are now in English.
+
+### 📚 Documentation
+- README: the CI badges now point to the real repository.
+
+🐬🐬🐬🐬🐬🐬🐬🐬🐬🐬
+
 ## 1.2.0
 
 🐬🐬🐬🐬🐬🐬🐬🐬🐬🐬

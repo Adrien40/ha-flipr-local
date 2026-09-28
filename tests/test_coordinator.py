@@ -335,6 +335,39 @@ async def test_no_notification_received_is_an_error(coordinator, ble):
     assert len(ble.client.writes) == 3  # 1 initial cycle + 2 attempts
 
 
+async def test_notification_wait_with_no_time_left_is_a_timeout(
+    coordinator, ble, monkeypatch
+):
+    monkeypatch.setattr(
+        "custom_components.flipr_local.coordinator.NOTIFY_WAIT_TIMEOUT", 0.0
+    )
+    await coordinator.async_refresh()
+    assert coordinator.data["bluetooth_status"] == BT_STATUS_ERROR_RETRY
+    assert coordinator.last_update_success
+
+
+async def test_late_notification_of_a_failed_attempt_is_dropped(coordinator, ble):
+    """A frame that arrives while the write of the 1st attempt fails must not be
+    taken for the answer of the 2nd attempt: the queue is emptied first."""
+    stale = build_frame(ph_mv=1500)
+    fresh = build_frame(ph_mv=1700)
+    ble.client.frames = [fresh]
+    original_write = ble.client.write_gatt_char
+    calls: list[str] = []
+
+    async def flaky_write(uuid, data, response=True):
+        calls.append(uuid)
+        if len(calls) == 1:
+            ble.client._handler(None, bytearray(stale))  # late frame, then failure
+            raise OSError("gatt")
+        await original_write(uuid, data, response)
+
+    ble.client.write_gatt_char = flaky_write
+    await coordinator.async_refresh()
+    assert coordinator.last_update_success
+    assert coordinator.data["raw_frame"].upper() == fresh.hex().upper()
+
+
 async def test_unexpected_exception_is_contained(coordinator, ble):
     ble.establish.side_effect = RuntimeError("boom")
     await coordinator.async_refresh()
@@ -793,32 +826,37 @@ def _armed_refresh_delay(hass, action) -> float:
 
 
 async def test_interval_change_rearms_refresh_timer_immediately(
-    hass, setup_integration
+    hass, setup_integration, freezer
 ):
     """A new Analysis Interval must be used by the very next timer, not one update later."""
+    from datetime import datetime
+
     coord = await setup_integration(
         make_entry(**{CONF_SCAN_INTERVAL: 60, CONF_REFERENCE_TIME: "08:00"})
     )
+    tz = dt_util.get_default_time_zone()
+    freezer.move_to(datetime(2026, 6, 1, 10, 2, 10, tzinfo=tz))
     delay = _armed_refresh_delay(
         hass, lambda: coord.update_local_state({CONF_SCAN_INTERVAL: 5})
     )
-    assert delay <= 5 * 60 + 2  # a 5 min interval: the next slot is at most 5 min away
+    assert delay == pytest.approx(170, abs=2.5)  # next 5 min slot: 10:05:00
     assert delay == pytest.approx(coord.update_interval.total_seconds(), abs=2.5)
 
 
 async def test_reference_time_change_rearms_refresh_timer_immediately(
-    hass, setup_integration
+    hass, setup_integration, freezer
 ):
-    from datetime import timedelta
+    from datetime import datetime
 
     coord = await setup_integration(
         make_entry(**{CONF_SCAN_INTERVAL: 1440, CONF_REFERENCE_TIME: "08:00"})
     )
-    new_ref = (dt_util.now() + timedelta(hours=3)).strftime("%H:%M")
+    tz = dt_util.get_default_time_zone()
+    freezer.move_to(datetime(2026, 6, 1, 10, 0, 30, tzinfo=tz))
     delay = _armed_refresh_delay(
-        hass, lambda: coord.update_local_state({CONF_REFERENCE_TIME: new_ref})
+        hass, lambda: coord.update_local_state({CONF_REFERENCE_TIME: "13:00"})
     )
-    assert delay == pytest.approx(3 * 3600, abs=90)  # HH:MM granularity
+    assert delay == pytest.approx(2 * 3600 + 59 * 60 + 30, abs=2.5)  # 13:00:00 today
 
 
 async def test_state_update_does_not_delay_the_timer_past_its_slot(

@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 from time import monotonic
+from types import SimpleNamespace
 from unittest.mock import patch
 
 import pytest
@@ -724,3 +725,17 @@ async def test_user_flow_keeps_explicit_sync_mode(hass):
         final = await flow.async_step_user(user_input=payload)
     assert final["type"] is FlowResultType.CREATE_ENTRY
     assert final["options"][CONF_SYNC_MODE] == "2"
+
+
+async def test_reconfigure_skips_other_devices_in_the_scan(hass, coordinator, entry):
+    """Another Bluetooth device in the scan must not be mistaken for the new Flipr."""
+    stranger = SimpleNamespace(address="AA:AA:AA:AA:AA:AA", name="Not a Flipr")
+    seen = [stranger, _service_info(address=NEW_MAC)]
+    with patch(DISCOVERED, return_value=seen):
+        result = await _start_reconfigure(hass, entry)
+        result = await hass.config_entries.flow.async_configure(
+            result["flow_id"], {CONF_MAC_ADDRESS: NEW_MAC}
+        )
+        await hass.async_block_till_done()
+    assert result["reason"] == "reconfigure_successful"
+    assert entry.data[CONF_MAC_ADDRESS] == NEW_MAC
