@@ -1,0 +1,38 @@
+[tool.ruff]
+# Python 3.14 (minimum Home Assistant 2026.3.0): `ruff format` writes `except A, B:` without
+# parentheses (PEP 758). This is valid and intentional, not a typo.
+target-version = "py314"
+line-length = 88
+
+[tool.ruff.lint]
+select = ["E", "F", "W", "I", "UP", "B", "RUF"]
+ignore = [
+    "E501",   # long log strings are left to `ruff format`
+    "RUF001", # intentional Unicode characters (×, ÷, →, accents) in docs/logs
+    "RUF002",
+    "RUF003",
+    "RUF012", # class attributes _attr_options = [...]: Home Assistant convention
+]
+
+[tool.ruff.lint.isort]
+known-first-party = ["custom_components"]
+
+[tool.pytest.ini_options]
+asyncio_mode = "auto"
+testpaths = ["tests"]
+addopts = "-p no:sugar"
+filterwarnings = [
+    # Benign upstream Hypothesis behavior: it registers a weakref to any
+    # random.Random instance it sees (e.g. from pytest-homeassistant-custom-component
+    # or a fixture), and that instance can be garbage-collected right after. Not
+    # caused by this integration's code and doesn't affect test correctness.
+    "ignore:It looks like `register_random` was passed an object:hypothesis.errors.HypothesisWarning",
+]
+
+[tool.coverage.run]
+source = ["custom_components/flipr_local"]
+branch = true
+
+[tool.coverage.report]
+show_missing = true
+skip_covered = false

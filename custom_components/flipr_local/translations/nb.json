@@ -17,6 +17,16 @@
               "cya": "💧 Stabilisatornivå / CyA (mg/l)"
             }
           },
+          "synchronization": {
+            "name": "⏱️ Synkronisering",
+            "data": {
+              "scan_interval": "🔄 Analyseintervall (minutter)",
+              "reference_time": "🕒 Referansetid (planlegging)"
+            },
+            "data_description": {
+              "reference_time": "Ankertid brukt til å justere planlagte analyser til faste intervaller (f.eks. 08:00, 10:00, 12:00... for et 2-timers intervall)."
+            }
+          },
           "probes_calibration": {
             "name": "🧪 Sondekalibrering",
             "data": {
@@ -27,6 +37,10 @@
               "orp_calib": "📏 ORP (Redox) Målt Verdi (f.eks. 650)",
               "orp_ref": "🎯 ORP (Redox) Løsningsmål (f.eks. 650)",
               "temp_offset": "🌡️ Temperaturforskyvning (°Celsius) (+/-)"
+            },
+            "data_description": {
+              "ph_calib_7": "Den rå verdien sonden faktisk målte mens den var nedsenket i denne kalibreringsløsningen — i mV, eller i pH hvis sonden allerede konverterer (begge godtas).",
+              "ph_calib_4": "Den rå verdien sonden faktisk målte mens den var nedsenket i denne kalibreringsløsningen — i mV, eller i pH hvis sonden allerede konverterer (begge godtas)."
             }
           }
         }
@@ -36,6 +50,13 @@
         "description": "Skriv inn Bluetooth MAC-adresse (f.eks. AA:BB:CC:DD:EE:FF)",
         "data": {
           "mac_address": "🏷️ Bluetooth MAC-adresse"
+        }
+      },
+      "reconfigure": {
+        "title": "Oppdater Flipr-enhet",
+        "description": "Pek denne oppføringen mot en annen fysisk Flipr (f.eks. etter å ha byttet enhet). Innstillinger, automatiseringer og enhetshistorikk beholdes.",
+        "data": {
+          "mac_address": "✍️ Bluetooth MAC-adresse"
         }
       }
     },
@@ -55,7 +76,8 @@
       "temp_threshold_error": "❌ Minimumstemperatur må være lavere enn maksimumstemperatur"
     },
     "abort": {
-      "already_configured": "⚠️ Denne enheten er allerede konfigurert"
+      "already_configured": "⚠️ Denne enheten er allerede konfigurert",
+      "reconfigure_successful": "Enheten ble konfigurert på nytt."
     }
   },
   "options": {
@@ -74,6 +96,16 @@
               "cya": "💧 Stabilisatornivå / CyA (mg/l)"
             }
           },
+          "synchronization": {
+            "name": "⏱️ Synkronisering",
+            "data": {
+              "scan_interval": "🔄 Analyseintervall (minutter)",
+              "reference_time": "🕒 Referansetid (planlegging)"
+            },
+            "data_description": {
+              "reference_time": "Ankertid brukt til å justere planlagte analyser til faste intervaller (f.eks. 08:00, 10:00, 12:00... for et 2-timers intervall)."
+            }
+          },
           "probes_calibration": {
             "name": "🧪 Sondekalibrering",
             "data": {
@@ -84,6 +116,10 @@
               "orp_calib": "📏 ORP (Redox) Målt Verdi (f.eks. 650)",
               "orp_ref": "🎯 ORP (Redox) Løsningsmål (f.eks. 650)",
               "temp_offset": "🌡️ Temperaturforskyvning (°Celsius) (+/-)"
+            },
+            "data_description": {
+              "ph_calib_7": "Den rå verdien sonden faktisk målte mens den var nedsenket i denne kalibreringsløsningen — i mV, eller i pH hvis sonden allerede konverterer (begge godtas).",
+              "ph_calib_4": "Den rå verdien sonden faktisk målte mens den var nedsenket i denne kalibreringsløsningen — i mV, eller i pH hvis sonden allerede konverterer (begge godtas)."
             }
           },
           "alert_thresholds": {
@@ -107,7 +143,13 @@
     "error": {
       "ph_threshold_error": "❌ Minimum pH må være mindre enn maksimum pH",
       "orp_threshold_error": "❌ Minimum ORP (Redox) må være mindre enn maksimum ORP",
-      "temp_threshold_error": "❌ Minimumstemperatur må være lavere enn maksimumstemperatur"
+      "temp_threshold_error": "❌ Minimumstemperatur må være lavere enn maksimumstemperatur",
+      "unknown": "❓ Ukjent feil",
+      "ph_calibration_equal": "❌ pH-kalibreringsverdier må være forskjellige",
+      "ph_reference_equal": "❌ pH-referanseverdier må være forskjellige",
+      "ph_slope_mismatch": "❌ Kalibrerings- og referansehellinger må stemme overens",
+      "ph_mv_out_of_range": "❌ mV-verdier må være mellom 500-3000",
+      "ph_ref_out_of_range": "❌ pH 4: 2.5-5.5, pH 7: 6.5-7.5"
     }
   },
   "selector": {
@@ -163,6 +205,11 @@
       },
       "cya": {
         "name": "CyA (Stabilisator)"
+      }
+    },
+    "time": {
+      "reference_time": {
+        "name": "Referansetid"
       }
     },
     "select": {
@@ -223,14 +270,11 @@
       "ph_raw": {
         "name": "Rå pH (mV)"
       },
+      "orp_raw": {
+        "name": "Rå ORP (mV)"
+      },
       "factory_ph": {
         "name": "Rå pH (Fabrikk)"
-      },
-      "estimated_free_chlorine": {
-        "name": "Estimert Fritt Klor (FC)"
-      },
-      "active_chlorine_hocl": {
-        "name": "Aktivt Klor (HOCl)"
       },
       "lsi": {
         "name": "Langelier Index"
@@ -261,6 +305,29 @@
       "active_measures": {
         "name": "Automatiske analyser"
       }
+    }
+  },
+  "issues": {
+    "device_unreachable": {
+      "title": "Flipr utilgjengelig",
+      "description": "Flipr-sonden ({name}) har ikke svart på {days} dag(er). Kontroller strøm, rekkevidde, og at en Bluetooth-adapter eller ESPHome-proxy dekker bassengområdet."
+    }
+  },
+  "exceptions": {
+    "out_of_range_no_history": {
+      "message": "Flipr {mac} er utenfor Bluetooth-rekkevidde, og ingen tidligere data er tilgjengelige."
+    },
+    "device_not_found": {
+      "message": "Bluetooth-enheten for Flipr {mac} ble ikke funnet til tross for et nylig signal."
+    },
+    "entry_not_available": {
+      "message": "Konfigurasjonsoppføringen er ikke lenger tilgjengelig."
+    },
+    "connection_timeout_no_history": {
+      "message": "Flipr {mac} kunne ikke nås etter {timeout} sekunder, og ingen data er tilgjengelige."
+    },
+    "unreachable_no_history": {
+      "message": "Flipr er utilgjengelig, og ingen tidligere data er tilgjengelige: {error}"
     }
   }
 }

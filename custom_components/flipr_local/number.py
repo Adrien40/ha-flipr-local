@@ -2,41 +2,47 @@
 # This file is part of Flipr Local.
 
 import logging
-from datetime import timedelta
-from homeassistant.components.number import RestoreNumber
+
+from homeassistant.components.number import NumberMode, RestoreNumber
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.const import EntityCategory
 from homeassistant.core import HomeAssistant, callback
 from homeassistant.helpers.dispatcher import async_dispatcher_connect
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 from homeassistant.helpers.update_coordinator import CoordinatorEntity
+
 from .const import (
-    DOMAIN,
-    CONF_MAC_ADDRESS,
-    CONF_CYA,
-    CONF_TAC,
-    CONF_TH,
-    CONF_TDS,
-    CONF_SCAN_INTERVAL,
     CONF_CHLORINE_MODEL,
-    get_flipr_model,
+    CONF_CYA,
+    CONF_MAC_ADDRESS,
+    CONF_SCAN_INTERVAL,
+    CONF_TAC,
+    CONF_TDS,
+    CONF_TH,
+    DOMAIN,
     flipr_device_info,
 )
+from .coordinator import FliprDataCoordinator
+from .model import get_flipr_model
 
 _LOGGER = logging.getLogger(__name__)
+
+
+# Single Bluetooth connection to the device: commands must be serialized.
+PARALLEL_UPDATES = 1
 
 
 async def async_setup_entry(
     hass: HomeAssistant, entry: ConfigEntry, async_add_entities: AddEntitiesCallback
 ) -> None:
-    coordinator = hass.data[DOMAIN][entry.entry_id]
+    coordinator = entry.runtime_data
     mac = entry.data[CONF_MAC_ADDRESS]
     entry_id = entry.entry_id
     model_name = entry.data.get("model") or get_flipr_model(entry.title)
 
     async_add_entities(
         [
-            FliprUpdateIntervalNumber(coordinator, mac, model_name),
+            FliprUpdateIntervalNumber(coordinator, mac, model_name, entry_id),
             FliprWaterConfigNumber(
                 coordinator,
                 mac,
@@ -45,7 +51,6 @@ async def async_setup_entry(
                 500,
                 1,
                 0,
-                "mdi:water-percent",
                 entry_id,
                 model_name,
                 "mg/L",
@@ -58,7 +63,6 @@ async def async_setup_entry(
                 5000,
                 1,
                 0,
-                "mdi:blur",
                 entry_id,
                 model_name,
                 "ppm",
@@ -71,7 +75,6 @@ async def async_setup_entry(
                 800,
                 1,
                 0,
-                "mdi:water-outline",
                 entry_id,
                 model_name,
                 "mg/L",
@@ -84,7 +87,6 @@ async def async_setup_entry(
                 150,
                 1,
                 0,
-                "mdi:shield-sun",
                 entry_id,
                 model_name,
                 "mg/L",
@@ -93,60 +95,116 @@ async def async_setup_entry(
     )
 
 
-class FliprUpdateIntervalNumber(CoordinatorEntity, RestoreNumber):
+class FliprUpdateIntervalNumber(CoordinatorEntity[FliprDataCoordinator], RestoreNumber):
     _attr_has_entity_name = True
     _attr_translation_key = "scan_interval"
 
-    def __init__(self, coordinator, mac: str, model_name: str) -> None:
+    def __init__(
+        self,
+        coordinator: FliprDataCoordinator,
+        mac: str,
+        model_name: str,
+        entry_id: str,
+    ) -> None:
         super().__init__(coordinator)
         self._mac = mac
+        self._entry_id = entry_id
         self._attr_unique_id = f"{mac}_{CONF_SCAN_INTERVAL}"
         self._attr_native_min_value = 5
         self._attr_native_max_value = 1440
         self._attr_native_step = 1
         self._attr_native_unit_of_measurement = "min"
         self._attr_entity_category = EntityCategory.CONFIG
-        self._attr_icon = "mdi:sync"
-        self._attr_mode = "box"
+        self._attr_mode = NumberMode.BOX
         self._attr_device_info = flipr_device_info(mac, model_name)
+        # Last value seen in the options: only react to an actual change
+        # in the options (see _handle_options_updated).
+        self._last_option_val: int | None = None
+
+    def _read_option_value(self) -> int | None:
+        entry = self.hass.config_entries.async_get_entry(self._entry_id)
+        if entry and CONF_SCAN_INTERVAL in entry.options:
+            return max(
+                int(self._attr_native_min_value),
+                min(
+                    round(float(entry.options[CONF_SCAN_INTERVAL])),
+                    int(self._attr_native_max_value),
+                ),
+            )
+        return None
 
     async def async_added_to_hass(self) -> None:
         await super().async_added_to_hass()
-        last = await self.async_get_last_number_data()
-        val = (
-            int(round(float(last.native_value)))
-            if last and last.native_value is not None
-            else 60
-        )
+
+        val = self.coordinator.data.get(CONF_SCAN_INTERVAL)
+        if val is None:
+            entry = self.hass.config_entries.async_get_entry(self._entry_id)
+            if entry and CONF_SCAN_INTERVAL in entry.options:
+                val = round(float(entry.options[CONF_SCAN_INTERVAL]))
+            elif entry and CONF_SCAN_INTERVAL in entry.data:
+                val = round(float(entry.data[CONF_SCAN_INTERVAL]))
+
+        if val is None:
+            last = await self.async_get_last_number_data()
+            val = (
+                round(float(last.native_value))
+                if last and last.native_value is not None
+                else 60
+            )
+
         val = max(self._attr_native_min_value, min(val, self._attr_native_max_value))
         self._attr_native_value = val
-        self.coordinator.update_interval = timedelta(minutes=val)
+        self._last_option_val = self._read_option_value()
+
+        self.coordinator.update_volatile_state({CONF_SCAN_INTERVAL: val})
+
+        self.async_on_remove(
+            async_dispatcher_connect(
+                self.hass,
+                f"{DOMAIN}_{self._mac}_options_updated",
+                self._handle_options_updated,
+            )
+        )
+
+        self.async_write_ha_state()
+
+    @callback
+    def _handle_options_updated(self) -> None:
+        # Only apply the option if it changed: otherwise a change made
+        # through this entity would be overwritten by the old options value as
+        # soon as ANOTHER setting is changed (e.g. the chlorine/bromine selector).
+        new_val = self._read_option_value()
+        if new_val is not None and new_val != self._last_option_val:
+            self._last_option_val = new_val
+            if new_val != self._attr_native_value:
+                self._attr_native_value = new_val
+                self.coordinator.update_local_state({CONF_SCAN_INTERVAL: new_val})
         self.async_write_ha_state()
 
     async def async_set_native_value(self, value: float) -> None:
-        val = int(round(float(value)))
-        val = max(self._attr_native_min_value, min(val, self._attr_native_max_value))
+        int_val = round(float(value))
+        val = max(
+            int(self._attr_native_min_value),
+            min(int_val, int(self._attr_native_max_value)),
+        )
         self._attr_native_value = val
-        self.coordinator.update_interval = timedelta(minutes=val)
+
+        self.coordinator.update_local_state({CONF_SCAN_INTERVAL: val})
         self.async_write_ha_state()
-        # Trigger a volatile (no-save) coordinator update so that FliprNextAnalysisSensor
-        # recalculates its value based on the new interval without writing to disk.
-        self.coordinator.update_volatile_state({})
 
 
-class FliprWaterConfigNumber(CoordinatorEntity, RestoreNumber):
+class FliprWaterConfigNumber(CoordinatorEntity[FliprDataCoordinator], RestoreNumber):
     _attr_has_entity_name = True
 
     def __init__(
         self,
-        coordinator,
+        coordinator: FliprDataCoordinator,
         mac: str,
         key: str,
         min_val: float,
         max_val: float,
         step: float,
         default_val: float,
-        icon: str,
         entry_id: str,
         model_name: str,
         unit: str,
@@ -161,12 +219,26 @@ class FliprWaterConfigNumber(CoordinatorEntity, RestoreNumber):
         self._attr_native_max_value = max_val
         self._attr_native_step = step
         self._attr_native_unit_of_measurement = unit
-        self._attr_icon = icon
         self._default_val = default_val
-        self._attr_mode = "box"
+        self._attr_mode = NumberMode.BOX
         self._attr_entity_category = EntityCategory.CONFIG
         self._attr_device_info = flipr_device_info(mac, model_name)
         self._chlorine_model: str = "chlorine"
+        # Last value seen in the options: only react to an actual change
+        # in the options (see _handle_options_updated).
+        self._last_option_val: int | None = None
+
+    def _read_option_value(self) -> int | None:
+        entry = self.hass.config_entries.async_get_entry(self._entry_id)
+        if entry and self._key in entry.options:
+            return max(
+                int(self._attr_native_min_value),
+                min(
+                    round(float(entry.options[self._key])),
+                    int(self._attr_native_max_value),
+                ),
+            )
+        return None
 
     def _refresh_chlorine_model(self) -> None:
         entry = self.hass.config_entries.async_get_entry(self._entry_id)
@@ -188,17 +260,18 @@ class FliprWaterConfigNumber(CoordinatorEntity, RestoreNumber):
         if val is None:
             entry = self.hass.config_entries.async_get_entry(self._entry_id)
             if entry and self._key in entry.options:
-                val = int(round(float(entry.options[self._key])))
+                val = round(float(entry.options[self._key]))
         if val is None:
             last = await self.async_get_last_number_data()
             val = (
-                int(round(float(last.native_value)))
+                round(float(last.native_value))
                 if last and last.native_value is not None
                 else self._default_val
             )
 
         val = max(self._attr_native_min_value, min(val, self._attr_native_max_value))
         self._attr_native_value = val
+        self._last_option_val = self._read_option_value()
 
         # FIX: use update_volatile_state instead of update_local_state.
         # The value being set here was just read from coordinator data, entry options,
@@ -221,20 +294,19 @@ class FliprWaterConfigNumber(CoordinatorEntity, RestoreNumber):
     @callback
     def _handle_options_updated(self) -> None:
         self._refresh_chlorine_model()
-        entry = self.hass.config_entries.async_get_entry(self._entry_id)
-        if entry and self._key in entry.options:
-            new_val = int(round(float(entry.options[self._key])))
-            new_val = max(
-                int(self._attr_native_min_value),
-                min(new_val, int(self._attr_native_max_value)),
-            )
+        # Only apply the option if it changed: otherwise a change made
+        # through this entity would be overwritten by the old options value as
+        # soon as ANOTHER setting is changed (e.g. the chlorine/bromine selector).
+        new_val = self._read_option_value()
+        if new_val is not None and new_val != self._last_option_val:
+            self._last_option_val = new_val
             if new_val != self._attr_native_value:
                 self._attr_native_value = new_val
                 self.coordinator.update_local_state({self._key: new_val})
         self.async_write_ha_state()
 
     async def async_set_native_value(self, value: float) -> None:
-        int_val = int(round(float(value)))
+        int_val = round(float(value))
         int_val = max(
             int(self._attr_native_min_value),
             min(int_val, int(self._attr_native_max_value)),

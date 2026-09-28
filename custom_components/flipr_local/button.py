@@ -1,44 +1,50 @@
 # Copyright (c) 2026 Adrien40
 # This file is part of Flipr Local.
 
-import logging
 import asyncio
+import logging
+
 from homeassistant.components.button import ButtonEntity
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 from homeassistant.helpers.update_coordinator import CoordinatorEntity
+
 from .const import (
-    DOMAIN,
     CONF_MAC_ADDRESS,
-    get_flipr_model,
-    flipr_device_info,
     TIMEOUT_FORCE_REFRESH,
-    BT_STATUS_OUT_OF_RANGE,
+    flipr_device_info,
 )
+from .coordinator import FliprDataCoordinator
+from .model import get_flipr_model
 
 _LOGGER = logging.getLogger(__name__)
+
+
+# Single Bluetooth connection to the device: commands must be serialized.
+PARALLEL_UPDATES = 1
 
 
 async def async_setup_entry(
     hass: HomeAssistant, entry: ConfigEntry, async_add_entities: AddEntitiesCallback
 ) -> None:
-    coordinator = hass.data[DOMAIN][entry.entry_id]
+    coordinator = entry.runtime_data
     mac = entry.data[CONF_MAC_ADDRESS]
     model_name = entry.data.get("model") or get_flipr_model(entry.title)
 
     async_add_entities([FliprForceAnalysisButton(coordinator, mac, model_name)])
 
 
-class FliprForceAnalysisButton(CoordinatorEntity, ButtonEntity):
+class FliprForceAnalysisButton(CoordinatorEntity[FliprDataCoordinator], ButtonEntity):
     _attr_has_entity_name = True
     _attr_translation_key = "force_analysis"
 
-    def __init__(self, coordinator, mac: str, model_name: str) -> None:
+    def __init__(
+        self, coordinator: FliprDataCoordinator, mac: str, model_name: str
+    ) -> None:
         super().__init__(coordinator)
         self._mac = mac
         self._attr_unique_id = f"{mac}_force_analysis"
-        self._attr_icon = "mdi:refresh-circle"
         self._attr_device_info = flipr_device_info(mac, model_name)
 
     async def async_press(self) -> None:
@@ -56,16 +62,6 @@ class FliprForceAnalysisButton(CoordinatorEntity, ButtonEntity):
             )
             return
 
-        if not self.coordinator.ble_available:
-            _LOGGER.warning(
-                "Cannot start analysis for %s: real-time Bluetooth signal unavailable",
-                self.coordinator.safe_mac,
-            )
-            self.coordinator.update_volatile_state(
-                {"bluetooth_status": BT_STATUS_OUT_OF_RANGE}
-            )
-            return
-
         self.coordinator.request_one_shot_analysis()
         self.coordinator.update_volatile_state({"action_running": True})
 
@@ -80,7 +76,7 @@ class FliprForceAnalysisButton(CoordinatorEntity, ButtonEntity):
                     self.coordinator.async_request_refresh(),
                     timeout=TIMEOUT_FORCE_REFRESH,
                 )
-            except asyncio.TimeoutError:
+            except TimeoutError:
                 _LOGGER.error(
                     "Analysis exceeded timeout of %s seconds for %s",
                     TIMEOUT_FORCE_REFRESH,

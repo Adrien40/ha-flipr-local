@@ -17,6 +17,16 @@
               "cya": "💧 Stabilizátor szint / CyA (mg/l)"
             }
           },
+          "synchronization": {
+            "name": "⏱️ Szinkronizálás",
+            "data": {
+              "scan_interval": "🔄 Elemzési időköz (perc)",
+              "reference_time": "🕒 Referenciaidő (ütemezés)"
+            },
+            "data_description": {
+              "reference_time": "Viszonyítási idő az ütemezett elemzések rendszeres időközökre igazításához (pl. 08:00, 10:00, 12:00... 2 órás intervallum esetén)."
+            }
+          },
           "probes_calibration": {
             "name": "🧪 Szondák kalibrálása",
             "data": {
@@ -27,6 +37,10 @@
               "orp_calib": "📏 ORP (Redox) mért érték (pl. 650)",
               "orp_ref": "🎯 ORP (Redox) céloldat (pl. 650)",
               "temp_offset": "🌡️ Hőmérséklet eltolás (°Celsius) (+/-)"
+            },
+            "data_description": {
+              "ph_calib_7": "A szonda által ténylegesen mért nyers érték, amíg ebben a kalibráló oldatban volt — mV-ban, vagy pH-ban, ha a szonda már átalakítja (mindkettő elfogadott).",
+              "ph_calib_4": "A szonda által ténylegesen mért nyers érték, amíg ebben a kalibráló oldatban volt — mV-ban, vagy pH-ban, ha a szonda már átalakítja (mindkettő elfogadott)."
             }
           }
         }
@@ -36,6 +50,13 @@
         "description": "Add meg a Bluetooth MAC-címet (pl. AA:BB:CC:DD:EE:FF)",
         "data": {
           "mac_address": "🏷️ Bluetooth MAC-cím"
+        }
+      },
+      "reconfigure": {
+        "title": "Flipr eszköz frissítése",
+        "description": "Irányítsa ezt a bejegyzést egy másik fizikai Flipr eszközre (pl. eszközcsere után). A beállítások, automatizálások és az entitáselőzmények megmaradnak.",
+        "data": {
+          "mac_address": "✍️ Bluetooth MAC-cím"
         }
       }
     },
@@ -55,7 +76,8 @@
       "temp_threshold_error": "❌ A minimum hőmérsékletnek alacsonyabbnak kell lennie a maximum hőmérsékletnél"
     },
     "abort": {
-      "already_configured": "⚠️ Ez az eszköz már be van állítva"
+      "already_configured": "⚠️ Ez az eszköz már be van állítva",
+      "reconfigure_successful": "Az eszköz sikeresen újrakonfigurálva."
     }
   },
   "options": {
@@ -74,6 +96,16 @@
               "cya": "💧 Stabilizátor szint / CyA (mg/l)"
             }
           },
+          "synchronization": {
+            "name": "⏱️ Szinkronizálás",
+            "data": {
+              "scan_interval": "🔄 Elemzési időköz (perc)",
+              "reference_time": "🕒 Referenciaidő (ütemezés)"
+            },
+            "data_description": {
+              "reference_time": "Viszonyítási idő az ütemezett elemzések rendszeres időközökre igazításához (pl. 08:00, 10:00, 12:00... 2 órás intervallum esetén)."
+            }
+          },
           "probes_calibration": {
             "name": "🧪 Szondák kalibrálása",
             "data": {
@@ -84,6 +116,10 @@
               "orp_calib": "📏 ORP (Redox) mért érték (pl. 650)",
               "orp_ref": "🎯 ORP (Redox) céloldat (pl. 650)",
               "temp_offset": "🌡️ Hőmérséklet eltolás (°Celsius) (+/-)"
+            },
+            "data_description": {
+              "ph_calib_7": "A szonda által ténylegesen mért nyers érték, amíg ebben a kalibráló oldatban volt — mV-ban, vagy pH-ban, ha a szonda már átalakítja (mindkettő elfogadott).",
+              "ph_calib_4": "A szonda által ténylegesen mért nyers érték, amíg ebben a kalibráló oldatban volt — mV-ban, vagy pH-ban, ha a szonda már átalakítja (mindkettő elfogadott)."
             }
           },
           "alert_thresholds": {
@@ -107,7 +143,13 @@
     "error": {
       "ph_threshold_error": "❌ A minimum pH-nak kisebbnek kell lennie a maximum pH-nál",
       "orp_threshold_error": "❌ A minimum ORP-nek (Redox) kisebbnek kell lennie a maximum ORP-nél",
-      "temp_threshold_error": "❌ A minimum hőmérsékletnek alacsonyabbnak kell lennie a maximum hőmérsékletnél"
+      "temp_threshold_error": "❌ A minimum hőmérsékletnek alacsonyabbnak kell lennie a maximum hőmérsékletnél",
+      "unknown": "❓ Ismeretlen hiba",
+      "ph_calibration_equal": "❌ A pH kalibrációs értékeknek eltérőnek kell lenniük",
+      "ph_reference_equal": "❌ A pH referenciaértékeknek eltérőnek kell lenniük",
+      "ph_slope_mismatch": "❌ A kalibrációs és referencia meredekségeknek egyezniük kell",
+      "ph_mv_out_of_range": "❌ Az mV értékeknek 500-3000 között kell lenniük",
+      "ph_ref_out_of_range": "❌ pH 4: 2.5-5.5, pH 7: 6.5-7.5"
     }
   },
   "selector": {
@@ -163,6 +205,11 @@
       },
       "cya": {
         "name": "CyA (Stabilizátor)"
+      }
+    },
+    "time": {
+      "reference_time": {
+        "name": "Referenciaidő"
       }
     },
     "select": {
@@ -223,14 +270,11 @@
       "ph_raw": {
         "name": "Nyers pH (mV)"
       },
+      "orp_raw": {
+        "name": "Nyers ORP (mV)"
+      },
       "factory_ph": {
         "name": "Nyers pH (Gyári)"
-      },
-      "estimated_free_chlorine": {
-        "name": "Becsült Szabad Klór (FC)"
-      },
-      "active_chlorine_hocl": {
-        "name": "Aktív Klór (HOCl)"
       },
       "lsi": {
         "name": "Langelier Index"
@@ -261,6 +305,29 @@
       "active_measures": {
         "name": "Automatikus elemzések"
       }
+    }
+  },
+  "issues": {
+    "device_unreachable": {
+      "title": "A Flipr nem érhető el",
+      "description": "A Flipr szonda ({name}) {days} napja nem válaszol. Ellenőrizze a tápellátást, a hatótávolságot, és hogy egy Bluetooth adapter vagy ESPHome proxy lefedi-e a medence területét."
+    }
+  },
+  "exceptions": {
+    "out_of_range_no_history": {
+      "message": "A Flipr {mac} Bluetooth hatótávolságon kívül van, és nincs elérhető korábbi adat."
+    },
+    "device_not_found": {
+      "message": "A Flipr {mac} Bluetooth-eszköze nem található a nemrégiben észlelt jel ellenére."
+    },
+    "entry_not_available": {
+      "message": "A konfigurációs bejegyzés már nem érhető el."
+    },
+    "connection_timeout_no_history": {
+      "message": "A Flipr {mac} nem volt elérhető {timeout} másodperc után, és nincs elérhető adat."
+    },
+    "unreachable_no_history": {
+      "message": "A Flipr nem érhető el, és nincs elérhető korábbi adat: {error}"
     }
   }
 }

@@ -1,0 +1,86 @@
+{
+  "entity": {
+    "sensor": {
+      "ph_raw": {
+        "default": "mdi:lightning-bolt"
+      },
+      "orp_raw": {
+        "default": "mdi:lightning-bolt-outline"
+      },
+      "factory_ph": {
+        "default": "mdi:factory"
+      },
+      "battery": {
+        "default": "mdi:battery-bluetooth"
+      },
+      "last_received": {
+        "default": "mdi:clock-check"
+      },
+      "raw_frame": {
+        "default": "mdi:bluetooth-transfer"
+      },
+      "next_analysis": {
+        "default": "mdi:clock-end"
+      },
+      "sync_mode_state": {
+        "default": "mdi:sync-alert",
+        "state": {
+          "0": "mdi:power-sleep",
+          "1": "mdi:waves",
+          "2": "mdi:leaf",
+          "3": "mdi:rocket-launch"
+        }
+      },
+      "bluetooth_status": {
+        "default": "mdi:bluetooth-alert",
+        "state": {
+          "waiting": "mdi:bluetooth-off",
+          "connecting": "mdi:bluetooth-connect",
+          "waking_up": "mdi:bluetooth-audio",
+          "requesting": "mdi:bluetooth-transfer",
+          "reading": "mdi:bluetooth-transfer",
+          "writing_sync": "mdi:bluetooth-settings",
+          "success": "mdi:bluetooth",
+          "sync_applied": "mdi:bluetooth-connect",
+          "error": "mdi:bluetooth-off",
+          "error_retry": "mdi:timer-sand",
+          "write_failed": "mdi:alert-circle",
+          "paused": "mdi:pause-circle",
+          "out_of_range": "mdi:bluetooth-off"
+        }
+      }
+    },
+    "button": {
+      "force_analysis": {
+        "default": "mdi:refresh-circle"
+      }
+    },
+    "number": {
+      "scan_interval": {
+        "default": "mdi:sync"
+      },
+      "tac": {
+        "default": "mdi:water-percent"
+      },
+      "tds": {
+        "default": "mdi:blur"
+      },
+      "th": {
+        "default": "mdi:water-outline"
+      },
+      "cya": {
+        "default": "mdi:shield-sun"
+      }
+    },
+    "switch": {
+      "active_measures": {
+        "default": "mdi:bluetooth-connect"
+      }
+    },
+    "time": {
+      "reference_time": {
+        "default": "mdi:clock-outline"
+      }
+    }
+  }
+}

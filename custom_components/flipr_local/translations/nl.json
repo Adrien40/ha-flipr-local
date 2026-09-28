@@ -17,6 +17,16 @@
               "cya": "💧 Stabilisator niveau / CyA (mg/l)"
             }
           },
+          "synchronization": {
+            "name": "⏱️ Synchronisatie",
+            "data": {
+              "scan_interval": "🔄 Analyse-interval (minuten)",
+              "reference_time": "🕒 Referentietijd (planning)"
+            },
+            "data_description": {
+              "reference_time": "Referentietijd gebruikt om geplande analyses af te stemmen op regelmatige intervallen (bijv. 08:00, 10:00, 12:00... voor een interval van 2 uur)."
+            }
+          },
           "probes_calibration": {
             "name": "🧪 Sonde Kalibratie",
             "data": {
@@ -27,6 +37,10 @@
               "orp_calib": "📏 ORP (Redox) Gemeten Waarde (bijv. 650)",
               "orp_ref": "🎯 ORP (Redox) Doeloplossing (bijv. 650)",
               "temp_offset": "🌡️ Temperatuurcompensatie (°Celsius) (+/-)"
+            },
+            "data_description": {
+              "ph_calib_7": "De ruwe waarde die uw sonde daadwerkelijk heeft gemeten terwijl deze in deze kalibratieoplossing was ondergedompeld — in mV, of in pH als uw sonde dit al omzet (beide worden geaccepteerd).",
+              "ph_calib_4": "De ruwe waarde die uw sonde daadwerkelijk heeft gemeten terwijl deze in deze kalibratieoplossing was ondergedompeld — in mV, of in pH als uw sonde dit al omzet (beide worden geaccepteerd)."
             }
           }
         }
@@ -36,6 +50,13 @@
         "description": "Voer het Bluetooth MAC-adres in (bijv. AA:BB:CC:DD:EE:FF)",
         "data": {
           "mac_address": "🏷️ Bluetooth MAC-adres"
+        }
+      },
+      "reconfigure": {
+        "title": "Flipr-apparaat bijwerken",
+        "description": "Koppel deze invoer aan een andere fysieke Flipr (bijv. na vervanging van het apparaat). Uw opties, automatiseringen en entiteitsgeschiedenis blijven behouden.",
+        "data": {
+          "mac_address": "✍️ Bluetooth MAC-adres"
         }
       }
     },
@@ -55,7 +76,8 @@
       "temp_threshold_error": "❌ Minimumtemperatuur moet lager zijn dan maximumtemperatuur"
     },
     "abort": {
-      "already_configured": "⚠️ Dit apparaat is al geconfigureerd"
+      "already_configured": "⚠️ Dit apparaat is al geconfigureerd",
+      "reconfigure_successful": "Apparaat succesvol opnieuw geconfigureerd."
     }
   },
   "options": {
@@ -74,6 +96,16 @@
               "cya": "💧 Stabilisator niveau / CyA (mg/l)"
             }
           },
+          "synchronization": {
+            "name": "⏱️ Synchronisatie",
+            "data": {
+              "scan_interval": "🔄 Analyse-interval (minuten)",
+              "reference_time": "🕒 Referentietijd (planning)"
+            },
+            "data_description": {
+              "reference_time": "Referentietijd gebruikt om geplande analyses af te stemmen op regelmatige intervallen (bijv. 08:00, 10:00, 12:00... voor een interval van 2 uur)."
+            }
+          },
           "probes_calibration": {
             "name": "🧪 Sonde Kalibratie",
             "data": {
@@ -84,10 +116,12 @@
               "orp_calib": "📏 ORP (Redox) Gemeten Waarde (bijv. 650)",
               "orp_ref": "🎯 ORP (Redox) Doeloplossing (bijv. 650)",
               "temp_offset": "🌡️ Temperatuurcompensatie (°Celsius) (+/-)"
+            },
+            "data_description": {
+              "ph_calib_7": "De ruwe waarde die uw sonde daadwerkelijk heeft gemeten terwijl deze in deze kalibratieoplossing was ondergedompeld — in mV, of in pH als uw sonde dit al omzet (beide worden geaccepteerd).",
+              "ph_calib_4": "De ruwe waarde die uw sonde daadwerkelijk heeft gemeten terwijl deze in deze kalibratieoplossing was ondergedompeld — in mV, of in pH als uw sonde dit al omzet (beide worden geaccepteerd)."
             }
-          }
-        },
-        "sections": {
+          },
           "alert_thresholds": {
             "name": "📊 Waarschuwingsdrempels",
             "data": {
@@ -109,7 +143,13 @@
     "error": {
       "ph_threshold_error": "❌ Minimum pH moet kleiner zijn dan maximum pH",
       "orp_threshold_error": "❌ Minimum ORP (Redox) moet kleiner zijn dan maximum ORP",
-      "temp_threshold_error": "❌ Minimumtemperatuur moet lager zijn dan maximumtemperatuur"
+      "temp_threshold_error": "❌ Minimumtemperatuur moet lager zijn dan maximumtemperatuur",
+      "unknown": "❓ Onbekende fout",
+      "ph_calibration_equal": "❌ pH kalibratiewaarden moeten verschillend zijn",
+      "ph_reference_equal": "❌ pH referentiewaarden moeten verschillend zijn",
+      "ph_slope_mismatch": "❌ Kalibratie- en referentiehellingen moeten overeenkomen",
+      "ph_mv_out_of_range": "❌ mV-waarden moeten tussen 500-3000 liggen",
+      "ph_ref_out_of_range": "❌ pH 4: 2.5-5.5, pH 7: 6.5-7.5"
     }
   },
   "selector": {
@@ -165,6 +205,11 @@
       },
       "cya": {
         "name": "CyA (Stabilisator)"
+      }
+    },
+    "time": {
+      "reference_time": {
+        "name": "Referentietijd"
       }
     },
     "select": {
@@ -225,14 +270,11 @@
       "ph_raw": {
         "name": "Ruw pH (mV)"
       },
+      "orp_raw": {
+        "name": "Ruw ORP (mV)"
+      },
       "factory_ph": {
         "name": "Ruw pH (Fabriek)"
-      },
-      "estimated_free_chlorine": {
-        "name": "Geschat Vrij Chloor (FC)"
-      },
-      "active_chlorine_hocl": {
-        "name": "Actief Chloor (HOCl)"
       },
       "lsi": {
         "name": "Langelier Index"
@@ -263,6 +305,29 @@
       "active_measures": {
         "name": "Automatische analyses"
       }
+    }
+  },
+  "issues": {
+    "device_unreachable": {
+      "title": "Flipr onbereikbaar",
+      "description": "De Flipr-sonde ({name}) heeft {days} dag(en) niet gereageerd. Controleer de voeding, het bereik, en of een Bluetooth-adapter of ESPHome-proxy het zwembadgebied dekt."
+    }
+  },
+  "exceptions": {
+    "out_of_range_no_history": {
+      "message": "Flipr {mac} bevindt zich buiten het Bluetooth-bereik en er zijn geen eerdere gegevens beschikbaar."
+    },
+    "device_not_found": {
+      "message": "Het Bluetooth-apparaat voor Flipr {mac} kon niet worden gevonden ondanks een recent signaal."
+    },
+    "entry_not_available": {
+      "message": "De configuratie-invoer is niet meer beschikbaar."
+    },
+    "connection_timeout_no_history": {
+      "message": "Flipr {mac} kon niet worden bereikt na {timeout} seconden en er zijn geen gegevens beschikbaar."
+    },
+    "unreachable_no_history": {
+      "message": "Flipr is onbereikbaar en er zijn geen eerdere gegevens beschikbaar: {error}"
     }
   }
 }

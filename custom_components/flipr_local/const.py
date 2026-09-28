@@ -2,11 +2,12 @@
 # This file is part of Flipr Local.
 
 from datetime import timedelta
-from homeassistant.helpers.device_registry import DeviceInfo
+
+from homeassistant.helpers.device_registry import CONNECTION_BLUETOOTH, DeviceInfo
 
 DOMAIN = "flipr_local"
 
-PLATFORMS = ["sensor", "binary_sensor", "button", "number", "select", "switch"]
+PLATFORMS = ["sensor", "binary_sensor", "button", "number", "select", "switch", "time"]
 
 CONF_MAC_ADDRESS = "mac_address"
 CONF_USE_GATEWAY = "use_gateway"
@@ -37,6 +38,7 @@ CONF_CHLORINE_MODEL = "chlorine_model"
 
 CONF_SYNC_MODE = "sync_mode"
 CONF_SCAN_INTERVAL = "scan_interval"
+CONF_REFERENCE_TIME = "reference_time"
 
 FLIPR_CHARACTERISTIC_UUID = "00000006-0000-1000-8000-00805f9b34fb"
 FLIPR_ANALYZE_UUID = "0000940d-0000-1000-8000-00805f9b34fb"
@@ -44,8 +46,17 @@ SYNC_CHAR_UUID = "000073b4-0000-1000-8000-00805f9b34fb"
 
 DEFAULT_UPDATE_INTERVAL = timedelta(minutes=60)
 TIMEOUT_BLE_CONN = 30.0
+# BLE cycle delays (named so they can be shortened in tests).
+GATT_WRITE_TIMEOUT = 15.0  # writing a command
+GATT_WRITE_RETRY_DELAY = 1.0  # pause before retrying a write
+NOTIFY_WAIT_TIMEOUT = 60.0  # waiting for a new frame (notification mode)
+TIMEOUT_GATT_OP = 10.0  # start_notify / stop_notify / disconnect / Start Max
+START_MAX_SILENT_WAIT = 35.0  # Flipr Start Max: internal measurement before reading
+START_MAX_READ_RETRY_WAIT = 8.0  # Flipr Start Max: pause between two reads
+ERROR_RETRY_DELAY = 60  # seconds before retrying after a BLE error
 TIMEOUT_FORCE_REFRESH = 180.0
 DEBOUNCE_COOLDOWN = 0.3
+REPAIR_STALE_AFTER = timedelta(days=3)
 SAVE_DEBOUNCE_DELAY = 2.0
 
 BLE_RECENTLY_SEEN_THRESHOLD_S: int = 120
@@ -55,9 +66,17 @@ BATTERY_MAX_MV = 3600
 
 VALID_SYNC_MODES = {"0", "1", "2", "3"}
 
-# FIX: named constant instead of magic number "26" scattered in code.
-# A Flipr BLE frame is always 13 bytes → 26 hex characters when encoded.
-EXPECTED_FRAME_HEX_LEN: int = 26
+# A Flipr BLE frame is always 13 bytes -> 26 hex characters.
+FRAME_LENGTH_BYTES: int = 13
+EXPECTED_FRAME_HEX_LEN: int = FRAME_LENGTH_BYTES * 2
+
+# --- Removed in 1.2.0 (estimated chlorine sensors): used for migration ---
+REMOVED_DATA_KEYS: tuple[str, ...] = ("estimated_free_chlorine", "active_chlorine_hocl")
+# (platform, unique_id suffix) of the entities to remove from the registry.
+REMOVED_ENTITIES: tuple[tuple[str, str], ...] = (
+    ("sensor", "estimated_free_chlorine"),
+    ("sensor", "active_chlorine_hocl"),
+)
 
 BT_STATUS_WAITING = "waiting"
 BT_STATUS_CONNECTING = "connecting"
@@ -72,9 +91,6 @@ BT_STATUS_ERROR_RETRY = "error_retry"
 BT_STATUS_WRITE_FAILED = "write_failed"
 BT_STATUS_PAUSED = "paused"
 BT_STATUS_OUT_OF_RANGE = "out_of_range"
-
-DATA_ESTIMATED_FREE_CHLORINE = "estimated_free_chlorine"
-DATA_ACTIVE_CHLORINE_HOCL = "active_chlorine_hocl"
 
 DEFAULT_PH_MIN: float = 6.90
 DEFAULT_PH_MAX: float = 7.50
@@ -92,22 +108,10 @@ DEFAULT_PH_REF_7: float = 7.02
 DEFAULT_PH_REF_4: float = 4.00
 
 
-def get_flipr_model(name: str | None) -> str:
-    if not name:
-        return "Flipr"
-    name_upper = name.upper()
-    if name_upper.startswith("F3"):
-        return "Flipr AnalysR 3"
-    if name_upper.startswith("F2"):
-        return "Flipr AnalysR"
-    if name_upper.startswith(("FLIPR 01", "FLIPR 00")):
-        return "Flipr Start Max"
-    return "Flipr"
-
-
 def flipr_device_info(mac: str, model_name: str) -> DeviceInfo:
     return DeviceInfo(
         identifiers={(DOMAIN, mac)},
+        connections={(CONNECTION_BLUETOOTH, mac)},
         name=model_name,
         manufacturer="Flipr",
         model=model_name,

@@ -17,6 +17,16 @@
               "cya": "💧 Úroveň stabilizátoru / CyA (mg/l)"
             }
           },
+          "synchronization": {
+            "name": "⏱️ Synchronizace",
+            "data": {
+              "scan_interval": "🔄 Interval analýzy (minuty)",
+              "reference_time": "🕒 Referenční čas (plánování)"
+            },
+            "data_description": {
+              "reference_time": "Referenční čas pro zarovnání naplánovaných analýz na pravidelné intervaly (např. 08:00, 10:00, 12:00... pro 2hodinový interval)."
+            }
+          },
           "probes_calibration": {
             "name": "🧪 Kalibrace sond",
             "data": {
@@ -27,6 +37,10 @@
               "orp_calib": "📏 Naměřená hodnota ORP (Redox) (např. 650)",
               "orp_ref": "🎯 Cílový roztok ORP (Redox) (např. 650)",
               "temp_offset": "🌡️ Posun teploty (°Celsius) (+/-)"
+            },
+            "data_description": {
+              "ph_calib_7": "Skutečná hodnota naměřená sondou po ponoření do tohoto kalibračního roztoku — v mV, nebo v pH, pokud ji sonda již převádí (obojí je přijímáno).",
+              "ph_calib_4": "Skutečná hodnota naměřená sondou po ponoření do tohoto kalibračního roztoku — v mV, nebo v pH, pokud ji sonda již převádí (obojí je přijímáno)."
             }
           }
         }
@@ -36,6 +50,13 @@
         "description": "Zadejte Bluetooth MAC adresu (např. AA:BB:CC:DD:EE:FF)",
         "data": {
           "mac_address": "🏷️ Bluetooth MAC adresa"
+        }
+      },
+      "reconfigure": {
+        "title": "Aktualizovat zařízení Flipr",
+        "description": "Přiřaďte tento záznam k jinému fyzickému zařízení Flipr (např. po výměně zařízení). Vaše možnosti, automatizace a historie entit zůstanou zachovány.",
+        "data": {
+          "mac_address": "✍️ Bluetooth MAC adresa"
         }
       }
     },
@@ -55,7 +76,8 @@
       "temp_threshold_error": "❌ Minimální teplota musí být nižší než maximální teplota"
     },
     "abort": {
-      "already_configured": "⚠️ Toto zařízení je již nakonfigurováno"
+      "already_configured": "⚠️ Toto zařízení je již nakonfigurováno",
+      "reconfigure_successful": "Zařízení bylo úspěšně překonfigurováno."
     }
   },
   "options": {
@@ -74,6 +96,16 @@
               "cya": "💧 Úroveň stabilizátoru / CyA (mg/l)"
             }
           },
+          "synchronization": {
+            "name": "⏱️ Synchronizace",
+            "data": {
+              "scan_interval": "🔄 Interval analýzy (minuty)",
+              "reference_time": "🕒 Referenční čas (plánování)"
+            },
+            "data_description": {
+              "reference_time": "Referenční čas pro zarovnání naplánovaných analýz na pravidelné intervaly (např. 08:00, 10:00, 12:00... pro 2hodinový interval)."
+            }
+          },
           "probes_calibration": {
             "name": "🧪 Kalibrace sond",
             "data": {
@@ -84,6 +116,10 @@
               "orp_calib": "📏 Naměřená hodnota ORP (Redox) (např. 650)",
               "orp_ref": "🎯 Cílový roztok ORP (Redox) (např. 650)",
               "temp_offset": "🌡️ Posun teploty (°Celsius) (+/-)"
+            },
+            "data_description": {
+              "ph_calib_7": "Skutečná hodnota naměřená sondou po ponoření do tohoto kalibračního roztoku — v mV, nebo v pH, pokud ji sonda již převádí (obojí je přijímáno).",
+              "ph_calib_4": "Skutečná hodnota naměřená sondou po ponoření do tohoto kalibračního roztoku — v mV, nebo v pH, pokud ji sonda již převádí (obojí je přijímáno)."
             }
           },
           "alert_thresholds": {
@@ -107,7 +143,13 @@
     "error": {
       "ph_threshold_error": "❌ Minimální pH musí být menší než maximální pH",
       "orp_threshold_error": "❌ Minimální ORP (Redox) musí být menší než maximální ORP",
-      "temp_threshold_error": "❌ Minimální teplota musí být nižší než maximální teplota"
+      "temp_threshold_error": "❌ Minimální teplota musí být nižší než maximální teplota",
+      "unknown": "❓ Neznámá chyba",
+      "ph_calibration_equal": "❌ Kalibrační hodnoty pH musí být odlišné",
+      "ph_reference_equal": "❌ Referenční hodnoty pH musí být odlišné",
+      "ph_slope_mismatch": "❌ Směrnice kalibrace a reference se musí shodovat",
+      "ph_mv_out_of_range": "❌ Hodnoty mV musí být mezi 500-3000",
+      "ph_ref_out_of_range": "❌ pH 4: 2.5-5.5, pH 7: 6.5-7.5"
     }
   },
   "selector": {
@@ -163,6 +205,11 @@
       },
       "cya": {
         "name": "CyA (Stabilizátor)"
+      }
+    },
+    "time": {
+      "reference_time": {
+        "name": "Referenční čas"
       }
     },
     "select": {
@@ -223,14 +270,11 @@
       "ph_raw": {
         "name": "Surové pH (mV)"
       },
+      "orp_raw": {
+        "name": "Surové ORP (mV)"
+      },
       "factory_ph": {
         "name": "Surové pH (Z výroby)"
-      },
-      "estimated_free_chlorine": {
-        "name": "Odhadovaný volný chlor (FC)"
-      },
-      "active_chlorine_hocl": {
-        "name": "Aktivní chlor (HOCl)"
       },
       "lsi": {
         "name": "Langelierův index"
@@ -261,6 +305,29 @@
       "active_measures": {
         "name": "Automatické analýzy"
       }
+    }
+  },
+  "issues": {
+    "device_unreachable": {
+      "title": "Flipr nedostupný",
+      "description": "Sonda Flipr ({name}) neodpověděla {days} den/dní. Zkontrolujte napájení, dosah a pokrytí bazénu Bluetooth adaptérem nebo ESPHome proxy."
+    }
+  },
+  "exceptions": {
+    "out_of_range_no_history": {
+      "message": "Flipr {mac} je mimo dosah Bluetooth a nejsou k dispozici žádná předchozí data."
+    },
+    "device_not_found": {
+      "message": "Bluetooth zařízení pro Flipr {mac} nebylo nalezeno navzdory nedávnému signálu."
+    },
+    "entry_not_available": {
+      "message": "Konfigurační záznam již není k dispozici."
+    },
+    "connection_timeout_no_history": {
+      "message": "Flipr {mac} nebylo možné kontaktovat po {timeout} sekundách a nejsou k dispozici žádná data."
+    },
+    "unreachable_no_history": {
+      "message": "Flipr je nedostupný a nejsou k dispozici žádná předchozí data: {error}"
     }
   }
 }

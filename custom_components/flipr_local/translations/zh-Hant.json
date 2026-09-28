@@ -17,6 +17,16 @@
               "cya": "💧 穩定劑水平 / CyA (mg/l)"
             }
           },
+          "synchronization": {
+            "name": "⏱️ 同步",
+            "data": {
+              "scan_interval": "🔄 分析間隔（分鐘）",
+              "reference_time": "🕒 參考時間（排程）"
+            },
+            "data_description": {
+              "reference_time": "用於將排程分析對齊到固定時段的基準時間（例如2小時間隔對應08:00、10:00、12:00……）。"
+            }
+          },
           "probes_calibration": {
             "name": "🧪 探頭校準",
             "data": {
@@ -27,6 +37,10 @@
               "orp_calib": "📏 ORP (氧化還原) 測量值 (例如：650)",
               "orp_ref": "🎯 ORP (氧化還原) 目標溶液 (例如：650)",
               "temp_offset": "🌡️ 溫度偏移 (°Celsius) (+/-)"
+            },
+            "data_description": {
+              "ph_calib_7": "探頭浸入此校準溶液時實際測得的原始值——單位為mV，若探頭已轉換則為pH（兩種格式均可）。",
+              "ph_calib_4": "探頭浸入此校準溶液時實際測得的原始值——單位為mV，若探頭已轉換則為pH（兩種格式均可）。"
             }
           }
         }
@@ -36,6 +50,13 @@
         "description": "輸入藍牙 MAC 位址 (例如：AA:BB:CC:DD:EE:FF)",
         "data": {
           "mac_address": "🏷️ 藍牙 MAC 位址"
+        }
+      },
+      "reconfigure": {
+        "title": "更新 Flipr 裝置",
+        "description": "將此設定項目指向另一台實體 Flipr（例如更換裝置後）。您的選項、自動化與實體歷史記錄將被保留。",
+        "data": {
+          "mac_address": "✍️ 藍牙 MAC 位址"
         }
       }
     },
@@ -55,7 +76,8 @@
       "temp_threshold_error": "❌ 最低溫度必須低於最高溫度"
     },
     "abort": {
-      "already_configured": "⚠️ 此裝置已設定"
+      "already_configured": "⚠️ 此裝置已設定",
+      "reconfigure_successful": "裝置重新設定成功。"
     }
   },
   "options": {
@@ -74,6 +96,16 @@
               "cya": "💧 穩定劑水平 / CyA (mg/l)"
             }
           },
+          "synchronization": {
+            "name": "⏱️ 同步",
+            "data": {
+              "scan_interval": "🔄 分析間隔（分鐘）",
+              "reference_time": "🕒 參考時間（排程）"
+            },
+            "data_description": {
+              "reference_time": "用於將排程分析對齊到固定時段的基準時間（例如2小時間隔對應08:00、10:00、12:00……）。"
+            }
+          },
           "probes_calibration": {
             "name": "🧪 探頭校準",
             "data": {
@@ -84,6 +116,10 @@
               "orp_calib": "📏 ORP (氧化還原) 測量值 (例如：650)",
               "orp_ref": "🎯 ORP (氧化還原) 目標溶液 (例如：650)",
               "temp_offset": "🌡️ 溫度偏移 (°Celsius) (+/-)"
+            },
+            "data_description": {
+              "ph_calib_7": "探頭浸入此校準溶液時實際測得的原始值——單位為mV，若探頭已轉換則為pH（兩種格式均可）。",
+              "ph_calib_4": "探頭浸入此校準溶液時實際測得的原始值——單位為mV，若探頭已轉換則為pH（兩種格式均可）。"
             }
           },
           "alert_thresholds": {
@@ -107,7 +143,13 @@
     "error": {
       "ph_threshold_error": "❌ 最小 pH 必須小於最大 pH",
       "orp_threshold_error": "❌ 最小 ORP (氧化還原) 必須小於最大 ORP",
-      "temp_threshold_error": "❌ 最低溫度必須低於最高溫度"
+      "temp_threshold_error": "❌ 最低溫度必須低於最高溫度",
+      "unknown": "❓ 未知錯誤",
+      "ph_calibration_equal": "❌ pH 校準值必須不同",
+      "ph_reference_equal": "❌ pH 參考值必須不同",
+      "ph_slope_mismatch": "❌ 校準和參考斜率必須相符",
+      "ph_mv_out_of_range": "❌ mV 值必須在 500-3000 之間",
+      "ph_ref_out_of_range": "❌ pH 4: 2.5-5.5, pH 7: 6.5-7.5"
     }
   },
   "selector": {
@@ -163,6 +205,11 @@
       },
       "cya": {
         "name": "CyA (穩定劑)"
+      }
+    },
+    "time": {
+      "reference_time": {
+        "name": "參考時間"
       }
     },
     "select": {
@@ -223,14 +270,11 @@
       "ph_raw": {
         "name": "原始 pH (mV)"
       },
+      "orp_raw": {
+        "name": "原始 ORP (mV)"
+      },
       "factory_ph": {
         "name": "原始 pH (出廠)"
-      },
-      "estimated_free_chlorine": {
-        "name": "估算餘氯 (FC)"
-      },
-      "active_chlorine_hocl": {
-        "name": "活性氯 (HOCl)"
       },
       "lsi": {
         "name": "朗格里爾指數"
@@ -261,6 +305,29 @@
       "active_measures": {
         "name": "自動分析"
       }
+    }
+  },
+  "issues": {
+    "device_unreachable": {
+      "title": "Flipr 無法連線",
+      "description": "Flipr探頭（{name}）已有{days}天未回應。請檢查電源、信號範圍，以及是否有藍牙轉接器或ESPHome代理涵蓋泳池區域。"
+    }
+  },
+  "exceptions": {
+    "out_of_range_no_history": {
+      "message": "Flipr {mac} 超出藍牙範圍，且沒有可用的歷史資料。"
+    },
+    "device_not_found": {
+      "message": "儘管最近收到過訊號，仍未找到 Flipr {mac} 的藍牙裝置。"
+    },
+    "entry_not_available": {
+      "message": "配置項目已不再可用。"
+    },
+    "connection_timeout_no_history": {
+      "message": "{timeout} 秒後仍無法連線 Flipr {mac}，且沒有可用資料。"
+    },
+    "unreachable_no_history": {
+      "message": "Flipr 無法連線，且沒有可用的歷史資料：{error}"
     }
   }
 }

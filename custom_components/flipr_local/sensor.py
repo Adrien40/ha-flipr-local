@@ -3,65 +3,62 @@
 
 from __future__ import annotations
 
+import logging
 from datetime import datetime as dt_datetime
 from typing import Any
-import logging
+
 import homeassistant.util.dt as dt_util
-from homeassistant.components.sensor import (
-    SensorEntity,
-    SensorDeviceClass,
-    SensorStateClass,
-    RestoreSensor,
-)
 from homeassistant.components.bluetooth import (
-    async_register_callback,
     BluetoothCallbackMatcher,
     BluetoothChange,
+    BluetoothScanningMode,
     BluetoothServiceInfoBleak,
     async_last_service_info,
-    BluetoothScanningMode,
+    async_register_callback,
 )
-from homeassistant.const import UnitOfTemperature, EntityCategory
+from homeassistant.components.sensor import (
+    RestoreSensor,
+    SensorDeviceClass,
+    SensorEntity,
+    SensorStateClass,
+)
 from homeassistant.config_entries import ConfigEntry
+from homeassistant.const import EntityCategory, UnitOfTemperature
 from homeassistant.core import HomeAssistant, callback
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
-from homeassistant.helpers.dispatcher import async_dispatcher_connect
 from homeassistant.helpers.update_coordinator import CoordinatorEntity
+
 from .const import (
-    DOMAIN,
-    CONF_MAC_ADDRESS,
-    CONF_CHLORINE_MODEL,
-    get_flipr_model,
-    flipr_device_info,
-    DATA_ESTIMATED_FREE_CHLORINE,
-    DATA_ACTIVE_CHLORINE_HOCL,
-    BT_STATUS_WAITING,
     BT_STATUS_CONNECTING,
-    BT_STATUS_WAKING_UP,
-    BT_STATUS_REQUESTING,
-    BT_STATUS_READING,
-    BT_STATUS_WRITING_SYNC,
-    BT_STATUS_SUCCESS,
-    BT_STATUS_SYNC_APPLIED,
     BT_STATUS_ERROR,
     BT_STATUS_ERROR_RETRY,
-    BT_STATUS_WRITE_FAILED,
-    BT_STATUS_PAUSED,
     BT_STATUS_OUT_OF_RANGE,
+    BT_STATUS_PAUSED,
+    BT_STATUS_READING,
+    BT_STATUS_REQUESTING,
+    BT_STATUS_SUCCESS,
+    BT_STATUS_SYNC_APPLIED,
+    BT_STATUS_WAITING,
+    BT_STATUS_WAKING_UP,
+    BT_STATUS_WRITE_FAILED,
+    BT_STATUS_WRITING_SYNC,
+    CONF_MAC_ADDRESS,
+    flipr_device_info,
 )
+from .coordinator import FliprDataCoordinator
+from .model import get_flipr_model
 
 _LOGGER = logging.getLogger(__name__)
 
-# Sensors whose availability depends on the selected chlorine model.
-_CHLORINE_MODEL_DEPENDENT_KEYS = frozenset(
-    {DATA_ESTIMATED_FREE_CHLORINE, DATA_ACTIVE_CHLORINE_HOCL}
-)
+
+# Coordinator centralizes updates; entities are read-only.
+PARALLEL_UPDATES = 0
 
 
 async def async_setup_entry(
     hass: HomeAssistant, entry: ConfigEntry, async_add_entities: AddEntitiesCallback
 ) -> None:
-    coordinator = hass.data[DOMAIN][entry.entry_id]
+    coordinator = entry.runtime_data
     mac_address = entry.data[CONF_MAC_ADDRESS]
     model_name = entry.data.get("model") or get_flipr_model(entry.title)
 
@@ -95,28 +92,6 @@ async def async_setup_entry(
                 "mV",
                 model_name=model_name,
                 state_class=SensorStateClass.MEASUREMENT,
-            ),
-            FliprSensor(
-                coordinator,
-                mac_address,
-                DATA_ESTIMATED_FREE_CHLORINE,
-                None,
-                "ppm",
-                2,
-                model_name=model_name,
-                state_class=SensorStateClass.MEASUREMENT,
-                icon="mdi:water-percent",
-            ),
-            FliprSensor(
-                coordinator,
-                mac_address,
-                DATA_ACTIVE_CHLORINE_HOCL,
-                None,
-                "mg/L",
-                4,
-                model_name=model_name,
-                state_class=SensorStateClass.MEASUREMENT,
-                icon="mdi:molecule",
             ),
             FliprSensor(
                 coordinator,
@@ -157,9 +132,21 @@ async def async_setup_entry(
                 None,
                 "mV",
                 category=EntityCategory.DIAGNOSTIC,
-                icon="mdi:lightning-bolt",
                 model_name=model_name,
                 state_class=SensorStateClass.MEASUREMENT,
+                enabled_default=False,
+            ),
+            FliprSensor(
+                coordinator,
+                mac_address,
+                "orp_raw",
+                None,
+                "mV",
+                1,
+                category=EntityCategory.DIAGNOSTIC,
+                model_name=model_name,
+                state_class=SensorStateClass.MEASUREMENT,
+                enabled_default=False,
             ),
             FliprSensor(
                 coordinator,
@@ -169,9 +156,9 @@ async def async_setup_entry(
                 None,
                 2,
                 category=EntityCategory.DIAGNOSTIC,
-                icon="mdi:factory",
                 model_name=model_name,
                 state_class=SensorStateClass.MEASUREMENT,
+                enabled_default=False,
             ),
             FliprSensor(
                 coordinator,
@@ -190,9 +177,9 @@ async def async_setup_entry(
                 None,
                 "mV",
                 category=EntityCategory.DIAGNOSTIC,
-                icon="mdi:battery-bluetooth",
                 model_name=model_name,
                 state_class=SensorStateClass.MEASUREMENT,
+                enabled_default=False,
             ),
             FliprSensor(
                 coordinator,
@@ -201,7 +188,6 @@ async def async_setup_entry(
                 SensorDeviceClass.TIMESTAMP,
                 None,
                 category=EntityCategory.DIAGNOSTIC,
-                icon="mdi:clock-check",
                 model_name=model_name,
             ),
             FliprSensor(
@@ -211,8 +197,8 @@ async def async_setup_entry(
                 None,
                 None,
                 category=EntityCategory.DIAGNOSTIC,
-                icon="mdi:bluetooth-transfer",
                 model_name=model_name,
+                enabled_default=False,
             ),
             FliprSyncModeSensor(coordinator, mac_address, model_name),
             FliprBluetoothStatusSensor(coordinator, mac_address, model_name),
@@ -222,22 +208,22 @@ async def async_setup_entry(
     )
 
 
-class FliprSensor(CoordinatorEntity, SensorEntity):
+class FliprSensor(CoordinatorEntity[FliprDataCoordinator], SensorEntity):
     _attr_has_entity_name = True
 
     def __init__(
         self,
-        coordinator,
+        coordinator: FliprDataCoordinator,
         mac: str,
         key: str,
         device_class: SensorDeviceClass | None = None,
         unit: str | None = None,
         precision: int | None = None,
         category: EntityCategory | None = None,
-        icon: str | None = None,
         model_name: str = "Flipr",
         options: list[str] | None = None,
         state_class: SensorStateClass | None = None,
+        enabled_default: bool = True,
     ) -> None:
         super().__init__(coordinator)
         self._mac = mac
@@ -249,52 +235,10 @@ class FliprSensor(CoordinatorEntity, SensorEntity):
         self._attr_suggested_display_precision = precision
         self._attr_entity_category = category
         self._attr_state_class = state_class
-        self._attr_icon = icon
+        self._attr_entity_registry_enabled_default = enabled_default
         if options:
             self._attr_options = options
         self._attr_device_info = flipr_device_info(mac, model_name)
-
-        # FIX: only sensors that depend on the chlorine model need this attribute.
-        # Other sensors initialise it to None to make the distinction explicit.
-        self._chlorine_model: str | None = (
-            "chlorine" if key in _CHLORINE_MODEL_DEPENDENT_KEYS else None
-        )
-
-    def _refresh_chlorine_model(self) -> None:
-        """Refresh the cached chlorine model from config entry options."""
-        entry = self.hass.config_entries.async_get_entry(self.coordinator.entry_id)
-        if entry:
-            self._chlorine_model = entry.options.get(
-                CONF_CHLORINE_MODEL, entry.data.get(CONF_CHLORINE_MODEL, "chlorine")
-            )
-
-    async def async_added_to_hass(self) -> None:
-        await super().async_added_to_hass()
-
-        # FIX: subscribe to the chlorine model dispatcher ONLY for sensors whose
-        # availability depends on it. Subscribing all ~14 sensors was wasting memory
-        # and causing unnecessary dispatcher callbacks on every options update.
-        if self._key in _CHLORINE_MODEL_DEPENDENT_KEYS:
-            self._refresh_chlorine_model()
-            self.async_on_remove(
-                async_dispatcher_connect(
-                    self.hass,
-                    f"{DOMAIN}_{self._mac}_options_updated",
-                    self._handle_options_updated,
-                )
-            )
-
-    @callback
-    def _handle_options_updated(self) -> None:
-        self._refresh_chlorine_model()
-        self.async_write_ha_state()
-
-    @property
-    def available(self) -> bool:
-        is_avail = super().available
-        if self._key in _CHLORINE_MODEL_DEPENDENT_KEYS:
-            return is_avail and self._chlorine_model != "bromine"
-        return is_avail
 
     @property
     def native_value(self) -> Any | None:
@@ -303,14 +247,16 @@ class FliprSensor(CoordinatorEntity, SensorEntity):
         return self.coordinator.data.get(self._key)
 
 
-class FliprSyncModeSensor(CoordinatorEntity, SensorEntity):
+class FliprSyncModeSensor(CoordinatorEntity[FliprDataCoordinator], SensorEntity):
     _attr_has_entity_name = True
     _attr_entity_category = EntityCategory.DIAGNOSTIC
     _attr_device_class = SensorDeviceClass.ENUM
     _attr_translation_key = "sync_mode_state"
     _attr_options = ["0", "1", "2", "3"]
 
-    def __init__(self, coordinator, mac: str, model_name: str) -> None:
+    def __init__(
+        self, coordinator: FliprDataCoordinator, mac: str, model_name: str
+    ) -> None:
         super().__init__(coordinator)
         self._mac = mac
         self._attr_unique_id = f"{mac}_sync_mode"
@@ -323,18 +269,8 @@ class FliprSyncModeSensor(CoordinatorEntity, SensorEntity):
         val = self.coordinator.data.get("sync_mode")
         return str(val) if val is not None else None
 
-    @property
-    def icon(self) -> str:
-        icons = {
-            "0": "mdi:power-sleep",
-            "1": "mdi:waves",
-            "2": "mdi:leaf",
-            "3": "mdi:rocket-launch",
-        }
-        return icons.get(self.native_value or "", "mdi:sync-alert")
 
-
-class FliprBluetoothStatusSensor(CoordinatorEntity, SensorEntity):
+class FliprBluetoothStatusSensor(CoordinatorEntity[FliprDataCoordinator], SensorEntity):
     _attr_has_entity_name = True
     _attr_entity_category = EntityCategory.DIAGNOSTIC
     _attr_device_class = SensorDeviceClass.ENUM
@@ -355,7 +291,9 @@ class FliprBluetoothStatusSensor(CoordinatorEntity, SensorEntity):
         BT_STATUS_OUT_OF_RANGE,
     ]
 
-    def __init__(self, coordinator, mac: str, model_name: str) -> None:
+    def __init__(
+        self, coordinator: FliprDataCoordinator, mac: str, model_name: str
+    ) -> None:
         super().__init__(coordinator)
         self._mac = mac
         self._attr_unique_id = f"{mac}_bluetooth_status"
@@ -365,29 +303,10 @@ class FliprBluetoothStatusSensor(CoordinatorEntity, SensorEntity):
     def native_value(self) -> str:
         if not self.coordinator.data:
             return BT_STATUS_WAITING
-        return self.coordinator.data.get("bluetooth_status", BT_STATUS_WAITING)
-
-    @property
-    def icon(self) -> str:
-        icons = {
-            BT_STATUS_WAITING: "mdi:bluetooth-off",
-            BT_STATUS_CONNECTING: "mdi:bluetooth-connect",
-            BT_STATUS_WAKING_UP: "mdi:bluetooth-audio",
-            BT_STATUS_REQUESTING: "mdi:bluetooth-transfer",
-            BT_STATUS_READING: "mdi:bluetooth-transfer",
-            BT_STATUS_WRITING_SYNC: "mdi:bluetooth-settings",
-            BT_STATUS_SUCCESS: "mdi:bluetooth",
-            BT_STATUS_SYNC_APPLIED: "mdi:bluetooth-connect",
-            BT_STATUS_ERROR: "mdi:bluetooth-off",
-            BT_STATUS_ERROR_RETRY: "mdi:timer-sand",
-            BT_STATUS_WRITE_FAILED: "mdi:alert-circle",
-            BT_STATUS_PAUSED: "mdi:pause-circle",
-            BT_STATUS_OUT_OF_RANGE: "mdi:bluetooth-off",
-        }
-        return icons.get(self.native_value, "mdi:bluetooth-alert")
+        return str(self.coordinator.data.get("bluetooth_status", BT_STATUS_WAITING))
 
 
-class FliprRealTimeRSSISensor(RestoreSensor):
+class FliprRealTimeRSSISensor(CoordinatorEntity[FliprDataCoordinator], RestoreSensor):
     _attr_has_entity_name = True
     _attr_device_class = SensorDeviceClass.SIGNAL_STRENGTH
     _attr_native_unit_of_measurement = "dBm"
@@ -396,9 +315,10 @@ class FliprRealTimeRSSISensor(RestoreSensor):
     _attr_translation_key = "rssi"
     _attr_should_poll = False
 
-    def __init__(self, coordinator, mac: str, model_name: str) -> None:
-        super().__init__()
-        self._coordinator = coordinator
+    def __init__(
+        self, coordinator: FliprDataCoordinator, mac: str, model_name: str
+    ) -> None:
+        super().__init__(coordinator)
         self._mac = mac
         self._attr_unique_id = f"{mac}_rssi"
         self._attr_device_info = flipr_device_info(mac, model_name)
@@ -407,11 +327,11 @@ class FliprRealTimeRSSISensor(RestoreSensor):
     @property
     def available(self) -> bool:
         if (
-            self._coordinator.data
-            and self._coordinator.data.get("bluetooth_status") == BT_STATUS_OUT_OF_RANGE
+            self.coordinator.data
+            and self.coordinator.data.get("bluetooth_status") == BT_STATUS_OUT_OF_RANGE
         ):
             return False
-        return self._coordinator.ble_available and self._attr_native_value is not None
+        return self.coordinator.ble_available and self._attr_native_value is not None
 
     async def async_added_to_hass(self) -> None:
         await super().async_added_to_hass()
@@ -442,20 +362,16 @@ class FliprRealTimeRSSISensor(RestoreSensor):
             )
         )
 
-        # FIX: removed the coordinator listener that was calling async_write_ha_state()
-        # on every coordinator poll cycle. The RSSI value is driven exclusively by BLE
-        # advertisement callbacks, not by coordinator data, so that listener was causing
-        # spurious state writes with no actual state change every N minutes.
 
-
-class FliprNextAnalysisSensor(CoordinatorEntity, SensorEntity):
+class FliprNextAnalysisSensor(CoordinatorEntity[FliprDataCoordinator], SensorEntity):
     _attr_has_entity_name = True
     _attr_entity_category = EntityCategory.DIAGNOSTIC
     _attr_device_class = SensorDeviceClass.TIMESTAMP
     _attr_translation_key = "next_analysis"
-    _attr_icon = "mdi:clock-end"
 
-    def __init__(self, coordinator, mac: str, model_name: str) -> None:
+    def __init__(
+        self, coordinator: FliprDataCoordinator, mac: str, model_name: str
+    ) -> None:
         super().__init__(coordinator)
         self._mac = mac
         self._attr_unique_id = f"{mac}_next_analysis"
@@ -469,13 +385,9 @@ class FliprNextAnalysisSensor(CoordinatorEntity, SensorEntity):
             return None
         if self.coordinator.data.get("action_running", False):
             return None
-        last = self.coordinator.data.get("last_received")
-        interval = self.coordinator.update_interval
-        if not last or not interval:
+        next_slot = getattr(self.coordinator, "next_slot", None)
+        if next_slot is None:
             return None
-        if last.tzinfo is None:
-            last = dt_util.as_utc(last)
-        next_dt = last + interval
-        if next_dt < dt_util.utcnow():
-            return None
-        return next_dt
+        if next_slot.tzinfo is None:
+            next_slot = dt_util.as_utc(next_slot)
+        return next_slot

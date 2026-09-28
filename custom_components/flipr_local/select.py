@@ -8,32 +8,43 @@ from homeassistant.core import HomeAssistant, callback
 from homeassistant.helpers.dispatcher import async_dispatcher_connect
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 from homeassistant.helpers.update_coordinator import CoordinatorEntity
+
 from .const import (
-    DOMAIN,
-    CONF_MAC_ADDRESS,
     CONF_CHLORINE_MODEL,
-    get_flipr_model,
+    CONF_MAC_ADDRESS,
+    DOMAIN,
     flipr_device_info,
 )
+from .coordinator import FliprDataCoordinator
+from .model import get_flipr_model
+
+# Single Bluetooth connection to the device: commands must be serialized.
+PARALLEL_UPDATES = 1
 
 
 async def async_setup_entry(
     hass: HomeAssistant, entry: ConfigEntry, async_add_entities: AddEntitiesCallback
 ) -> None:
-    coordinator = hass.data[DOMAIN][entry.entry_id]
+    coordinator = entry.runtime_data
     mac = entry.data[CONF_MAC_ADDRESS]
     model_name = entry.data.get("model") or get_flipr_model(entry.title)
 
     async_add_entities([FliprModelSelect(coordinator, entry.entry_id, mac, model_name)])
 
 
-class FliprModelSelect(CoordinatorEntity, SelectEntity):
+class FliprModelSelect(CoordinatorEntity[FliprDataCoordinator], SelectEntity):
     _attr_has_entity_name = True
     _attr_entity_category = EntityCategory.CONFIG
     _attr_translation_key = "chlorine_model"
     _attr_options = ["chlorine", "bromine"]
 
-    def __init__(self, coordinator, entry_id: str, mac: str, model_name: str) -> None:
+    def __init__(
+        self,
+        coordinator: FliprDataCoordinator,
+        entry_id: str,
+        mac: str,
+        model_name: str,
+    ) -> None:
         super().__init__(coordinator)
         self._entry_id = entry_id
         self._mac = mac

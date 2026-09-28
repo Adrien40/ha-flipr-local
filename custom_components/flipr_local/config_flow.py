@@ -1,9 +1,10 @@
 # Copyright (c) 2026 Adrien40
 # This file is part of Flipr Local.
 
-import math
-import voluptuous as vol
 import re
+from typing import Any
+
+import voluptuous as vol
 from homeassistant import config_entries
 from homeassistant.components.bluetooth import (
     BluetoothServiceInfoBleak,
@@ -14,40 +15,42 @@ from homeassistant.data_entry_flow import section
 from homeassistant.helpers import selector
 
 from .const import (
-    DOMAIN,
+    CONF_CHLORINE_MODEL,
+    CONF_CYA,
     CONF_MAC_ADDRESS,
+    CONF_ORP_CALIB,
+    CONF_ORP_MAX,
+    CONF_ORP_MIN,
+    CONF_ORP_REF,
     CONF_PH_CALIB_4,
     CONF_PH_CALIB_7,
-    CONF_PH_MIN,
     CONF_PH_MAX,
-    CONF_ORP_MIN,
-    CONF_ORP_MAX,
-    CONF_ORP_CALIB,
-    CONF_ORP_REF,
-    CONF_TEMP_MIN,
-    CONF_TEMP_MAX,
-    CONF_TEMP_OFFSET,
-    CONF_PH_REF_7,
+    CONF_PH_MIN,
     CONF_PH_REF_4,
-    CONF_USE_GATEWAY,
-    CONF_CHLORINE_MODEL,
+    CONF_PH_REF_7,
+    CONF_REFERENCE_TIME,
+    CONF_SCAN_INTERVAL,
     CONF_SYNC_MODE,
-    CONF_CYA,
-    get_flipr_model,
-    DEFAULT_PH_MIN,
-    DEFAULT_PH_MAX,
-    DEFAULT_ORP_MIN,
+    CONF_TEMP_MAX,
+    CONF_TEMP_MIN,
+    CONF_TEMP_OFFSET,
+    CONF_USE_GATEWAY,
+    DEFAULT_ORP_CALIB,
     DEFAULT_ORP_MAX,
-    DEFAULT_TEMP_MIN,
-    DEFAULT_TEMP_MAX,
+    DEFAULT_ORP_MIN,
+    DEFAULT_ORP_REF,
     DEFAULT_PH_CALIB_4,
     DEFAULT_PH_CALIB_7,
+    DEFAULT_PH_MAX,
+    DEFAULT_PH_MIN,
     DEFAULT_PH_REF_4,
     DEFAULT_PH_REF_7,
-    DEFAULT_ORP_CALIB,
-    DEFAULT_ORP_REF,
+    DEFAULT_TEMP_MAX,
+    DEFAULT_TEMP_MIN,
+    DOMAIN,
 )
-from .chemistry import get_mv_from_input
+from .model import get_flipr_model
+from .validation import _flatten_sections, validate_calibration
 
 MANUAL_ENTRY = "manual"
 MAC_PATTERN = re.compile(r"^([0-9A-Fa-f]{2}:){5}[0-9A-Fa-f]{2}$")
@@ -56,115 +59,11 @@ SYNC_MODE_OPTIONS = ["0", "1", "2", "3"]
 CHLORINE_MODEL_OPTIONS = ["chlorine", "bromine"]
 
 
-def _to_float(val: object) -> float:
-    if isinstance(val, str):
-        val = val.replace(",", ".")
-    result = float(val)
-    if math.isnan(result) or math.isinf(result):
-        raise ValueError("NaN/Inf is not a valid calibration value")
-    return result
-
-
-def _flatten_sections(user_input: dict) -> dict:
-    """Merge section (dict) values into a flat dict.
-
-    FIX: Unified helper used by both async_step_user and async_step_init.
-    Section (dict) values take priority over any same-named top-level keys,
-    since section values are more specific. This was previously inconsistent:
-    - async_step_user: top-level keys written first, dicts could overwrite them.
-    - async_step_init: dicts written first, top-level keys used setdefault (no override).
-    Both forms now follow the same rule: dict/section values win.
-    """
-    flat: dict = {}
-    # Pass 1: collect all section (dict) values.
-    for value in user_input.values():
-        if isinstance(value, dict):
-            flat.update(value)
-    # Pass 2: add top-level scalars only if the key wasn't already set by a section.
-    for k, v in user_input.items():
-        if not isinstance(v, dict):
-            flat.setdefault(k, v)
-    return flat
-
-
-def validate_calibration(data: dict) -> dict | tuple[str, str]:
-    try:
-        raw_c4 = _to_float(data.get(CONF_PH_CALIB_4, DEFAULT_PH_CALIB_4))
-        raw_c7 = _to_float(data.get(CONF_PH_CALIB_7, DEFAULT_PH_CALIB_7))
-        ref4 = _to_float(data.get(CONF_PH_REF_4, DEFAULT_PH_REF_4))
-        ref7 = _to_float(data.get(CONF_PH_REF_7, DEFAULT_PH_REF_7))
-    except (ValueError, TypeError):
-        return (CONF_PH_CALIB_4, "unknown")
-
-    try:
-        if CONF_PH_MIN in data and CONF_PH_MAX in data:
-            ph_min = _to_float(data[CONF_PH_MIN])
-            ph_max = _to_float(data[CONF_PH_MAX])
-            if ph_min >= ph_max:
-                return (CONF_PH_MIN, "ph_threshold_error")
-    except (ValueError, TypeError):
-        return (CONF_PH_MIN, "unknown")
-
-    try:
-        if CONF_TEMP_MIN in data and CONF_TEMP_MAX in data:
-            temp_min = _to_float(data[CONF_TEMP_MIN])
-            temp_max = _to_float(data[CONF_TEMP_MAX])
-            if temp_min >= temp_max:
-                return (CONF_TEMP_MIN, "temp_threshold_error")
-    except (ValueError, TypeError):
-        return (CONF_TEMP_MIN, "unknown")
-
-    try:
-        if CONF_ORP_MIN in data and CONF_ORP_MAX in data:
-            orp_min = int(_to_float(data[CONF_ORP_MIN]))
-            orp_max = int(_to_float(data[CONF_ORP_MAX]))
-            if orp_min >= orp_max:
-                return (CONF_ORP_MIN, "orp_threshold_error")
-    except (ValueError, TypeError):
-        return (CONF_ORP_MIN, "unknown")
-
-    try:
-        c4_mv = get_mv_from_input(raw_c4)
-    except ValueError:
-        return (CONF_PH_CALIB_4, "ph_mv_out_of_range")
-
-    try:
-        c7_mv = get_mv_from_input(raw_c7)
-    except ValueError:
-        return (CONF_PH_CALIB_7, "ph_mv_out_of_range")
-
-    if ref4 < 2.5 or ref4 > 5.5 or ref7 < 6.5 or ref7 > 7.5:
-        return (CONF_PH_REF_4, "ph_ref_out_of_range")
-    if abs(c7_mv - c4_mv) < 1.0:
-        return (CONF_PH_CALIB_7, "ph_calibration_equal")
-    if abs(ref7 - ref4) < 0.01:
-        return (CONF_PH_REF_7, "ph_reference_equal")
-    if c7_mv > c4_mv:
-        return (CONF_PH_CALIB_7, "ph_slope_mismatch")
-
-    normalized = dict(data)
-    normalized[CONF_PH_CALIB_4] = raw_c4
-    normalized[CONF_PH_CALIB_7] = raw_c7
-    normalized[CONF_PH_REF_4] = ref4
-    normalized[CONF_PH_REF_7] = ref7
-
-    if CONF_ORP_REF in data:
-        normalized[CONF_ORP_REF] = int(_to_float(data[CONF_ORP_REF]))
-    if CONF_ORP_CALIB in data:
-        normalized[CONF_ORP_CALIB] = int(_to_float(data[CONF_ORP_CALIB]))
-    if CONF_TEMP_OFFSET in data:
-        normalized[CONF_TEMP_OFFSET] = float(_to_float(data[CONF_TEMP_OFFSET]))
-    if CONF_CYA in data:
-        normalized[CONF_CYA] = int(_to_float(data[CONF_CYA]))
-
-    return normalized
-
-
 class FliprConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
     VERSION = 1
-    MINOR_VERSION = 1
+    MINOR_VERSION = 2
 
-    def __init__(self):
+    def __init__(self) -> None:
         super().__init__()
         self._mac_address: str | None = None
         self._bt_name: str | None = None
@@ -177,7 +76,7 @@ class FliprConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
 
     async def async_step_bluetooth(
         self, discovery_info: BluetoothServiceInfoBleak
-    ) -> config_entries.FlowResult:
+    ) -> config_entries.ConfigFlowResult:
         await self.async_set_unique_id(discovery_info.address.upper())
         self._abort_if_unique_id_configured()
 
@@ -191,7 +90,9 @@ class FliprConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
 
         return await self.async_step_user()
 
-    async def async_step_user(self, user_input=None) -> config_entries.FlowResult:
+    async def async_step_user(
+        self, user_input: dict[str, Any] | None = None
+    ) -> config_entries.ConfigFlowResult:
         errors: dict[str, str] = {}
 
         if user_input is not None:
@@ -200,7 +101,7 @@ class FliprConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
             # FIX: use _flatten_sections() — the same logic as async_step_init —
             # so that section (dict) values consistently take priority over top-level
             # scalars in both flows.
-            flat_input: dict = _flatten_sections(user_input)
+            flat_input: dict[str, Any] = _flatten_sections(user_input)
 
             validation = validate_calibration(flat_input)
             if isinstance(validation, tuple):
@@ -277,9 +178,9 @@ class FliprConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
                 mac_to_display[self._mac_address] = auto_entry
                 default_selection = auto_entry
 
-        selector_options: list[str] = [MANUAL_ENTRY] + device_entries
+        selector_options: list[str] = [MANUAL_ENTRY, *device_entries]
 
-        schema: dict = {}
+        schema: dict[Any, Any] = {}
         if len(selector_options) > 1:
             mac_key = (
                 vol.Required(CONF_MAC_ADDRESS, default=default_selection)
@@ -324,6 +225,26 @@ class FliprConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
                         }
                     ),
                     {"collapsed": False},
+                ),
+                vol.Required("synchronization"): section(
+                    vol.Schema(
+                        {
+                            vol.Required(
+                                CONF_SCAN_INTERVAL, default=60
+                            ): selector.NumberSelector(
+                                selector.NumberSelectorConfig(
+                                    min=5,
+                                    max=1440,
+                                    step=1,
+                                    mode=selector.NumberSelectorMode.BOX,
+                                )
+                            ),
+                            vol.Required(
+                                CONF_REFERENCE_TIME, default="08:00"
+                            ): selector.TimeSelector(),
+                        }
+                    ),
+                    {"collapsed": True},
                 ),
                 vol.Required("probes_calibration"): section(
                     vol.Schema(
@@ -411,7 +332,9 @@ class FliprConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
             errors=errors,
         )
 
-    async def async_step_manual(self, user_input=None) -> config_entries.FlowResult:
+    async def async_step_manual(
+        self, user_input: dict[str, Any] | None = None
+    ) -> config_entries.ConfigFlowResult:
         errors: dict[str, str] = {}
         if user_input is not None:
             mac_raw = user_input[CONF_MAC_ADDRESS].strip()
@@ -429,23 +352,74 @@ class FliprConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
             errors=errors,
         )
 
+    async def async_step_reconfigure(
+        self, user_input: dict[str, Any] | None = None
+    ) -> config_entries.ConfigFlowResult:
+        """Point this entry at a different physical Flipr (e.g. after
+        replacing the device), without losing its options, automations,
+        or entity history. Only the MAC address changes; everything else
+        (calibration, thresholds, sync mode) is kept as-is.
+        """
+        errors: dict[str, str] = {}
+        reconfigure_entry = self._get_reconfigure_entry()
+
+        if user_input is not None:
+            mac_raw = user_input[CONF_MAC_ADDRESS].strip()
+            if not MAC_PATTERN.match(mac_raw):
+                errors[CONF_MAC_ADDRESS] = "invalid_mac"
+            else:
+                final_mac = mac_raw.upper()
+                if final_mac != reconfigure_entry.data.get(CONF_MAC_ADDRESS):
+                    await self.async_set_unique_id(final_mac)
+                    self._abort_if_unique_id_configured()
+
+                bt_name = None
+                for info in async_discovered_service_info(self.hass, False):
+                    if info.address.upper() == final_mac and info.name:
+                        bt_name = info.name
+                        break
+                model = get_flipr_model(bt_name)
+
+                return self.async_update_reload_and_abort(
+                    reconfigure_entry,
+                    unique_id=final_mac,
+                    data_updates={CONF_MAC_ADDRESS: final_mac, "model": model},
+                )
+
+        return self.async_show_form(
+            step_id="reconfigure",
+            data_schema=vol.Schema(
+                {
+                    vol.Required(
+                        CONF_MAC_ADDRESS,
+                        default=reconfigure_entry.data.get(CONF_MAC_ADDRESS, ""),
+                    ): str
+                }
+            ),
+            errors=errors,
+        )
+
     @staticmethod
     @callback
-    def async_get_options_flow(config_entry):
+    def async_get_options_flow(
+        config_entry: config_entries.ConfigEntry,
+    ) -> FliprOptionsFlowHandler:
         return FliprOptionsFlowHandler()
 
 
 class FliprOptionsFlowHandler(config_entries.OptionsFlow):
     def __init__(self) -> None:
         super().__init__()
-        self._pending_data: dict | None = None
+        self._pending_data: dict[str, Any] | None = None
 
-    async def async_step_init(self, user_input=None) -> config_entries.FlowResult:
+    async def async_step_init(
+        self, user_input: dict[str, Any] | None = None
+    ) -> config_entries.ConfigFlowResult:
         errors: dict[str, str] = {}
 
         if user_input is not None:
             # FIX: use shared _flatten_sections() helper — same behaviour as config flow.
-            flat_input: dict = _flatten_sections(user_input)
+            flat_input: dict[str, Any] = _flatten_sections(user_input)
 
             validation = validate_calibration(flat_input)
             if isinstance(validation, tuple):
@@ -463,7 +437,7 @@ class FliprOptionsFlowHandler(config_entries.OptionsFlow):
                 return self.async_create_entry(title="", data=normalized_input)
 
         entry = self.config_entry
-        coordinator = self.hass.data.get(DOMAIN, {}).get(entry.entry_id)
+        coordinator = getattr(entry, "runtime_data", None)
 
         cya_coord = (
             coordinator.data.get(CONF_CYA) if coordinator and coordinator.data else None
@@ -522,6 +496,26 @@ class FliprOptionsFlowHandler(config_entries.OptionsFlow):
         temp_min = entry.options.get(CONF_TEMP_MIN, DEFAULT_TEMP_MIN)
         temp_max = entry.options.get(CONF_TEMP_MAX, DEFAULT_TEMP_MAX)
 
+        scan_interval = (
+            coordinator.data.get(CONF_SCAN_INTERVAL)
+            if coordinator and coordinator.data
+            else None
+        )
+        if scan_interval is None:
+            scan_interval = entry.options.get(
+                CONF_SCAN_INTERVAL, entry.data.get(CONF_SCAN_INTERVAL, 60)
+            )
+
+        current_reference_time = (
+            coordinator.data.get(CONF_REFERENCE_TIME)
+            if coordinator and coordinator.data
+            else None
+        )
+        if current_reference_time is None:
+            current_reference_time = entry.options.get(
+                CONF_REFERENCE_TIME, entry.data.get(CONF_REFERENCE_TIME, "08:00")
+            )
+
         return self.async_show_form(
             step_id="init",
             data_schema=vol.Schema(
@@ -563,6 +557,27 @@ class FliprOptionsFlowHandler(config_entries.OptionsFlow):
                             }
                         ),
                         {"collapsed": False},
+                    ),
+                    vol.Required("synchronization"): section(
+                        vol.Schema(
+                            {
+                                vol.Required(
+                                    CONF_SCAN_INTERVAL, default=int(scan_interval)
+                                ): selector.NumberSelector(
+                                    selector.NumberSelectorConfig(
+                                        min=5,
+                                        max=1440,
+                                        step=1,
+                                        mode=selector.NumberSelectorMode.BOX,
+                                    )
+                                ),
+                                vol.Required(
+                                    CONF_REFERENCE_TIME,
+                                    default=current_reference_time,
+                                ): selector.TimeSelector(),
+                            }
+                        ),
+                        {"collapsed": True},
                     ),
                     vol.Required("probes_calibration"): section(
                         vol.Schema(
@@ -713,7 +728,9 @@ class FliprOptionsFlowHandler(config_entries.OptionsFlow):
             errors=errors,
         )
 
-    async def async_step_warning(self, user_input=None) -> config_entries.FlowResult:
+    async def async_step_warning(
+        self, user_input: dict[str, Any] | None = None
+    ) -> config_entries.ConfigFlowResult:
         if self._pending_data is None:
             return await self.async_step_init()
         if user_input is not None:

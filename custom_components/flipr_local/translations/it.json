@@ -17,6 +17,16 @@
               "cya": "💧 Livello stabilizzante / CyA (mg/l)"
             }
           },
+          "synchronization": {
+            "name": "⏱️ Sincronizzazione",
+            "data": {
+              "scan_interval": "🔄 Intervallo di Analisi (minuti)",
+              "reference_time": "🕒 Orario di Riferimento (Pianificazione)"
+            },
+            "data_description": {
+              "reference_time": "Ora di riferimento usata per allineare le analisi pianificate a intervalli regolari (es. 08:00, 10:00, 12:00... per un intervallo di 2 ore)."
+            }
+          },
           "probes_calibration": {
             "name": "🧪 Calibrazione Sonde",
             "data": {
@@ -27,6 +37,10 @@
               "orp_calib": "📏 Valore misurato ORP (Redox) (es. 650)",
               "orp_ref": "🎯 Target soluzione ORP (Redox) (es. 650)",
               "temp_offset": "🌡️ Offset Temperatura (°Celsius) (+/-)"
+            },
+            "data_description": {
+              "ph_calib_7": "Il valore grezzo effettivamente misurato dalla sonda mentre era immersa in questa soluzione di calibrazione — in mV, o in pH se la sonda converte già (entrambi accettati).",
+              "ph_calib_4": "Il valore grezzo effettivamente misurato dalla sonda mentre era immersa in questa soluzione di calibrazione — in mV, o in pH se la sonda converte già (entrambi accettati)."
             }
           }
         }
@@ -36,6 +50,13 @@
         "description": "Inserisci l'indirizzo MAC Bluetooth (es. AA:BB:CC:DD:EE:FF)",
         "data": {
           "mac_address": "🏷️ Indirizzo MAC Bluetooth"
+        }
+      },
+      "reconfigure": {
+        "title": "Aggiorna dispositivo Flipr",
+        "description": "Collega questa voce a un altro Flipr fisico (ad es. dopo la sostituzione del dispositivo). Le opzioni, le automazioni e la cronologia delle entità vengono mantenute.",
+        "data": {
+          "mac_address": "✍️ Indirizzo MAC Bluetooth"
         }
       }
     },
@@ -55,7 +76,8 @@
       "temp_threshold_error": "❌ La temperatura minima deve essere inferiore alla temperatura massima"
     },
     "abort": {
-      "already_configured": "⚠️ Questo dispositivo è già configurato"
+      "already_configured": "⚠️ Questo dispositivo è già configurato",
+      "reconfigure_successful": "Dispositivo riconfigurato con successo."
     }
   },
   "options": {
@@ -74,6 +96,16 @@
               "cya": "💧 Livello stabilizzante / CyA (mg/l)"
             }
           },
+          "synchronization": {
+            "name": "⏱️ Sincronizzazione",
+            "data": {
+              "scan_interval": "🔄 Intervallo di Analisi (minuti)",
+              "reference_time": "🕒 Orario di Riferimento (Pianificazione)"
+            },
+            "data_description": {
+              "reference_time": "Ora di riferimento usata per allineare le analisi pianificate a intervalli regolari (es. 08:00, 10:00, 12:00... per un intervallo di 2 ore)."
+            }
+          },
           "probes_calibration": {
             "name": "🧪 Calibrazione Sonde",
             "data": {
@@ -84,6 +116,10 @@
               "orp_calib": "📏 Valore misurato ORP (Redox) (es. 650)",
               "orp_ref": "🎯 Target soluzione ORP (Redox) (es. 650)",
               "temp_offset": "🌡️ Offset Temperatura (°Celsius) (+/-)"
+            },
+            "data_description": {
+              "ph_calib_7": "Il valore grezzo effettivamente misurato dalla sonda mentre era immersa in questa soluzione di calibrazione — in mV, o in pH se la sonda converte già (entrambi accettati).",
+              "ph_calib_4": "Il valore grezzo effettivamente misurato dalla sonda mentre era immersa in questa soluzione di calibrazione — in mV, o in pH se la sonda converte già (entrambi accettati)."
             }
           },
           "alert_thresholds": {
@@ -107,7 +143,13 @@
     "error": {
       "ph_threshold_error": "❌ Il pH minimo deve essere inferiore al pH massimo",
       "orp_threshold_error": "❌ L'ORP (Redox) minimo deve essere inferiore all'ORP massimo",
-      "temp_threshold_error": "❌ La temperatura minima deve essere inferiore alla temperatura massima"
+      "temp_threshold_error": "❌ La temperatura minima deve essere inferiore alla temperatura massima",
+      "unknown": "❓ Errore sconosciuto",
+      "ph_calibration_equal": "❌ I valori di calibrazione del pH devono essere diversi",
+      "ph_reference_equal": "❌ I valori di riferimento del pH devono essere diversi",
+      "ph_slope_mismatch": "❌ Le pendenze di calibrazione e di riferimento devono coincidere",
+      "ph_mv_out_of_range": "❌ I valori mV devono essere compresi tra 500-3000",
+      "ph_ref_out_of_range": "❌ pH 4: 2.5-5.5, pH 7: 6.5-7.5"
     }
   },
   "selector": {
@@ -163,6 +205,11 @@
       },
       "cya": {
         "name": "CyA (Stabilizzante)"
+      }
+    },
+    "time": {
+      "reference_time": {
+        "name": "Orario di Riferimento"
       }
     },
     "select": {
@@ -223,14 +270,11 @@
       "ph_raw": {
         "name": "pH Grezzo (mV)"
       },
+      "orp_raw": {
+        "name": "ORP Grezzo (mV)"
+      },
       "factory_ph": {
         "name": "pH Grezzo (Fabbrica)"
-      },
-      "estimated_free_chlorine": {
-        "name": "Cloro Libero Stimato (FC)"
-      },
-      "active_chlorine_hocl": {
-        "name": "Cloro Attivo (HOCl)"
       },
       "lsi": {
         "name": "Indice di Langelier"
@@ -261,6 +305,29 @@
       "active_measures": {
         "name": "Analisi automatiche"
       }
+    }
+  },
+  "issues": {
+    "device_unreachable": {
+      "title": "Flipr non raggiungibile",
+      "description": "La sonda Flipr ({name}) non risponde da {days} giorno/i. Controllare l'alimentazione, la portata, e che un adattatore Bluetooth o un proxy ESPHome copra l'area della piscina."
+    }
+  },
+  "exceptions": {
+    "out_of_range_no_history": {
+      "message": "Flipr {mac} è fuori portata Bluetooth e non sono disponibili dati precedenti."
+    },
+    "device_not_found": {
+      "message": "Il dispositivo Bluetooth per Flipr {mac} non è stato trovato nonostante un segnale recente."
+    },
+    "entry_not_available": {
+      "message": "La voce di configurazione non è più disponibile."
+    },
+    "connection_timeout_no_history": {
+      "message": "Non è stato possibile contattare Flipr {mac} dopo {timeout} secondi e non sono disponibili dati."
+    },
+    "unreachable_no_history": {
+      "message": "Flipr non è raggiungibile e non sono disponibili dati precedenti: {error}"
     }
   }
 }

@@ -6,15 +6,25 @@
         "title": "⚙️ Flipr Configuration",
         "description": "If the Flipr is not detected automatically, add its Bluetooth MAC address. 📱 Use a mobile app like 'nRF Connect' to find it!\n\n🪫️ **Important - Battery Management:**\n- **With the Wi-Fi Gateway**: The Flipr will switch to **Eco Mode** (2 measurements/day, visible on the official app).\n- You can change this setting in the integration configuration via the gear icon ⚙️.\n\n⚠️ After adding, **wait about 60 seconds** for the data to update...",
         "data": {
-          "mac_address": "🔎 Discovered device"
+          "mac_address": "🔎 Discovered Device"
         },
         "sections": {
           "general": {
             "name": "⚙️ General",
             "data": {
               "use_gateway": "Use with the Flipr Wi-Fi Gateway 🛜",
-              "chlorine_model": "🧪 Water treatment",
-              "cya": "💧 Stabilizer level / CyA (mg/l)"
+              "chlorine_model": "🧪 Water Treatment",
+              "cya": "💧 Stabilizer Level / CyA (mg/l)"
+            }
+          },
+          "synchronization": {
+            "name": "⏱️ Synchronization",
+            "data": {
+              "scan_interval": "🔄 Analysis Interval (minutes)",
+              "reference_time": "🕒 Reference Time (Scheduling)"
+            },
+            "data_description": {
+              "reference_time": "Anchor time used to align scheduled analyses on regular slots (e.g. 08:00, 10:00, 12:00... for a 2-hour interval)."
             }
           },
           "probes_calibration": {
@@ -27,6 +37,10 @@
               "orp_calib": "📏 ORP (Redox) Measured Value (e.g., 650)",
               "orp_ref": "🎯 ORP (Redox) Target Solution (e.g., 650)",
               "temp_offset": "🌡️ Temperature Offset (°Celsius) (+/-)"
+            },
+            "data_description": {
+              "ph_calib_7": "The raw value your probe actually measured while dipped in this calibration solution — in mV, or in pH if your probe already converts it (both are accepted).",
+              "ph_calib_4": "The raw value your probe actually measured while dipped in this calibration solution — in mV, or in pH if your probe already converts it (both are accepted)."
             }
           }
         }
@@ -36,6 +50,13 @@
         "description": "Enter the Bluetooth MAC address (e.g., AA:BB:CC:DD:EE:FF)",
         "data": {
           "mac_address": "🏷️ Bluetooth MAC address"
+        }
+      },
+      "reconfigure": {
+        "title": "Update Flipr device",
+        "description": "Point this entry at a different physical Flipr (e.g. after replacing the device). Your options, automations, and entity history are kept.",
+        "data": {
+          "mac_address": "✍️ Bluetooth MAC address"
         }
       }
     },
@@ -55,23 +76,34 @@
       "temp_threshold_error": "❌ Minimum temperature must be less than maximum temperature"
     },
     "abort": {
-      "already_configured": "⚠️ This device is already configured"
+      "already_configured": "⚠️ This device is already configured.",
+      "reconfigure_successful": "Device reconfigured successfully."
     }
   },
   "options": {
     "step": {
       "init": {
         "title": "🛠️ Flipr Options",
-        "description": "Adjust calibration, behavior, and your personal alert thresholds.",
+        "description": "Adjust Calibration, behavior, and your personal Alert thresholds.",
         "data": {},
         "sections": {
           "general": {
             "name": "⚙️ General",
             "data": {
               "use_gateway": "Use with the Flipr Wi-Fi Gateway 🛜",
-              "sync_mode": "🔄 Synchronization mode (via Flipr Gateway)",
-              "chlorine_model": "🧪 Water treatment",
-              "cya": "💧 Stabilizer level / CyA (mg/l)"
+              "sync_mode": "🔄 Synchronization Mode (via Flipr Gateway)",
+              "chlorine_model": "🧪 Water Treatment",
+              "cya": "💧 Stabilizer Level / CyA (mg/l)"
+            }
+          },
+          "synchronization": {
+            "name": "⏱️ Synchronization",
+            "data": {
+              "scan_interval": "🔄 Analysis Interval (minutes)",
+              "reference_time": "🕒 Reference Time (Scheduling)"
+            },
+            "data_description": {
+              "reference_time": "Anchor time used to align scheduled analyses on regular slots (e.g. 08:00, 10:00, 12:00... for a 2-hour interval)."
             }
           },
           "probes_calibration": {
@@ -84,6 +116,10 @@
               "orp_calib": "📏 ORP (Redox) Measured Value (e.g., 650)",
               "orp_ref": "🎯 ORP (Redox) Target Solution (e.g., 650)",
               "temp_offset": "🌡️ Temperature Offset (°Celsius) (+/-)"
+            },
+            "data_description": {
+              "ph_calib_7": "The raw value your probe actually measured while dipped in this calibration solution — in mV, or in pH if your probe already converts it (both are accepted).",
+              "ph_calib_4": "The raw value your probe actually measured while dipped in this calibration solution — in mV, or in pH if your probe already converts it (both are accepted)."
             }
           },
           "alert_thresholds": {
@@ -107,7 +143,13 @@
     "error": {
       "ph_threshold_error": "❌ Minimum pH must be less than maximum pH",
       "orp_threshold_error": "❌ Minimum ORP (Redox) must be less than maximum ORP",
-      "temp_threshold_error": "❌ Minimum temperature must be less than maximum temperature"
+      "temp_threshold_error": "❌ Minimum temperature must be less than maximum temperature",
+      "unknown": "❓ Unknown error",
+      "ph_calibration_equal": "❌ pH calibration values must be different",
+      "ph_reference_equal": "❌ pH reference values must be different",
+      "ph_slope_mismatch": "❌ Calibration and reference slopes must match",
+      "ph_mv_out_of_range": "❌ mV values must be between 500-3000",
+      "ph_ref_out_of_range": "❌ pH 4: 2.5-5.5, pH 7: 6.5-7.5"
     }
   },
   "selector": {
@@ -150,7 +192,7 @@
     },
     "number": {
       "scan_interval": {
-        "name": "Analysis interval"
+        "name": "Analysis Interval"
       },
       "tac": {
         "name": "TAC (Alkalinity)"
@@ -165,9 +207,14 @@
         "name": "CyA (Stabilizer)"
       }
     },
+    "time": {
+      "reference_time": {
+        "name": "Reference Time"
+      }
+    },
     "select": {
       "chlorine_model": {
-        "name": "🧪 Water treatment",
+        "name": "🧪 Water Treatment",
         "state": {
           "chlorine": "🧂 Chlorine / Salt",
           "bromine": "🟤 Bromine"
@@ -176,7 +223,7 @@
     },
     "sensor": {
       "sync_mode_state": {
-        "name": "Gateway sync mode",
+        "name": "Gateway Sync Mode",
         "state": {
           "0": "💤 Sleep",
           "1": "🌊 Normal",
@@ -190,20 +237,20 @@
           "waiting": "💤 Disconnected",
           "connecting": "⏳ Connecting to Flipr...",
           "waking_up": "🚀 Waking up system...",
-          "requesting": "🗣️ Requesting analysis...",
-          "reading": "📡 Listening for frame...",
+          "requesting": "🗣️ Requesting Analysis...",
+          "reading": "📡 Listening for Frame...",
           "writing_sync": "⚙️ Sending configuration...",
-          "success": "✅ Analysis complete (Disconnected)",
+          "success": "✅ Analysis Complete (Disconnected)",
           "sync_applied": "✅ Configuration applied",
           "error": "❌ Connection error",
           "error_retry": "⏳ Error (Retrying in 60s)",
           "write_failed": "⚠️ Write failed",
           "paused": "⏸️ Analyses paused",
-          "out_of_range": "📵 Signal lost"
+          "out_of_range": "📵 Signal Lost"
         }
       },
       "next_analysis": {
-        "name": "Next analysis"
+        "name": "Next Analysis"
       },
       "temperature": {
         "name": "Temperature"
@@ -223,14 +270,11 @@
       "ph_raw": {
         "name": "Raw pH (mV)"
       },
+      "orp_raw": {
+        "name": "Raw ORP (mV)"
+      },
       "factory_ph": {
         "name": "Raw pH (Factory)"
-      },
-      "estimated_free_chlorine": {
-        "name": "Estimated Free Chlorine (FC)"
-      },
-      "active_chlorine_hocl": {
-        "name": "Active Chlorine (HOCl)"
       },
       "lsi": {
         "name": "Langelier Index"
@@ -248,7 +292,7 @@
         "name": "Equilibrium pH (Taylor)"
       },
       "last_received": {
-        "name": "Last analysis"
+        "name": "Last Analysis"
       },
       "raw_frame": {
         "name": "Raw Frame"
@@ -259,8 +303,31 @@
     },
     "switch": {
       "active_measures": {
-        "name": "Automatic analyses"
+        "name": "Automatic Analyses"
       }
+    }
+  },
+  "issues": {
+    "device_unreachable": {
+      "title": "Flipr unreachable",
+      "description": "The Flipr probe ({name}) has not responded for {days} day(s). Check that it is powered, in range, and that a Bluetooth adapter or ESPHome proxy covers the pool area."
+    }
+  },
+  "exceptions": {
+    "out_of_range_no_history": {
+      "message": "Flipr {mac} is out of Bluetooth range and no previous data is available."
+    },
+    "device_not_found": {
+      "message": "Bluetooth device for Flipr {mac} could not be found despite a recent signal."
+    },
+    "entry_not_available": {
+      "message": "The config entry is no longer available."
+    },
+    "connection_timeout_no_history": {
+      "message": "Flipr {mac} could not be reached after {timeout} seconds and no data is available."
+    },
+    "unreachable_no_history": {
+      "message": "Flipr is unreachable and no previous data is available: {error}"
     }
   }
 }

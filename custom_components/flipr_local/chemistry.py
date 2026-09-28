@@ -1,21 +1,31 @@
 # Copyright (c) 2026 Adrien40
 # This file is part of Flipr Local.
+"""Pure calculations: probe calibration and water chemistry (Langelier)."""
 
-import math
+from __future__ import annotations
+
 import logging
+import math
+
 from .const import PH_FACTORY_OFFSET, PH_FACTORY_SLOPE
 
 _LOGGER = logging.getLogger(__name__)
 
-_CYA_HOCl_MAX_FACTOR = 50.0
+PH_MIN_VALID = 0.0
+PH_MAX_VALID = 14.0
 
 
 def get_mv_from_input(val: float | int | str) -> float:
+    """Convert a user input (pH 2-14 or mV 500-3000) to mV."""
     try:
         val_f = float(val)
-    except (ValueError, TypeError):
+    # PEP 758 (Python 3.14): parentheses are optional when there is no `as` clause. Intentional.
+    except ValueError, TypeError:
         _LOGGER.error("Invalid calibration value: %s", val)
-        raise ValueError("Invalid format")
+        raise ValueError("Invalid format") from None
+
+    if not math.isfinite(val_f):
+        raise ValueError(f"Value {val_f} is not finite")
 
     if 2.0 <= val_f <= 14.0:
         mv = round((val_f - PH_FACTORY_OFFSET) / PH_FACTORY_SLOPE)
@@ -29,8 +39,42 @@ def get_mv_from_input(val: float | int | str) -> float:
     raise ValueError(f"Value {val_f} out of bounds")
 
 
+def compute_ph_calibrated(
+    ph_raw_mv: float,
+    c4_mv: float,
+    c7_mv: float,
+    ph_ref_4: float,
+    ph_ref_7: float,
+) -> float:
+    """pH calibrated via the line through the two calibration points.
+
+    Raises ValueError if the calibration is degenerate (points coincide):
+    returning a "neutral" value like 7.0 would mask a miscalibration.
+    """
+    ref_delta = ph_ref_4 - ph_ref_7
+    mv_delta = float(c4_mv) - float(c7_mv)
+    if abs(ref_delta) < 1e-9 or abs(mv_delta) < 1e-9:
+        raise ValueError("Degenerate pH calibration")
+    slope = mv_delta / ref_delta
+    return ph_ref_7 + (ph_raw_mv - float(c7_mv)) / slope
+
+
+def compute_factory_ph(ph_raw_mv: float) -> float:
+    """pH from the factory calibration line."""
+    return PH_FACTORY_SLOPE * ph_raw_mv + PH_FACTORY_OFFSET
+
+
+def apply_orp_offset(raw_orp: float, orp_ref: float, orp_measured: float) -> int:
+    """Correct ORP by the measured/expected gap on a reference solution."""
+    return round(raw_orp + (orp_ref - orp_measured))
+
+
+def _all_finite(*values: float | None) -> bool:
+    return all(v is not None and math.isfinite(v) for v in values)
+
+
 def _compute_ph_s(temp_c: float, tac_c: float, th_c: float, tds_c: float) -> float:
-    # FIX 🔴 : suppression de la conversion °F/Rankine — on utilise directement Kelvin
+    """Saturation pH (Langelier formula, temperature in Kelvin)."""
     a = (math.log10(max(1.0, tds_c)) - 1) / 10
     b = -13.12 * math.log10(temp_c + 273.15) + 34.55
     c = math.log10(max(1.0, th_c)) - 0.4
@@ -39,110 +83,59 @@ def _compute_ph_s(temp_c: float, tac_c: float, th_c: float, tds_c: float) -> flo
 
 
 def compute_isl(
-    temp: float, ph: float, tac: float, th: float, tds: float
+    temp: float | None,
+    ph: float | None,
+    tac: float | None,
+    th: float | None,
+    tds: float | None,
 ) -> float | None:
-    if any(v is None for v in [temp, ph, tac, th, tds]):
+    """Langelier Saturation Index; None if an input is missing/invalid."""
+    if not _all_finite(temp, ph, tac, th, tds):
         return None
+    assert temp is not None and ph is not None and tac is not None
+    assert th is not None and tds is not None
     if tac <= 0 or th <= 0 or tds <= 0:
         return None
     try:
         ph_s = _compute_ph_s(float(temp), float(tac), float(th), float(tds))
-        return round(ph - ph_s, 2)
-    except Exception as e:
-        _LOGGER.debug("Error computing ISL: %s", e)
+        result = round(ph - ph_s, 2)
+    except (ValueError, OverflowError, TypeError) as err:
+        _LOGGER.debug("Error computing ISL: %s", err)
         return None
+    return result if math.isfinite(result) else None
 
 
 def compute_ph_equilibrium(
-    temp: float, tac: float, th: float, tds: float
+    temp: float | None,
+    tac: float | None,
+    th: float | None,
+    tds: float | None,
 ) -> float | None:
-    if any(v is None for v in [temp, tac, th, tds]):
+    """Equilibrium (saturation) pH; None if an input is missing/invalid."""
+    if not _all_finite(temp, tac, th, tds):
         return None
+    assert temp is not None and tac is not None
+    assert th is not None and tds is not None
     if tac <= 0 or th <= 0 or tds <= 0:
         return None
     try:
-        return round(_compute_ph_s(float(temp), float(tac), float(th), float(tds)), 2)
-    except Exception as e:
-        _LOGGER.debug("Error computing equilibrium pH: %s", e)
+        result = round(_compute_ph_s(float(temp), float(tac), float(th), float(tds)), 2)
+    except (ValueError, OverflowError, TypeError) as err:
+        _LOGGER.debug("Error computing equilibrium pH: %s", err)
         return None
+    return result if math.isfinite(result) else None
 
 
-def estimate_free_chlorine(orp: float, ph: float, cya: float = 40.0) -> float | None:
-    try:
-        if orp < 415.0:
-            _LOGGER.debug(
-                "ORP=%.1f mV is below 415 mV — free chlorine estimation unreliable",
-                orp,
-            )
-        effective_orp = max(415.0, orp)
-        amplifier = 657 - (51 * ph)
-        # FIX 🟡 : pas de abs() — un amplifier négatif (pH > 12.88) est aussi invalide
-        if amplifier < 0.1:
-            amplifier = 0.1
-
-        exponent = (effective_orp - 1065 + (50 * ph)) / amplifier
-        fc_theoretical = math.pow(10, exponent)
-
-        # DO NOT REMOVE: CYA=40 mg/L is the calibration reference of this formula (factor=1.0).
-        # Below 40 mg/L there is no penalty: factor is floored at 1.0, which also handles
-        # CYA=0 (no stabilizer) without any cliff drop.
-        # Above 40 mg/L the factor grows linearly: higher CYA requires more chlorine.
-        # CRITICAL: max() applies to the result of (cya/40), NOT to cya before division.
-        # Writing max(1.0, cya)/40 is a completely different (wrong) formula.
-        cya_factor = max(1.0, float(cya) / 40.0)
-        fc_estimated = fc_theoretical * cya_factor
-
-        _LOGGER.debug(
-            "FC Estimation: ORP=%.1f, pH=%.2f, CYA=%.1f -> factor=%.3f -> FC_Est=%.4f",
-            orp,
-            ph,
-            cya,
-            cya_factor,
-            fc_estimated,
-        )
-        return round(max(0.0, min(fc_estimated, 15.0)), 2)
-
-    except (ValueError, OverflowError, ZeroDivisionError) as e:
-        _LOGGER.error("Mathematical error in estimate_free_chlorine: %s", e)
-        return None
+LSI_CORROSIVE_BELOW = -0.3
+LSI_SCALING_ABOVE = 0.3
 
 
-# FIX 🟡 : annotation corrigée float -> float | None, cohérente avec le check défensif interne
-def compute_active_chlorine_from_fc(
-    fc_estimated: float | None, ph: float, temp_c: float, cya: float
-) -> float | None:
-    try:
-        if fc_estimated is None:
-            return None
-        if fc_estimated <= 0:
-            return 0.0
-
-        temp_c_clamped = max(0.0, min(float(temp_c), 60.0))
-        if temp_c_clamped != float(temp_c):
-            _LOGGER.debug(
-                "Temperature %.2f°C out of HOCl pKa range — clamped to %.2f°C",
-                temp_c,
-                temp_c_clamped,
-            )
-
-        temp_k = temp_c_clamped + 273.15
-        pka = (3000.0 / temp_k) - 10.0686 + (0.0253 * temp_k)
-        hocl_fraction = 1.0 / (1.0 + math.pow(10, ph - pka))
-
-        cya_penalty_factor = min(
-            1.0 + (max(0.0, cya) * 0.8),
-            _CYA_HOCl_MAX_FACTOR,
-        )
-        active_chlorine = (fc_estimated * hocl_fraction) / cya_penalty_factor
-
-        _LOGGER.debug(
-            "HOCl Calculation: FC_Est=%.2f, pH=%.2f, CYA=%.1f -> HOCl=%.4f",
-            fc_estimated,
-            ph,
-            cya,
-            active_chlorine,
-        )
-        return round(max(0.0, active_chlorine), 4)
-    except Exception as e:
-        _LOGGER.error("Error in compute_active_chlorine_from_fc: %s", e)
-        return None
+def classify_lsi(lsi: float | None) -> str:
+    """Interpret the Langelier index: corrosive / balanced / scaling / unknown."""
+    if lsi is None:
+        return "unknown"
+    if lsi < LSI_CORROSIVE_BELOW:
+        return "corrosive"
+    if lsi > LSI_SCALING_ABOVE:
+        return "scaling"
+    return "balanced"

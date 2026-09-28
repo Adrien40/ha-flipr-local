@@ -13,12 +13,22 @@
             "name": "⚙️ Général",
             "data": {
               "use_gateway": "Utiliser avec la Passerelle Wi-Fi Flipr 🛜",
-              "chlorine_model": "🧪 Traitement de l'eau",
-              "cya": "💧 Niveau de stabilisant / CyA (mg/l)"
+              "chlorine_model": "🧪 Traitement de l'Eau",
+              "cya": "💧 Niveau de Stabilisant / CyA (mg/l)"
+            }
+          },
+          "synchronization": {
+            "name": "⏱️ Synchronisation",
+            "data": {
+              "scan_interval": "🔄 Intervalle d'Analyse (minutes)",
+              "reference_time": "🕒 Heure de Référence (Planification)"
+            },
+            "data_description": {
+              "reference_time": "Heure de référence utilisée pour aligner les analyses planifiées sur des créneaux réguliers (ex. 08:00, 10:00, 12:00... pour un intervalle de 2 heures)."
             }
           },
           "probes_calibration": {
-            "name": "🧪 Calibration des sondes",
+            "name": "🧪 Calibration des Sondes",
             "data": {
               "ph_calib_7": "🟢 Valeur pH 7 (ex : 1600 mV ou 8.40)",
               "ph_ref_7": "🎯 Cible de la solution pH 7 (ex : 7.02)",
@@ -27,6 +37,10 @@
               "orp_calib": "📏 Valeur ORP (Redox) (ex : 650)",
               "orp_ref": "🎯 Cible de la solution ORP (Redox) (ex : 650)",
               "temp_offset": "🌡️ Décalage Température (°C) (+/-)"
+            },
+            "data_description": {
+              "ph_calib_7": "La valeur brute réellement mesurée par votre sonde une fois plongée dans cette solution de calibration — en mV, ou en pH si votre sonde convertit déjà (les deux formats sont acceptés).",
+              "ph_calib_4": "La valeur brute réellement mesurée par votre sonde une fois plongée dans cette solution de calibration — en mV, ou en pH si votre sonde convertit déjà (les deux formats sont acceptés)."
             }
           }
         }
@@ -36,6 +50,13 @@
         "description": "Veuillez entrer l'adresse MAC Bluetooth de votre Flipr (ex : AA:BB:CC:DD:EE:FF)",
         "data": {
           "mac_address": "🏷️ Adresse MAC Bluetooth"
+        }
+      },
+      "reconfigure": {
+        "title": "Mettre à jour l'appareil Flipr",
+        "description": "Pointez cette intégration vers un autre Flipr physique (par exemple après un remplacement de l'appareil). Vos options, automatisations et l'historique des entités sont conservés.",
+        "data": {
+          "mac_address": "✍️ Adresse MAC Bluetooth"
         }
       }
     },
@@ -52,30 +73,41 @@
       "ph_ref_out_of_range": "❌ pH 4 : 2.5-5.5, pH 7 : 6.5-7.5",
       "ph_threshold_error": "❌ Le pH minimum doit être inférieur au pH maximum",
       "orp_threshold_error": "❌ L'ORP (Redox) minimum doit être inférieur à l'ORP (Redox) maximum",
-      "temp_threshold_error": "❌ La température minimum doit être inférieure à la température maximum"
+      "temp_threshold_error": "❌ La Température minimum doit être inférieure à la Température maximum"
     },
     "abort": {
-      "already_configured": "⚠️ Cet appareil est déjà configuré."
+      "already_configured": "⚠️ Cet appareil est déjà configuré.",
+      "reconfigure_successful": "L'appareil a été reconfiguré avec succès."
     }
   },
   "options": {
     "step": {
       "init": {
         "title": "🛠️ Options Flipr",
-        "description": "Ajustez la calibration, le comportement et vos seuils d'alerte personnels.",
+        "description": "Ajustez la Calibration, le comportement et vos seuils d'Alerte personnels.",
         "data": {},
         "sections": {
           "general": {
             "name": "⚙️ Général",
             "data": {
               "use_gateway": "Utiliser avec la Passerelle Wi-Fi Flipr 🛜",
-              "sync_mode": "🔄 Mode de synchronisation (via Passerelle)",
-              "chlorine_model": "🧪 Traitement de l'eau",
-              "cya": "💧 Niveau de stabilisant / CyA (mg/l)"
+              "sync_mode": "🔄 Mode de Synchronisation (via Passerelle)",
+              "chlorine_model": "🧪 Traitement de l'Eau",
+              "cya": "💧 Niveau de Stabilisant / CyA (mg/l)"
+            }
+          },
+          "synchronization": {
+            "name": "⏱️ Synchronisation",
+            "data": {
+              "scan_interval": "🔄 Intervalle d'Analyse (minutes)",
+              "reference_time": "🕒 Heure de Référence (Planification)"
+            },
+            "data_description": {
+              "reference_time": "Heure de référence utilisée pour aligner les analyses planifiées sur des créneaux réguliers (ex. 08:00, 10:00, 12:00... pour un intervalle de 2 heures)."
             }
           },
           "probes_calibration": {
-            "name": "🧪 Calibration des sondes",
+            "name": "🧪 Calibration des Sondes",
             "data": {
               "ph_calib_7": "🟢 Valeur pH 7 (ex : 1600 mV ou 8.40)",
               "ph_ref_7": "🎯 Cible de la solution pH 7 (ex : 7.02)",
@@ -84,10 +116,14 @@
               "orp_calib": "📏 Valeur ORP (Redox) (ex : 650)",
               "orp_ref": "🎯 Cible de la solution ORP (Redox) (ex : 650)",
               "temp_offset": "🌡️ Décalage Température (°C) (+/-)"
+            },
+            "data_description": {
+              "ph_calib_7": "La valeur brute réellement mesurée par votre sonde une fois plongée dans cette solution de calibration — en mV, ou en pH si votre sonde convertit déjà (les deux formats sont acceptés).",
+              "ph_calib_4": "La valeur brute réellement mesurée par votre sonde une fois plongée dans cette solution de calibration — en mV, ou en pH si votre sonde convertit déjà (les deux formats sont acceptés)."
             }
           },
           "alert_thresholds": {
-            "name": "📊 Seuils d'alerte",
+            "name": "📊 Seuils d'Alerte",
             "data": {
               "ph_min": "📉 Seuil : pH Minimum (ex : 6.90)",
               "ph_max": "📈 Seuil : pH Maximum (ex : 7.50)",
@@ -101,13 +137,19 @@
       },
       "warning": {
         "title": "⚠️ Attention à la Batterie",
-        "description": "Vous avez choisi d'utiliser la **Passerelle Wi-Fi** avec un mode de synchronisation élevé (Normal ou Boost).\n\nCette combinaison force le Flipr à communiquer intensivement à la fois avec le Cloud (via sa passerelle) et avec Home Assistant, ce qui risque de **vider la batterie rapidement**.\n\nIl est recommandé de passer en mode Éco ou Sommeil.\n\nCliquez sur **Valider** pour forcer cette configuration, ou sur la croix pour modifier."
+        "description": "Vous avez choisi d'utiliser la **Passerelle Wi-Fi** avec un mode de synchronisation élevé (Normal ou Boost).\n\nCette combinaison force le Flipr à communiquer intensivement à la fois avec le Cloud (via sa passerelle) et avec Home Assistant, ce qui risque de **vider la batterie rapidement**.\n\nIl est recommandé de passer en Mode Éco ou Sommeil.\n\nCliquez sur **Valider** pour forcer cette configuration, ou sur la croix pour modifier."
       }
     },
     "error": {
       "ph_threshold_error": "❌ Le pH minimum doit être inférieur au pH maximum",
       "orp_threshold_error": "❌ L'ORP (Redox) minimum doit être inférieur à l'ORP (Redox) maximum",
-      "temp_threshold_error": "❌ La température minimum doit être inférieure à la température maximum"
+      "temp_threshold_error": "❌ La Température minimum doit être inférieure à la Température maximum",
+      "unknown": "❓ Erreur inconnue",
+      "ph_calibration_equal": "❌ Les valeurs de calibration pH doivent être différentes",
+      "ph_reference_equal": "❌ Les valeurs de référence pH doivent être différentes",
+      "ph_slope_mismatch": "❌ Erreur logique : La valeur brute du pH 7 (mV) doit être strictement inférieure au pH 4 (mV)",
+      "ph_mv_out_of_range": "❌ Les valeurs mV doivent être entre 500 et 3000",
+      "ph_ref_out_of_range": "❌ pH 4 : 2.5-5.5, pH 7 : 6.5-7.5"
     }
   },
   "selector": {
@@ -145,12 +187,12 @@
     },
     "button": {
       "force_analysis": {
-        "name": "Nouvelle analyse (~60s)"
+        "name": "Nouvelle Analyse (~60s)"
       }
     },
     "number": {
       "scan_interval": {
-        "name": "Intervalle d'analyse"
+        "name": "Intervalle d'Analyse"
       },
       "tac": {
         "name": "TAC (Alcalinité)"
@@ -165,9 +207,14 @@
         "name": "CyA (Stabilisant)"
       }
     },
+    "time": {
+      "reference_time": {
+        "name": "Heure de Référence"
+      }
+    },
     "select": {
       "chlorine_model": {
-        "name": "🧪 Traitement de l'eau",
+        "name": "🧪 Traitement de l'Eau",
         "state": {
           "chlorine": "🧂 Chlore / Sel",
           "bromine": "🟤 Brome"
@@ -176,7 +223,7 @@
     },
     "sensor": {
       "sync_mode_state": {
-        "name": "Mode synchro. passerelle",
+        "name": "Mode Synchro. Passerelle",
         "state": {
           "0": "💤 Sommeil",
           "1": "🌊 Normal",
@@ -203,7 +250,7 @@
         }
       },
       "next_analysis": {
-        "name": "Prochaine analyse"
+        "name": "Prochaine Analyse"
       },
       "temperature": {
         "name": "Température"
@@ -223,14 +270,11 @@
       "ph_raw": {
         "name": "pH Brut (mV)"
       },
+      "orp_raw": {
+        "name": "Redox Brut (mV)"
+      },
       "factory_ph": {
         "name": "pH Brut (Usine)"
-      },
-      "estimated_free_chlorine": {
-        "name": "Chlore Libre Estimé (FC)"
-      },
-      "active_chlorine_hocl": {
-        "name": "Chlore Actif (HOCl)"
       },
       "lsi": {
         "name": "Indice de Langelier"
@@ -248,7 +292,7 @@
         "name": "pH d'Équilibre (Taylor)"
       },
       "last_received": {
-        "name": "Dernière analyse"
+        "name": "Dernière Analyse"
       },
       "raw_frame": {
         "name": "Trame Brute"
@@ -259,8 +303,31 @@
     },
     "switch": {
       "active_measures": {
-        "name": "Analyses automatiques"
+        "name": "Analyses Automatiques"
       }
+    }
+  },
+  "issues": {
+    "device_unreachable": {
+      "title": "Flipr injoignable",
+      "description": "La sonde Flipr ({name}) n'a pas répondu depuis {days} jour(s). Vérifiez l'alimentation, la portée, et qu'un adaptateur Bluetooth ou un proxy ESPHome couvre la zone de la piscine."
+    }
+  },
+  "exceptions": {
+    "out_of_range_no_history": {
+      "message": "Le Flipr {mac} est hors de portée Bluetooth et aucune donnée précédente n'est disponible."
+    },
+    "device_not_found": {
+      "message": "L'appareil Bluetooth du Flipr {mac} est introuvable malgré un signal récent."
+    },
+    "entry_not_available": {
+      "message": "L'entrée de configuration n'est plus disponible."
+    },
+    "connection_timeout_no_history": {
+      "message": "Le Flipr {mac} n'a pas pu être joint après {timeout} secondes et aucune donnée n'est disponible."
+    },
+    "unreachable_no_history": {
+      "message": "Le Flipr est injoignable et aucune donnée précédente n'est disponible : {error}"
     }
   }
 }
