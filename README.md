@@ -4,11 +4,11 @@
 [![hacs_badge](https://img.shields.io/badge/HACS-Custom-orange.svg)](https://github.com/hacs/integration)
 [![GitHub Release](https://img.shields.io/github/v/release/Adrien40/ha-flipr-local)](https://github.com/Adrien40/ha-flipr-local/releases)
 [![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg)](LICENSE)
-[![Tests](https://img.shields.io/github/actions/workflow/status/Adrien40/ha-flipr-local-test/tests.yaml?branch=main&label=tests)](https://github.com/Adrien40/ha-flipr-local-test/actions/workflows/tests.yaml)
-[![Validate](https://img.shields.io/github/actions/workflow/status/Adrien40/ha-flipr-local-test/validate.yaml?branch=main&label=hassfest%2Fhacs)](https://github.com/Adrien40/ha-flipr-local-test/actions/workflows/validate.yaml)
-[![Linting](https://img.shields.io/github/actions/workflow/status/Adrien40/ha-flipr-local-test/lint.yaml?branch=main&label=lint)](https://github.com/Adrien40/ha-flipr-local-test/actions/workflows/lint.yaml)
-[![Typing](https://img.shields.io/github/actions/workflow/status/Adrien40/ha-flipr-local-test/mypy.yaml?branch=main&label=mypy%20--strict)](https://github.com/Adrien40/ha-flipr-local-test/actions/workflows/mypy.yaml)
-[![CodeQL](https://img.shields.io/github/actions/workflow/status/Adrien40/ha-flipr-local-test/codeql.yaml?branch=main&label=codeql)](https://github.com/Adrien40/ha-flipr-local-test/actions/workflows/codeql.yaml)
+[![Tests](https://img.shields.io/github/actions/workflow/status/Adrien40/ha-flipr-local/tests.yaml?branch=main&label=tests)](https://github.com/Adrien40/ha-flipr-local/actions/workflows/tests.yaml)
+[![Validate](https://img.shields.io/github/actions/workflow/status/Adrien40/ha-flipr-local/validate.yaml?branch=main&label=hassfest%2Fhacs)](https://github.com/Adrien40/ha-flipr-local/actions/workflows/validate.yaml)
+[![Linting](https://img.shields.io/github/actions/workflow/status/Adrien40/ha-flipr-local/lint.yaml?branch=main&label=lint)](https://github.com/Adrien40/ha-flipr-local/actions/workflows/lint.yaml)
+[![Typing](https://img.shields.io/github/actions/workflow/status/Adrien40/ha-flipr-local/mypy.yaml?branch=main&label=mypy%20--strict)](https://github.com/Adrien40/ha-flipr-local/actions/workflows/mypy.yaml)
+[![CodeQL](https://img.shields.io/github/actions/workflow/status/Adrien40/ha-flipr-local/codeql.yaml?branch=main&label=codeql)](https://github.com/Adrien40/ha-flipr-local/actions/workflows/codeql.yaml)
 [![Quality Scale](https://img.shields.io/badge/HA%20Quality%20Scale-Platinum-e5e4e2)](custom_components/flipr_local/quality_scale.yaml)
 
 If you find this project useful, you can support its development 🙏
