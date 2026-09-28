@@ -1,0 +1,31 @@
+name: Typing
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  mypy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v7
+
+      - name: Set up Python
+        uses: actions/setup-python@v7
+        with:
+          python-version: "3.14"
+          cache: pip
+          cache-dependency-path: requirements_test.txt
+
+      - name: Install dependencies
+        run: pip install -r requirements_test.txt
+
+      # Platinum quality scale (strict-typing): the codebase must pass
+      # `mypy --strict` with zero errors. Keep it that way.
+      - name: Run mypy --strict
+        run: mypy --strict custom_components/flipr_local

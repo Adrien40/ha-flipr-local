@@ -1,0 +1,47 @@
+name: Release
+
+# Publishes a GitHub release from the changelog when a version tag is pushed
+# (with or without the leading "v"):
+#   git tag v1.2.0 && git push origin v1.2.0
+# The tag must match "version" in manifest.json, and CHANGELOG.md must contain
+# a "## 1.2.0" section (CHANGELOG.fr.md is added when it has one too).
+
+on:
+  push:
+    tags:
+      - "v[0-9]+.[0-9]+.[0-9]+*"
+      - "[0-9]+.[0-9]+.[0-9]+*"
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v7
+
+      - name: Build release notes from the changelog
+        env:
+          TAG: ${{ github.ref_name }}
+        run: |
+          python3 scripts/release_notes.py "${TAG#v}" \
+            --manifest custom_components/flipr_local/manifest.json \
+            > release_notes.md
+          cat release_notes.md
+
+      - name: Create or update the GitHub release
+        env:
+          GH_TOKEN: ${{ github.token }}
+          TAG: ${{ github.ref_name }}
+        run: |
+          flags=()
+          if [[ ! "$TAG" =~ ^v?[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+            flags+=(--prerelease)
+          fi
+          if gh release view "$TAG" > /dev/null 2>&1; then
+            gh release edit "$TAG" --title "$TAG" --notes-file release_notes.md "${flags[@]}"
+          else
+            gh release create "$TAG" --title "$TAG" --notes-file release_notes.md --verify-tag "${flags[@]}"
+          fi
