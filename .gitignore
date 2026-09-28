@@ -6,3 +6,9 @@ venv/
 .vscode/
 .idea/
 .DS_Store
+
+.coverage
+htmlcov/
+.pytest_cache/
+.hypothesis/
+.ruff_cache/
