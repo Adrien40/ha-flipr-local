@@ -1,10 +1,14 @@
 # Copyright (c) 2026 Adrien40
 # This file is part of Flipr Local.
 
-from homeassistant.components.binary_sensor import (
-    BinarySensorDeviceClass,
-    BinarySensorEntity,
-)
+from homeassistant.components.binary_sensor import BinarySensorEntity
+
+try:
+    from homeassistant.components.binary_sensor.const import BinarySensorDeviceClass
+except ImportError:  # pragma: no cover - older Home Assistant
+    from homeassistant.components.binary_sensor import (  # type: ignore[attr-defined]
+        BinarySensorDeviceClass,
+    )
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.const import EntityCategory
 from homeassistant.core import HomeAssistant, callback

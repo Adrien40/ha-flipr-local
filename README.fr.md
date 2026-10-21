@@ -31,11 +31,15 @@ Si ce projet vous est utile, vous pouvez soutenir son développement 🙏
 ### 📊 Visualisation
 
 <p align="center">
-  <img src="https://raw.githubusercontent.com/Adrien40/ha-flipr-local/main/docs/screenshots/dashboard_overview.png" width="500">
+  <img src="https://raw.githubusercontent.com/Adrien40/ha-flipr-local/main/docs/screenshots/dashboard_overview.png" width="800">
 </p>
 
 <p align="center">
   <em>📊 Vue d’ensemble des données de la piscine dans Home Assistant</em>
+</p>
+
+<p align="center">
+  👉 <a href="docs/dashboard_example.fr.md"><strong>Récupérer le YAML de ce dashboard</strong></a>
 </p>
 
 ---

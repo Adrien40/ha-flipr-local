@@ -1,5 +1,17 @@
 # Flipr Local - Changelog
 
+## 1.2.2
+
+🐬🐬🐬🐬🐬🐬🐬🐬🐬🐬
+
+### 🧰 Maintenance
+- Typing: compatibility with the latest Home Assistant, which now relies on `probatio` instead of `voluptuous` for its schemas, and which moved `BinarySensorDeviceClass`. `mypy --strict` passes again. Older Home Assistant versions keep working through a fallback import.
+
+### 📚 Documentation
+- New **[Dashboard Example](docs/dashboard_example.md)** page with the full YAML of the dashboard shown in the README (title with badges, graphs, and a compact variant), linked from the README.
+
+🐬🐬🐬🐬🐬🐬🐬🐬🐬🐬
+
 ## 1.2.1
 
 🐬🐬🐬🐬🐬🐬🐬🐬🐬🐬

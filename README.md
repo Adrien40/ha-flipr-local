@@ -31,11 +31,15 @@ If you find this project useful, you can support its development 🙏
 ### 📊 Overview
 
 <p align="center">
-  <img src="https://raw.githubusercontent.com/Adrien40/ha-flipr-local/main/docs/screenshots/dashboard_overview.png" width="500">
+  <img src="https://raw.githubusercontent.com/Adrien40/ha-flipr-local/main/docs/screenshots/dashboard_overview.png" width="800">
 </p>
 
 <p align="center">
   <em>📊 Dashboard overview of pool data in Home Assistant</em>
+</p>
+
+<p align="center">
+  👉 <a href="docs/dashboard_example.md"><strong>Get the YAML of this dashboard</strong></a>
 </p>
 
 ---

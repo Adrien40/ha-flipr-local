@@ -4,7 +4,10 @@
 import re
 from typing import Any
 
-import voluptuous as vol
+try:  # Home Assistant >= 2026.x ships `probatio` (drop-in voluptuous replacement)
+    import probatio as vol
+except ImportError:  # pragma: no cover - older Home Assistant
+    import voluptuous as vol  # type: ignore[no-redef]
 from homeassistant import config_entries
 from homeassistant.components.bluetooth import (
     BluetoothServiceInfoBleak,
