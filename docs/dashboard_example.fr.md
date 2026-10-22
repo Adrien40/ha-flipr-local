@@ -122,7 +122,7 @@ cards:
     decimals: 2
     entities:
       - entity: sensor.flipr_analysr_3_temperature
-        name: 🌡️ Temperature
+        name: 🌡️ Température
     color_thresholds:
       - value: 20
         color: '#00AEEF'
