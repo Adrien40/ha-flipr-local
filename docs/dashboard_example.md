@@ -1,12 +1,14 @@
 [![Français](https://img.shields.io/badge/Langue-Fran%C3%A7ais-blue)](dashboard_example.fr.md) [![English](https://img.shields.io/badge/Language-English-red)](#)
-[← Back to README](README.md)
+[← Back to README](../README.md)
 
 # 📊 Flipr Local - Dashboard Example
 
 This page gives the YAML of the dashboard shown in the README, so you can copy it into your own Home Assistant. It is made of **two cards** placed one after the other in a *Sections* view. 💡
 
 <p align="center">
-  <img src="screenshots/dashboard_overview.png" width="800" alt="Dashboard overview">
+  <img src="screenshots/dashboard_overview_combined.png" width="800" alt="Dashboard overview">
+  <br>
+  <em>Left: with min / max (step 5), right: without (step 6).</em>
 </p>
 
 ---
@@ -34,7 +36,7 @@ The YAML below uses the entity IDs of a **Flipr AnalysR 3** (`sensor.flipr_analy
 | `sensor.flipr_analysr_3_temperature` | Temperature |
 | `sensor.flipr_analysr_3_ph` | pH |
 | `sensor.flipr_analysr_3_orp_redox` | ORP (Redox) |
-| `sensor.flipr_analysr_3_batterie` | Battery (`_battery` with an English interface) |
+| `sensor.flipr_analysr_3_battery` | Battery (`_batterie` with a French interface) |
 
 > 💡 The exact IDs are in **Settings** > **Devices & services** > **Flipr** > *entities*. The easiest way is a *Find & Replace* of `flipr_analysr_3` with your own prefix in the editor.
 
@@ -56,13 +58,13 @@ Heading with three badges: **battery level**, **time elapsed since the last anal
 ```yaml
 type: heading
 icon: mdi:pool-thermometer
-heading: Flipr Connect Local
+heading: Flipr Local
 heading_style: title
 badges:
   - type: custom:mushroom-template-badge
     icon: mdi:battery
     content: >-
-      {{ "{:,.0f}".format(states('sensor.flipr_analysr_3_batterie') | float) |
+      {{ "{:,.0f}".format(states('sensor.flipr_analysr_3_battery') | float) |
       replace(',', ' ') }} %
     card_mod:
       style: |
@@ -75,15 +77,15 @@ badges:
       {% set last_up = states.sensor.flipr_analysr_3_temperature.last_updated
       %} {% if last_up is not none %}
         {% set diff = (as_timestamp(last_up) - as_timestamp(now())) | abs | int %}
-        {% set heures = (diff // 3600) %}
+        {% set hours = (diff // 3600) %}
         {% set minutes = ((diff % 3600) // 60) %}
-        {%- if heures > 0 -%}
-          Il y a {{ heures }} h
+        {%- if hours > 0 -%}
+          {{ hours }} h ago
         {%- else -%}
-          Il y a {{ minutes }} min
+          {{ minutes }} min ago
         {%- endif -%}
       {% else %}
-        Inconnu
+        Unknown
       {% endif %}
     card_mod:
       style: |
@@ -95,9 +97,9 @@ badges:
     content: >-
       {% set last_up = states.sensor.flipr_analysr_3_temperature.last_updated
       %} {% if last_up is not none %}
-        {{ as_timestamp(last_up) | timestamp_custom('%Hh%M') }}
+        {{ as_timestamp(last_up) | timestamp_custom('%H:%M') }}
       {% else %}
-        --h--
+        --:--
       {% endif %}
     card_mod:
       style: |
@@ -146,7 +148,7 @@ cards:
       graph: line
       extrema: true
       legend: false
-    locale: fr
+    locale: en
     hour24: true
     icon: mdi:thermometer-water
   - type: custom:mini-graph-card
@@ -178,7 +180,7 @@ cards:
       graph: line
       extrema: true
       legend: false
-    locale: fr
+    locale: en
     hour24: true
     icon: mdi:ph
   - type: custom:mini-graph-card
@@ -209,7 +211,7 @@ cards:
       graph: line
       extrema: true
       legend: false
-    locale: fr
+    locale: en
     hour24: true
     icon: mdi:flask-outline
 grid_options:
@@ -228,6 +230,6 @@ For smaller graphs (narrow section, phone), use the same YAML as step 5 and chan
 
 * **Colour thresholds** (`color_thresholds`): each `value` is the point where the line starts to take the given colour. The green zones match an ideal pool (pH 7.0 – 7.2, ORP 680 – 760 mV, temperature 27 – 29.5 °C). Adapt them to your own targets.
 * **Time window**: change `hours_to_show` (e.g. `72` for three days) and `points_per_hour` to smooth or refine the curve.
-* **Language**: `locale: fr` controls the number format (decimal comma). Use `locale: en` for a decimal point.
-* **Badge text**: the *"Il y a … h / min"* and *"Inconnu"* wording is in French in the template; translate it if needed.
-* **Heading**: change `heading: Flipr Connect Local` to the name you want.
+* **Language**: `locale: en` controls the number format (decimal point). Use `locale: fr` for a decimal comma.
+* **Badge text**: the *"… h / min ago"* and *"Unknown"* wording is written in the template; change it if needed.
+* **Heading**: change `heading: Flipr Local` to the name you want.

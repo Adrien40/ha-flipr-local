@@ -225,7 +225,7 @@ Once the device is added, you can click on **Configure** ⚙️ to:
 * Define your **custom Alert Thresholds** (Min/Max pH, Min/Max ORP, etc.) to trigger your own automations.
 
 > 📖 **Need help calibrating your probes?**  
-> Find the step-by-step procedure (official app method vs. raw mV values, temperature compensation, and Alert Thresholds) in the **[Calibration Guide](calibration_help.md)**. Release notes are in the **[Changelog](CHANGELOG.md)**.
+> Find the step-by-step procedure (official app method vs. raw mV values, temperature compensation, and Alert Thresholds) in the **[Calibration Guide](docs/calibration_help.md)**. Release notes are in the **[Changelog](CHANGELOG.md)**.
 
 ---
 

@@ -225,7 +225,7 @@ Une fois l'appareil ajouté, vous pouvez cliquer sur **Configurer** ⚙️ pour 
 * Définir vos **Seuils d'Alerte personnalisés** (pH Min/Max, ORP Min/Max, etc.) pour piloter vos propres automatisations.
 
 > 📖 **Besoin d'aide pour calibrer vos sondes ?**
-> Retrouvez la procédure pas à pas (méthode via l'application officielle ou en mV bruts, ajustement selon la température et Seuils d'Alerte) dans le **[Guide de Calibration](calibration_help.fr.md)**. Les notes de version sont dans le **[Journal des modifications](CHANGELOG.fr.md)**.
+> Retrouvez la procédure pas à pas (méthode via l'application officielle ou en mV bruts, ajustement selon la température et Seuils d'Alerte) dans le **[Guide de Calibration](docs/calibration_help.fr.md)**. Les notes de version sont dans le **[Journal des modifications](CHANGELOG.fr.md)**.
 
 ---
 

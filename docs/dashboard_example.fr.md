@@ -1,12 +1,14 @@
 [![English](https://img.shields.io/badge/Language-English-red)](dashboard_example.md) [![Français](https://img.shields.io/badge/Langue-Fran%C3%A7ais-blue)](#)
-[← Retour au README](README.fr.md)
+[← Retour au README](../README.fr.md)
 
 # 📊 Flipr Local - Exemple de Dashboard
 
 Cette page donne le YAML du dashboard présenté dans le README, pour le copier dans votre propre Home Assistant. Il se compose de **deux cartes** placées l'une après l'autre dans une vue *Sections*. 💡
 
 <p align="center">
-  <img src="screenshots/dashboard_overview.png" width="800" alt="Vue d’ensemble du dashboard">
+  <img src="screenshots/dashboard_overview_combined.png" width="800" alt="Vue d’ensemble du dashboard">
+  <br>
+  <em>À gauche : avec min / max (étape 5), à droite : sans (étape 6).</em>
 </p>
 
 ---
@@ -56,7 +58,7 @@ Titre avec trois badges : le **niveau de batterie**, le **temps écoulé depuis 
 ```yaml
 type: heading
 icon: mdi:pool-thermometer
-heading: Flipr Connect Local
+heading: Flipr Local
 heading_style: title
 badges:
   - type: custom:mushroom-template-badge
@@ -230,4 +232,4 @@ Pour des graphiques plus petits (section étroite, téléphone), reprenez le mê
 * **Fenêtre de temps** : modifiez `hours_to_show` (ex. `72` pour trois jours) et `points_per_hour` pour lisser ou affiner la courbe.
 * **Langue** : `locale: fr` gère le format des nombres (virgule décimale). Utilisez `locale: en` pour un point décimal.
 * **Texte des badges** : les libellés *« Il y a … h / min »* et *« Inconnu »* sont écrits dans le template, modifiez-les si besoin.
-* **Titre** : remplacez `heading: Flipr Connect Local` par le nom de votre choix.
+* **Titre** : remplacez `heading: Flipr Local` par le nom de votre choix.
